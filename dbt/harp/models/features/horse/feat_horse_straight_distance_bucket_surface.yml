@@ -1,0 +1,75 @@
+version: 2
+models:
+  - name: feat_horse_straight_distance_bucket_surface
+    description: "Horse-level 3-year history features by straight_distance_bucket and surface, excluding current day."
+    columns:
+      - name: kettonum
+        description: "Horse identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: "Race date used as the history cutoff date."
+        config:
+          meta: {}
+          tags: []
+      - name: straight_distance_bucket
+        description: "Straight-distance bucket derived from straight_distance_m: 1=<300, 2=300-349, 3=350-399, 4=400-499, 5=>=500."
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: "Surface code. 0=turf, 1=dirt."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_starts
+        description: "Past 3-year starts at the same (straight_distance_bucket, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_places
+        description: "Past 3-year places at the same (straight_distance_bucket, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at the same (straight_distance_bucket, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_weighted_starts
+        description: "Exponentially weighted 3-year starts at the same (straight_distance_bucket, surface) with half-life 180 days."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_weighted_places
+        description: "Exponentially weighted 3-year places at the same (straight_distance_bucket, surface) with half-life 180 days."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_weighted_pos4_agari_synergy
+        description: "Exponentially weighted 3-year sum of pos4_agari_synergy at the same (straight_distance_bucket, surface) with half-life 180 days."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+        description: "same_straight_distance_bucket_surface_past_pos4_agari_synergy / same_straight_distance_bucket_surface_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_weighted_avg_pos4_agari_synergy
+        description: "same_straight_distance_bucket_surface_past_weighted_pos4_agari_synergy / same_straight_distance_bucket_surface_past_weighted_starts (weighted starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_place_rate
+        description: "same_straight_distance_bucket_surface_past_places / same_straight_distance_bucket_surface_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_weighted_place_rate
+        description: "same_straight_distance_bucket_surface_past_weighted_places / same_straight_distance_bucket_surface_past_weighted_starts (weighted starts > 0)."
+        config:
+          meta: {}
+          tags: []

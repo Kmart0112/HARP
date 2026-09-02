@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: feat_sire_yearly_old_cd
+    columns:
+      - name: sire_id
+        description: "種牡馬 ID。"
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: "開催年月。対象月の直前までで rolling を切る。"
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd
+        description: "年齢区分コード。0=古馬、1=2歳、2=3歳。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_starts_5y
+        description: "種牡馬×old_cd の過去5年出走数。対象月は含まない。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_places_5y
+        description: "種牡馬×old_cd の過去5年複勝数。対象月は含まない。"
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd_place_rate_3y_prior
+        description: "old_cd 全体の過去3年複勝率。平滑化 prior。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_pos4_agari_synergy
+        description: "種牡馬×old_cd の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_place_rate_smooth_prev_old_cd
+        description: "種牡馬×old_cd の複勝率を old_cd 全体 prior で平滑化した5年 rolling。"
+        config:
+          meta: {}
+          tags: []

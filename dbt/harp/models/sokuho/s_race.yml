@@ -1,0 +1,89 @@
+version: 2
+models:
+  - name: s_race
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_round
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kaiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: nichiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_num
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: grade_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: num_starters
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: updated_at
+        description: ''
+        config:
+          meta: {}
+          tags: []

@@ -1,0 +1,279 @@
+version: 2
+models:
+  - name: m_sire_course
+    columns:
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: runs_cluster_0
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_cluster_0
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_cluster_0
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: runs_cluster_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_cluster_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_cluster_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: runs_cluster_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_cluster_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_cluster_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: runs_cluster_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_cluster_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_cluster_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: runs_cluster_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_cluster_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_cluster_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: runs_cluster_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_cluster_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_cluster_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: runs_cluster_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_cluster_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_cluster_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_cluster_0
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_cluster_0
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_cluster_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_cluster_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_cluster_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_cluster_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_cluster_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_cluster_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_cluster_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_cluster_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_cluster_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_cluster_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_cluster_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_cluster_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: total_runs_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_diff_cluster_0
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_diff_cluster_0
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_diff_cluster_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_diff_cluster_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_diff_cluster_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_diff_cluster_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_diff_cluster_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_diff_cluster_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_diff_cluster_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_diff_cluster_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_diff_cluster_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_diff_cluster_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_diff_cluster_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_diff_cluster_6
+        description: ''
+        config:
+          meta: {}
+          tags: []

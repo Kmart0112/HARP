@@ -1,0 +1,36 @@
+version: 1
+
+validation:
+  name: feature_selection_example
+  category: feature_selection
+  change_summary: compare_cluster_and_time_families
+  experiment_name: feature_selection
+
+outputs:
+  report_file: "{date}_feature_selection_example_report.md"
+  runs_csv_file: "{date}_feature_selection_example_runs.csv"
+  decisions_csv_file: "{date}_feature_selection_example_decisions.csv"
+  selected_contract_file: "feature_selection_example_selected_{date}.yml"
+  run_log_dir: "feature_selection_example_logs_{date}"
+
+selection:
+  base_feature_set_name: place_v1
+  target_contract_path: contracts/features/place/feature_selection_example_selected.yaml
+  aggregate_groups:
+    - group_id: cluster_pos4_family
+      aggregate_features: [same_cluster_avg_pos4_agari_synergy_avg3]
+      source_features: [same_cluster_avg_pos4_agari_synergy_z]
+  variant_groups:
+    - group_id: time_family
+      candidates: [time_vs_avg_wavg5_recent, time_vs_avg_sd]
+
+report:
+  title: "特徴量整理レポート（example）"
+  background: "feature_selection formal workflow の最小例。"
+  hypothesis_lines:
+    - "aggregate/source family を比較し、冗長な組み合わせを整理する。"
+  leakage_notes:
+    - "既存特徴量のみを対象とし、新規特徴量追加は行わない。"
+  implementation_notes:
+    - "metrics-only v1"
+    - "source registry は更新しない"

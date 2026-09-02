@@ -1,0 +1,26 @@
+version: 2
+models:
+  - name: fct_race_umaren_odds_result
+    columns:
+      - name: race_id
+        description: ''
+      - name: horse_number_1
+        description: ''
+      - name: horse_number_2
+        description: ''
+      - name: pair_key
+        description: ''
+      - name: odds_popularity
+        description: ''
+      - name: odds_umaren
+        description: ''
+      - name: odds_snapshot_time_10min
+        description: 'Latest snapshot publish time at or before 10 minutes to post.'
+      - name: odds_popularity_10min
+        description: 'Popularity from the 10-minutes-to-post umaren snapshot.'
+      - name: odds_umaren_10min
+        description: 'Umaren odds from the 10-minutes-to-post snapshot.'
+      - name: pay_umaren
+        description: ''
+      - name: pay_popularity
+        description: ''

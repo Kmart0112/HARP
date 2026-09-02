@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: m_train_race_entry_features
+    description: "Training mart built from the odds-free feature matrix, pre10m odds snapshot, and post-race supervised labels."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: odds_snapshot_type
+        description: "Odds snapshot used for training. Expected value is pre10m."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+        tests:
+          - not_null
+      - name: result_order
+        description: "Final placing label."
+      - name: is_win
+        description: "Win label."
+      - name: is_place
+        description: "Place label."

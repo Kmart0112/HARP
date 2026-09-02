@@ -1,0 +1,184 @@
+version: 2
+models:
+  - name: int_race_entry_metrics
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_pace_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: relative_agari3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_vs_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_vs_avg_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_avg_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten4f_vs_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten4f_vs_avg_front_runners
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_adjusted
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pace_front_disadvantage
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_hensachi
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_starts_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_places_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_logit
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_logit_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_corrected
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_corrected_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_place_rate_corrected
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_place_rate_corrected_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/course-cluster place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_dist_pm200_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey and surface, distance within +/-200m, over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey and surface, straight-distance bucket, over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_turn_direction_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey and surface, turn_direction, over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_turn_direction_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey and turn_direction over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_jyo_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey, surface, and racecourse over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_jyo_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/surface/racecourse place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_straight_distance_bucket_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/surface/straight-distance-bucket place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_turn_direction_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/surface/turn_direction place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_turn_direction_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/turn_direction place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []

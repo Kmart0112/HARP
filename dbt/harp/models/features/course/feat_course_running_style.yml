@@ -1,0 +1,49 @@
+version: 2
+models:
+  - name: feat_course_running_style
+    columns:
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: running_style_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_style_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_style_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_style_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []

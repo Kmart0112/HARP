@@ -1,0 +1,91 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Test / coverage
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Jupyter
+notebooks/
+.ipynb_checkpoints/
+
+# IDEs / editors
+.idea/
+
+# OS (Windows)
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Logs
+*.log
+
+# Runtime / experiment artifacts
+/outputs/
+/models/
+/tmp/
+/mlflow/
+/mlruns/
+/pipeline/outputs/
+/pipeline/artifacts/
+/pipeline/reports/
+/notebook/tmp/
+/notebook/**/outputs/
+/notebook/report/results/
+/notebook/report/_images/
+/notebook/report/features/20*.md
+/notebook/report/shap/*.md
+/apps/analysis/**/outputs/
+*.pkl
+*.parquet
+
+# Local env files
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Codex-generated local environment
+.codex/environments/
+
+# Local editor / MCP settings
+.codex/config.toml
+.mcp.json
+.vscode/
+
+# direnv
+.envrc
+.direnv/
+
+# Database
+*.sqlite*
+*.sqlite-journal
+*.db
+tmp/db_dumps/
+
+# Ignore Smart Environment folder
+.smart-env/
+.smtcmp_json_db/
+
+# dbt generated state
+/dbt/harp/target/
+/dbt/harp/logs/
+/dbt/harp/dbt_packages/
+/dbt/harp/.dbt_state/

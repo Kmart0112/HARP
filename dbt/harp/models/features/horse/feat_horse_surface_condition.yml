@@ -1,0 +1,49 @@
+version: 2
+models:
+  - name: feat_horse_surface_condition
+    columns:
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_avg_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []

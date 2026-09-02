@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: int_race_entry_training_overlay
+    description: "Training/backtest overlay keyed by race, horse, and odds snapshot type. It uses pre10m odds snapshots from the normalized historical jodds source and keeps final n_odds out of training features."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: odds_snapshot_type
+        description: "Training/backtest snapshot timing. Currently pre10m only."
+        tests:
+          - not_null
+      - name: snapshot_at
+        description: "Odds publication time when available."
+      - name: horse_number
+        description: "Horse number within the race."
+      - name: odds_tansho
+        description: "Win odds."
+      - name: odds_fukusho_low
+        description: "Place odds lower bound."
+      - name: odds_fukusho_high
+        description: "Place odds upper bound."
+      - name: odds_fukusho_avg
+        description: "Mean of place odds lower and upper bounds."
+      - name: odds_fukusho_weighted_avg
+        description: "Weighted place odds average."
+      - name: popularity
+        description: "Popularity rank, preferring odds snapshot then declared entry."
+      - name: h_weight
+        description: "Declared horse body weight."
+      - name: weight_change
+        description: "Declared body weight change."
+      - name: weather_cd
+        description: "Weather code fallback from fct_race_basic."
+      - name: surface_condition_cd
+        description: "Surface condition bucket fallback from fct_race_basic."
+      - name: live_num_starters
+        description: "Starter count used for feature context."
+      - name: ijyo_cd
+        description: "Abnormal finish / scratch / exclusion code."
+      - name: is_scratched
+        description: "True when ijyo_cd is present."
+      - name: odds_source
+        description: "Odds source relation."
+      - name: updated_at
+        description: "dbt model build timestamp."

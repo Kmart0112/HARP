@@ -1,0 +1,39 @@
+version: 2
+models:
+  - name: feat_course_style_profile
+    columns:
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: top3_corner3_pos_avg_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: top3_corner3_pos_var_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []

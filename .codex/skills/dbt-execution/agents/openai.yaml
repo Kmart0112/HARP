@@ -1,0 +1,4 @@
+interface:
+  display_name: "DBT Execution"
+  short_description: "Run dbt with uv isolated mode (no local venv) and pinned dbt versions."
+  default_prompt: "Use $dbt-execution to run dbt in this repo via `uv tool run --isolated --from dbt-core==1.10.0 --with dbt-postgres==1.9.1 dbt ...`, and follow full-refresh/selector conventions."

@@ -1,0 +1,1189 @@
+version: 2
+models:
+  - name: stg_n_uma
+    columns:
+      - name: recordspec
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: datakubun
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: makedate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: delkubun
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: regdate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: deldate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: birthdate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: bamei
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: bameikana
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: bameieng
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: zaikyuflag
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: reserved
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: umakigocd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sexcd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hinsyucd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: keirocd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum10
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei10
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum11
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei11
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum12
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei12
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum13
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei13
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infohansyokunum14
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ketto3infobamei14
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tozaicd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chokyosicode
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chokyosiryakusyo
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: syotai
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breedercode
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breedername
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sanchiname
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: banusicode
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: banusiname
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ruikeihonsyoheiti
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ruikeihonsyosyogai
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ruikeifukaheichi
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ruikeifukasyogai
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ruikeisyutokuheichi
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ruikeisyutokusyogai
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sogochakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sogochakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sogochakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sogochakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sogochakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sogochakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chuochakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chuochakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chuochakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chuochakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chuochakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chuochakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba1chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba1chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba1chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba1chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba1chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba1chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba2chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba2chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba2chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba2chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba2chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba2chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba3chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba3chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba3chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba3chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba3chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba3chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba4chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba4chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba4chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba4chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba4chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba4chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba5chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba5chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba5chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba5chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba5chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba5chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba6chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba6chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba6chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba6chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba6chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba6chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba7chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba7chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba7chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba7chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba7chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ba7chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai1chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai1chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai1chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai1chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai1chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai1chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai2chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai2chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai2chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai2chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai2chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai2chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai3chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai3chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai3chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai3chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai3chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai3chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai4chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai4chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai4chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai4chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai4chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai4chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai5chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai5chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai5chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai5chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai5chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai5chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai6chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai6chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai6chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai6chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai6chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai6chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai7chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai7chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai7chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai7chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai7chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai7chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai8chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai8chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai8chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai8chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai8chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai8chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai9chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai9chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai9chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai9chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai9chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai9chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai10chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai10chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai10chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai10chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai10chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai10chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai11chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai11chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai11chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai11chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai11chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai11chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai12chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai12chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai12chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai12chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai12chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyotai12chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori1chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori1chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori1chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori1chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori1chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori1chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori2chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori2chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori2chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori2chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori2chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori2chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori3chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori3chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori3chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori3chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori3chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori3chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori4chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori4chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori4chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori4chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori4chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori4chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori5chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori5chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori5chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori5chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori5chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori5chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori6chakukaisu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori6chakukaisu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori6chakukaisu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori6chakukaisu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori6chakukaisu5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori6chakukaisu6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyakusitu1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyakusitu2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyakusitu3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyakusitu4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: racecount
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum_int
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: dam_id
+        description: 'Dam horse identifier from raw n_uma.Ketto3InfoHansyokuNum2 (EveryDB2 UMA field 20).'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_id
+        description: 'Damsire identifier from raw n_uma.Ketto3InfoHansyokuNum5 (EveryDB2 UMA field 26).'
+        config:
+          meta: {}
+          tags: []
+      - name: birth_date
+        description: ''
+        config:
+          meta: {}
+          tags: []

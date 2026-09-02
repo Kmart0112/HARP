@@ -1,0 +1,118 @@
+version: 1
+
+validation:
+  name: sire_sex_cd_te_addon
+  category: feature_engineering
+  change_summary: validate_sire_sex_cd_target_encoding_addon
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_sire_sex_cd_te_addon_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_sire_sex_cd_te_addon_runs.csv"
+  run_log_dir: "sire_sex_cd_te_addon_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（sire sex_cd TE add-on）"
+  background: "種牡馬×sex_cd の target encoding を、既存の sire conditional TE と同じ monthly as-of / 過去3年 rolling で追加し、複勝率平滑版と pos4/agari 版の効き方を正式フローで確認する。"
+  hypothesis_lines:
+    - "`same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd` は、牝馬限定戦やセン馬混合戦での血統差を overall sire TE より細かく補足できる可能性がある。"
+    - "`same_sex_cd_sire_avg_pos4_agari_synergy` は、性別で分かれやすい脚質・末脚傾向を拾い、overall sire pos4 TE の文脈差を補える可能性がある。"
+    - "`sex_cd` 自体は base set に入っているため、`sire × sex_cd` TE が効くなら sex の主効果ではなく血統との interaction を追加で持てているはず。"
+  leakage_notes:
+    - "as-of: いずれの特徴量も `held_year_month` の過去データのみを使い、対象レース当月の成績は参照しない。"
+    - "集計元は `feat_race_entry_base` の過去走のみで、対象レース結果や払戻は使わない。"
+    - "複勝率平滑版の prior には `sex_cd` 全体の過去3年複勝率のみを使い、将来年の情報は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "新規 mart 列は inventory として registry に登録するが、validation 中は source registry の active set を変更しない。"
+    - "比較は baseline / 各単独追加 / 2本同時追加 / overall sire TE との置換比較で行う。"
+    - "SHAP では複勝率平滑版は `sire_avg_place_rate_smooth` と `sex_cd`、pos4 版は `sire_avg_pos4_agari_synergy` と `sex_cd` を比較軸に依存形を見る。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+    feature_type: num
+    change_type: add
+    summary: 種牡馬×sex_cd の複勝率を sex_cd 全体 prior で平滑化した過去3年 rolling。
+    sections: [feature_names]
+    comparison_features: [sire_avg_place_rate_smooth, sex_cd]
+    dbt_model_path: dbt/harp/models/features/sire/feat_sire_yearly_sex_cd.sql
+    dbt_yaml_path: dbt/harp/models/features/sire/feat_sire_yearly_sex_cd.yml
+    final_column: mart.m_train_race_horse_past5.same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+
+  - feature_name: same_sex_cd_sire_avg_pos4_agari_synergy
+    feature_type: num
+    change_type: add
+    summary: 種牡馬×sex_cd の pos4_agari_synergy を過去3年 rolling で平均した conditional TE。
+    sections: [feature_names]
+    comparison_features: [sire_avg_pos4_agari_synergy, sex_cd]
+    dbt_model_path: dbt/harp/models/features/sire/feat_sire_yearly_sex_cd.sql
+    dbt_yaml_path: dbt/harp/models/features/sire/feat_sire_yearly_sex_cd.yml
+    final_column: mart.m_train_race_horse_past5.same_sex_cd_sire_avg_pos4_agari_synergy
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        - same_sex_cd_sire_avg_pos4_agari_synergy
+
+  - scenario_name: add_same_sex_cd_sire_place_rate
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        - same_sex_cd_sire_avg_pos4_agari_synergy
+      include_features: [same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd]
+    shap:
+      candidate_feature: same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+      comparison_features: [sire_avg_place_rate_smooth, sex_cd]
+      report_run_label: same_sex_cd_sire_place_rate
+
+  - scenario_name: add_same_sex_cd_sire_pos4
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        - same_sex_cd_sire_avg_pos4_agari_synergy
+      include_features: [same_sex_cd_sire_avg_pos4_agari_synergy]
+    shap:
+      candidate_feature: same_sex_cd_sire_avg_pos4_agari_synergy
+      comparison_features: [sire_avg_pos4_agari_synergy, sex_cd]
+      report_run_label: same_sex_cd_sire_pos4
+
+  - scenario_name: add_both_same_sex_cd_sire_features
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        - same_sex_cd_sire_avg_pos4_agari_synergy
+      include_features:
+        - same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        - same_sex_cd_sire_avg_pos4_agari_synergy
+
+  - scenario_name: replace_sire_overall_place_rate_with_same_sex_cd_sire_place_rate
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - sire_avg_place_rate_smooth
+        - same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        - same_sex_cd_sire_avg_pos4_agari_synergy
+      include_features: [same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd]
+
+  - scenario_name: replace_sire_overall_pos4_with_same_sex_cd_sire_pos4
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - sire_avg_pos4_agari_synergy
+        - same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        - same_sex_cd_sire_avg_pos4_agari_synergy
+      include_features: [same_sex_cd_sire_avg_pos4_agari_synergy]

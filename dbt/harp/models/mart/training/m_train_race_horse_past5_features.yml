@@ -1,0 +1,43 @@
+version: 2
+models:
+  - name: m_train_race_horse_past5_features
+    description: "Lightweight training mart for race-entry level model inputs. Human-readable display attributes such as horse_name and sire_name are intentionally kept out and provided by mart.reporting.m_race_entry_context."
+    columns:
+      - name: race_id
+        description: "Race key built as YYYY + MMDD + JyoCD + Kaiji + Nichiji + RaceNum."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier from raw n_uma_race.KettoNum."
+        tests:
+          - not_null
+      - name: horse_number
+        description: "Horse number within the race."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+        tests:
+          - not_null
+      - name: held_year
+        description: "Race year."
+        tests:
+          - not_null
+      - name: is_win
+        description: "Win flag for supervised training."
+      - name: is_place
+        description: "Place flag for supervised training."
+      - name: result_order
+        description: "Official finish order."
+      - name: jockey_cd
+        description: "Jockey code retained for model features and feature joins."
+      - name: trainer_cd
+        description: "Trainer code retained for model features and feature joins."
+      - name: breeder_cd
+        description: "Breeder code retained for model features and feature joins."
+      - name: sire_id
+        description: "Sire identifier retained for model features and feature joins."
+      - name: dam_id
+        description: "Dam identifier retained for model features and feature joins."
+      - name: damsire_id
+        description: "Damsire identifier retained for model features and feature joins."

@@ -1,0 +1,86 @@
+name: harp
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: harp-postgres
+    restart: unless-stopped
+    shm_size: "1g"
+    command:
+      - postgres
+      - -c
+      - listen_addresses=*
+      - -c
+      - max_connections=200
+      - -c
+      - idle_in_transaction_session_timeout=5min
+      - -c
+      - work_mem=16MB
+      - -c
+      - maintenance_work_mem=128MB
+      - -c
+      - effective_cache_size=512MB
+      - -c
+      - max_parallel_workers=2
+      - -c
+      - max_parallel_workers_per_gather=0
+      - -c
+      - hba_file=/etc/postgresql/pg_hba.conf
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: "${HARP_DB_USER:-harp}"
+      POSTGRES_PASSWORD: "${HARP_DB_PASSWORD:?set HARP_DB_PASSWORD in your local environment}"
+      POSTGRES_DB: "${HARP_DB_NAME:-harp}"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - harp_pgdata:/var/lib/postgresql/data
+      - ./postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+
+
+  db:
+    image: postgres:15
+    container_name: superset-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: superset
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: "${SUPERSET_DB_PASSWORD:?set SUPERSET_DB_PASSWORD in your local environment}"
+    volumes:
+      - superset_db:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:15432:5432"
+
+  superset:
+    build:
+      context: .
+      dockerfile: superset/Dockerfile
+    image: harp-superset:local
+    container_name: superset-app
+    depends_on:
+      - db
+    environment:
+      SUPERSET_SECRET_KEY: "${SUPERSET_SECRET_KEY:?set SUPERSET_SECRET_KEY in your local environment}"
+      SUPERSET_ADMIN_USERNAME: "${SUPERSET_ADMIN_USERNAME:-admin}"
+      SUPERSET_ADMIN_EMAIL: "${SUPERSET_ADMIN_EMAIL:-admin@example.com}"
+      SUPERSET_ADMIN_PASSWORD: "${SUPERSET_ADMIN_PASSWORD:?set SUPERSET_ADMIN_PASSWORD in your local environment}"
+      SUPERSET_LOAD_EXAMPLES: "false"
+    volumes:
+      - superset_home:/app/superset_home
+      - ./superset_config.py:/app/pythonpath/superset_config.py
+    ports:
+      - "8088:8088"
+    command:
+      - /bin/bash
+      - -c
+      - >
+          set -e;
+          superset db upgrade;
+          superset fab create-admin --username "$${SUPERSET_ADMIN_USERNAME}" --firstname Superset --lastname Admin --email "$${SUPERSET_ADMIN_EMAIL}" --password "$${SUPERSET_ADMIN_PASSWORD}" || true;
+          superset init;
+          exec superset run -h 0.0.0.0 -p 8088 --with-threads
+
+volumes:
+  harp_pgdata: {}
+  superset_db: {}
+  superset_home: {}

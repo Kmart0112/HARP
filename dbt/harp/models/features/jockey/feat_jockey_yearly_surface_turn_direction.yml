@@ -1,0 +1,20 @@
+version: 2
+models:
+  - name: feat_jockey_yearly_surface_turn_direction
+    columns:
+      - name: jockey_cd
+        description: "Jockey code."
+      - name: held_year_month
+        description: "Month bucket for feature as-of date."
+      - name: surface
+        description: "Surface code (0 turf, 1 dirt)."
+      - name: turn_direction
+        description: "Course turn direction label (left, right, straight)."
+      - name: jockey_surface_turn_direction_starts_3y
+        description: "Past starts over prior 3 years for same jockey, surface, and turn_direction."
+      - name: jockey_surface_turn_direction_places_3y
+        description: "Past places over prior 3 years for same jockey, surface, and turn_direction."
+      - name: jockey_surface_turn_direction_place_rate_3y
+        description: "Place rate over prior 3 years for same jockey, surface, and turn_direction."
+      - name: jockey_surface_turn_direction_place_rate_3y_smooth
+        description: "Smoothed place rate over prior 3 years for same jockey, surface, and turn_direction."

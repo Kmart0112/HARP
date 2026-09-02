@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "harp"
+version = "0.1.0"
+description = "HARP training and prediction pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "dbt-osmosis==1.1.17",
+    "dbt-postgres==1.9.1",
+    "lightgbm==4.6.0",
+    "mlflow",
+    "numpy==2.3.5",
+    "pandas==2.3.3",
+    "polars",
+    "connectorx",
+    "psycopg[binary]==3.3.2",
+    "python-dotenv==1.0.1",
+    "scikit-learn==1.8.0",
+    "scipy==1.17.1",
+    "SQLAlchemy==2.0.45",
+    "streamlit==1.53.1",
+    "marimo>=0.22.4",
+    "pytest==8.4.2",
+    "matplotlib",
+    "shap",
+    "pymc",
+]
+
+[project.optional-dependencies]
+knowledge = [
+    "cognee==0.5.5",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["harp*"]

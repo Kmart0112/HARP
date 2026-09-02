@@ -1,0 +1,92 @@
+version: 1
+
+validation:
+  name: current_4f1f_profile_cat3_addon
+  category: feature_engineering
+  change_summary: validate_current_4f1f_profile_cat3_addon
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_current_4f1f_profile_cat3_addon_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_current_4f1f_profile_cat3_addon_runs.csv"
+  run_log_dir: "current_4f1f_profile_cat3_addon_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（current 4F x 1F profile cat3 add-on）"
+  background: "当週調教の 4F z-score と最終1F z-score の組み合わせを 3x3 にビン化した joint category を、`place_v1` 上の add-on 候補として検証する。"
+  hypothesis_lines:
+    - "`wood_4f1f_profile_cat3` は current wood の 4F と 1F の相対的な組み合わせを、単独連続値よりロバストに表現できる可能性がある。"
+    - "`hanro_4f1f_profile_cat3` は current hanro の 4F と 1F の joint regime を保持し、非線形な面の差を補足できる可能性がある。"
+    - "今回は current の wood / hanro を対象に、単独追加2本と両方追加を同一 theme で確認する。"
+  leakage_notes:
+    - "as-of: いずれも対象レースの3-4日前までに確定している当週調教時計のみを使う。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は使わない。"
+    - "将来情報不使用: `held_date` 以後の調教データは参照しない。"
+    - "bin 化は target を見ずに固定閾値（z-score tertile 相当）で行う。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "candidate は `wood_4f1f_profile_cat3` と `hanro_4f1f_profile_cat3` の2本のみ。"
+    - "candidate は `categorical_feature` として扱うため、scenario では `include_features` と `include_cat_features` の両方に入れる。"
+    - "baseline は現行 `place_v1` をそのまま使い、current の 1F z / 4F z は残す。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: wood_4f1f_profile_cat3
+    feature_type: cat
+    change_type: add
+    summary: 当週の代表ウッド調教について、4F z-score と最終1F z-score を 3x3 にビン化した joint category。`0` は欠損、`1..9` は fastest/fastest から slowest/slowest。
+    sections: [feature_names, cat_features]
+    comparison_features: [wood_lap_time_1_z_tozai_day, wood_haron_time_4_z_tozai_day]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.wood_4f1f_profile_cat3
+
+  - feature_name: hanro_4f1f_profile_cat3
+    feature_type: cat
+    change_type: add
+    summary: 当週の代表坂路調教について、4F z-score と最終1F z-score を 3x3 にビン化した joint category。`0` は欠損、`1..9` は fastest/fastest から slowest/slowest。
+    sections: [feature_names, cat_features]
+    comparison_features: [hanro_lap_time_1_z_tozai_day, hanro_haron_time_4_z_tozai_day]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.hanro_4f1f_profile_cat3
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_wood_4f1f_profile_cat3
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [wood_4f1f_profile_cat3]
+      include_cat_features: [wood_4f1f_profile_cat3]
+    shap:
+      candidate_feature: wood_4f1f_profile_cat3
+      comparison_features: [wood_lap_time_1_z_tozai_day, wood_haron_time_4_z_tozai_day]
+      report_run_label: wood_4f1f_profile_cat3
+
+  - scenario_name: add_hanro_4f1f_profile_cat3
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [hanro_4f1f_profile_cat3]
+      include_cat_features: [hanro_4f1f_profile_cat3]
+    shap:
+      candidate_feature: hanro_4f1f_profile_cat3
+      comparison_features: [hanro_lap_time_1_z_tozai_day, hanro_haron_time_4_z_tozai_day]
+      report_run_label: hanro_4f1f_profile_cat3
+
+  - scenario_name: add_both_4f1f_profile_cat3
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - wood_4f1f_profile_cat3
+        - hanro_4f1f_profile_cat3
+      include_cat_features:
+        - wood_4f1f_profile_cat3
+        - hanro_4f1f_profile_cat3

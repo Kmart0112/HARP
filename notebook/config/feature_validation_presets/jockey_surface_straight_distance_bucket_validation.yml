@@ -1,0 +1,96 @@
+version: 1
+
+validation:
+  name: jockey_surface_straight_distance_bucket_validation
+  category: feature_engineering
+  change_summary: compare_jockey_surface_straight_distance_bucket_variants
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_jockey_surface_straight_distance_bucket_validation_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_jockey_surface_straight_distance_bucket_validation_runs.csv"
+  run_log_dir: "jockey_surface_straight_distance_bucket_validation_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（jockey surface×straight-distance bucket）"
+  background: "騎手TEを `surface×直線長バケット` で細分化したときに、平滑化複勝率そのものと overall 騎手力との差分 logit のどちらが add-on として有効かを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`jockey_surface_straight_distance_bucket_place_rate_3y_smooth` は直線長に応じた騎手適性を `surface` と合わせて補足できる。"
+    - "`jockey_surface_straight_distance_bucket_avg_diff_logit_smooth` は overall 騎手力との差を持つことで、既存騎手TEとの冗長性を減らせる可能性がある。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、単独追加に加えて `jockey_cluster_avg_place_rate_corrected` からの純置換も確認する。"
+  leakage_notes:
+    - "as-of: いずれの candidate も `held_year_month` 単位で当月除外の過去集計から計算し、対象レース発走前に確定している。"
+    - "`surface×straight_distance_bucket` のキーはレース前に確定している静的コース属性のみを使う。"
+    - "`jockey_surface_straight_distance_bucket_avg_diff_logit_smooth` は同じ過去集計列同士の変換差分であり、対象レース結果や払戻を使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "candidate 2列は base に未採用のため、各 scenario で明示的に include する。"
+    - "`add_both_surface_straight_distance_bucket` は 2 列を同時投入し、単独追加とあわせて比較する。"
+    - "`replace_cluster_with_surface_straight_distance_bucket_smooth` は `jockey_cluster_avg_place_rate_corrected` を外し、smooth 候補へ純置換する。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+    feature_type: num
+    change_type: add
+    summary: "同一騎手×馬場×直線長バケットにおける過去3年の平滑化複勝率。"
+    sections: [feature_names]
+    comparison_features: [jockey_surface_jyo_avg_diff_logit_smooth, jockey_cluster_avg_place_rate_corrected, same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_yearly_surface_straight_distance_bucket.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_yearly_surface_straight_distance_bucket.yml
+    final_column: mart.m_train_race_horse_past5.jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+
+  - feature_name: jockey_surface_straight_distance_bucket_avg_diff_logit_smooth
+    feature_type: num
+    change_type: add
+    summary: "`surface×直線長バケット` の平滑化複勝率と overall 平滑化複勝率の logit 差分。"
+    sections: [feature_names]
+    comparison_features: [jockey_surface_jyo_avg_diff_logit_smooth, jockey_cluster_avg_place_rate_corrected, same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/intermediate/entity/int_race_entry_metrics.sql
+    dbt_yaml_path: dbt/harp/models/intermediate/entity/int_race_entry_metrics.yml
+    final_column: mart.m_train_race_horse_past5.jockey_surface_straight_distance_bucket_avg_diff_logit_smooth
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_surface_straight_distance_bucket_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_surface_straight_distance_bucket_place_rate_3y_smooth]
+      exclude_features: [jockey_surface_straight_distance_bucket_avg_diff_logit_smooth]
+    shap:
+      candidate_feature: jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+      comparison_features: [jockey_surface_jyo_avg_diff_logit_smooth, jockey_cluster_avg_place_rate_corrected, same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+      report_run_label: jockey_surface_straight_distance_bucket_smooth
+
+  - scenario_name: add_surface_straight_distance_bucket_diff_logit_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_surface_straight_distance_bucket_avg_diff_logit_smooth]
+      exclude_features: [jockey_surface_straight_distance_bucket_place_rate_3y_smooth]
+    shap:
+      candidate_feature: jockey_surface_straight_distance_bucket_avg_diff_logit_smooth
+      comparison_features: [jockey_surface_jyo_avg_diff_logit_smooth, jockey_cluster_avg_place_rate_corrected, same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+      report_run_label: jockey_surface_straight_distance_bucket_diff_logit_smooth
+
+  - scenario_name: add_both_surface_straight_distance_bucket
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+        - jockey_surface_straight_distance_bucket_avg_diff_logit_smooth
+
+  - scenario_name: replace_cluster_with_surface_straight_distance_bucket_smooth
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_surface_straight_distance_bucket_place_rate_3y_smooth]
+      exclude_features: [jockey_cluster_avg_place_rate_corrected, jockey_surface_straight_distance_bucket_avg_diff_logit_smooth]

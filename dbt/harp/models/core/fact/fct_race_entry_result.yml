@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: fct_race_entry_result
+    description: "Race-entry result fact for fields only available after the race result is finalized."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+      - name: dm_rank
+        description: "Data mining rank when present in the source."
+      - name: popularity
+        description: "Final popularity rank from the result row."
+      - name: odds_tansho
+        description: "Final win odds from the result row."
+      - name: result_order
+        description: "Final placing."
+      - name: running_style_cd
+        description: "Actual running style code."
+      - name: rank_1c
+        description: "First-corner position."
+      - name: rank_2c
+        description: "Second-corner position."
+      - name: rank_3c
+        description: "Third-corner position."
+      - name: rank_4c
+        description: "Fourth-corner position."
+      - name: agari3f
+        description: "Horse final 3F time."
+      - name: agari4f
+        description: "Horse final 4F time."
+      - name: time_diff
+        description: "Raw non-negative time difference to winner."
+      - name: time_diff_log
+        description: "log(time_diff + 1), preserving the existing fct_race_entry modeling convention."
+      - name: time_sec
+        description: "Running time in seconds."
+      - name: is_win
+        description: "True when result_order is 1."
+      - name: is_place
+        description: "True when result_order is in the place-paying range for the race starter count."

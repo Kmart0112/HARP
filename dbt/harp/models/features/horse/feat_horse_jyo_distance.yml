@@ -1,0 +1,50 @@
+version: 2
+models:
+  - name: feat_horse_jyo_distance
+    description: "Horse-level 3-year history features by same racecourse (jyo_cd) and same distance (distance_m), excluding current day. Raw field definitions: https://everydb.iwinz.net/edb2_manual/ (x_RACE, x_UMA_RACE)."
+    columns:
+      - name: kettonum
+        description: "Horse identifier from raw n_uma_race.KettoNum (x_UMA_RACE)."
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: "Race date used as the history cutoff date."
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: "Racecourse code from raw n_race.JyoCD (x_RACE)."
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: "Distance in meters from raw n_race.Kyori (x_RACE)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_starts
+        description: "3-year starts on same (kettonum, jyo_cd, distance_m). SQL: sum(starts_on_day) over (partition by kettonum, jyo_cd, distance_m order by held_date range between interval '3 years' preceding and interval '1 day' preceding)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_places
+        description: "3-year places on same (kettonum, jyo_cd, distance_m) using summed is_place. is_place is 1 when result_order <= 2 for races with <8 starters, else result_order <= 3."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_pos4_agari_synergy
+        description: "3-year sum of pos4_agari_synergy on same (kettonum, jyo_cd, distance_m)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_avg_pos4_agari_synergy
+        description: "same_jyo_distance_past_pos4_agari_synergy / same_jyo_distance_past_starts (only when starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_place_rate
+        description: "same_jyo_distance_past_places / same_jyo_distance_past_starts (only when starts > 0)."
+        config:
+          meta: {}
+          tags: []

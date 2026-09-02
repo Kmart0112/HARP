@@ -1,0 +1,21 @@
+version: 2
+models:
+  - name: fct_jodds_umaren_snapshot
+    columns:
+      - name: race_id
+        description: ''
+      - name: happyo_time
+        description: ''
+      - name: horse_number_1
+        description: ''
+      - name: horse_number_2
+        description: ''
+      - name: pair_key
+        description: ''
+      - name: odds_umaren
+        description: ''
+      - name: popularity
+        description: ''
+      - name: hassotime
+        description: ''
+

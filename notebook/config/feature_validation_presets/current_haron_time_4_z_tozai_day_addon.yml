@@ -1,0 +1,86 @@
+version: 1
+
+validation:
+  name: current_haron_time_4_z_tozai_day_addon
+  category: feature_engineering
+  change_summary: validate_current_haron_time_4_z_tozai_day_addon
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_current_haron_time_4_z_tozai_day_addon_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_current_haron_time_4_z_tozai_day_addon_runs.csv"
+  run_log_dir: "current_haron_time_4_z_tozai_day_addon_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（current haron time 4 z by tozai day addon）"
+  background: "当週調教の 4F 時計を `tozai_cd × chokyo_date` 単位で標準化した z-score を、現在の `place_v1` に add-on できるか確認する。"
+  hypothesis_lines:
+    - "`wood_haron_time_4_z_tozai_day` は、既に z 化した当週 1F では取り切れない持続負荷の差を補足できる可能性がある。"
+    - "`hanro_haron_time_4_z_tozai_day` は、坂路の総負荷を日次・東西差を吸収した形で追加できる可能性がある。"
+    - "今回は当週だけを対象に、wood 単独・hanro 単独・両方 add を比較する。"
+  leakage_notes:
+    - "as-of: いずれも対象レースの3-4日前までに確定している当週調教時計のみを使う。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は使わない。"
+    - "将来情報不使用: `held_date` 以後の調教データは参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "baseline では registry 現行の current/week1 1F z 置換後セットをそのまま使う。"
+    - "candidate は `wood_haron_time_4_z_tozai_day` と `hanro_haron_time_4_z_tozai_day` の2本。"
+    - "比較軸は対応する当週 1F z とする。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: wood_haron_time_4_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 当週の代表ウッド調教4Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [wood_lap_time_1_z_tozai_day]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.wood_haron_time_4_z_tozai_day
+
+  - feature_name: hanro_haron_time_4_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 当週の代表坂路調教4Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [hanro_lap_time_1_z_tozai_day]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.hanro_haron_time_4_z_tozai_day
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_wood_haron_time_4_z_tozai_day
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [wood_haron_time_4_z_tozai_day]
+    shap:
+      candidate_feature: wood_haron_time_4_z_tozai_day
+      comparison_features: [wood_lap_time_1_z_tozai_day]
+      report_run_label: wood_haron_time_4_z_tozai_day
+
+  - scenario_name: add_hanro_haron_time_4_z_tozai_day
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [hanro_haron_time_4_z_tozai_day]
+    shap:
+      candidate_feature: hanro_haron_time_4_z_tozai_day
+      comparison_features: [hanro_lap_time_1_z_tozai_day]
+      report_run_label: hanro_haron_time_4_z_tozai_day
+
+  - scenario_name: add_both_haron_time_4_z_tozai_day
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - wood_haron_time_4_z_tozai_day
+        - hanro_haron_time_4_z_tozai_day

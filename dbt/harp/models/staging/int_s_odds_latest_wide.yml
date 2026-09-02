@@ -1,0 +1,21 @@
+version: 2
+models:
+  - name: int_s_odds_latest_wide
+    columns:
+      - name: race_id
+        description: ''
+      - name: horse_number_1
+        description: ''
+      - name: horse_number_2
+        description: ''
+      - name: pair_key
+        description: ''
+      - name: odds_wide_low
+        description: ''
+      - name: odds_wide_high
+        description: ''
+      - name: odds_wide_mid
+        description: ''
+      - name: popularity
+        description: ''
+

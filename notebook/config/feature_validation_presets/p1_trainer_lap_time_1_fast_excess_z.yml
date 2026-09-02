@@ -1,0 +1,112 @@
+version: 1
+
+validation:
+  name: p1_trainer_lap_time_1_fast_excess_z
+  category: feature_engineering
+  change_summary: validate_p1_trainer_lap_time_1_fast_excess_z
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_p1_trainer_lap_time_1_fast_excess_z_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_p1_trainer_lap_time_1_fast_excess_z_runs.csv"
+  run_log_dir: "p1_trainer_lap_time_1_fast_excess_z_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（p1 trainer lap time 1 fast excess z）"
+  background: "前走時点の raw `lap_time_1` に対して、当時の厩舎基準からの excess z を lag した `p1` 特徴量を、既存の raw `p1_lap_time_1` と比較しながら検証する。"
+  hypothesis_lines:
+    - "`p1_trainer_wood_lap_time_1_fast_excess_z_3y` は前走時点の raw wood 1F より、厩舎基準比でどれだけ攻めていたかを表す signal になり得る。"
+    - "`p1_trainer_hanro_lap_time_1_fast_excess_z_3y` は前走時点の raw hanro 1F より、厩舎内の相対的な強さを表しやすい可能性がある。"
+    - "今回は `p1_wood_lap_time_1` / `p1_hanro_lap_time_1` を基準に、add と replace を確認する。"
+  leakage_notes:
+    - "as-of: いずれも直近1走前レース時点ですでに確定していた調教情報のみを lag して使う。"
+    - "集計境界: excess z の基準は各前走時点の `held_year_month` 直前36か月 rolling で、当月は含めない。"
+    - "対象レースの結果情報不使用: 今回の target race の結果指標は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "candidate は `p1_trainer_wood_lap_time_1_fast_excess_z_3y` と `p1_trainer_hanro_lap_time_1_fast_excess_z_3y` の2本のみ。"
+    - "既存 ON の比較対象は `p1_wood_lap_time_1` / `p1_hanro_lap_time_1`。"
+    - "前走時点の `p1_*_z_tozai_day` は SHAP comparison で補助的に参照する。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: p1_trainer_wood_lap_time_1_fast_excess_z_3y
+    feature_type: num
+    change_type: add
+    summary: 直近1走前レース時点の代表ウッド調教1Fが、当時の trainer_cd 過去3年平均よりどれだけ速かったかを trainer 内標準偏差で正規化した excess z。
+    sections: [feature_names]
+    comparison_features: [p1_wood_lap_time_1_z_tozai_day, p1_wood_lap_time_1]
+    dbt_model_path: dbt/harp/models/intermediate/entity/int_race_entry_past_lag_base.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.p1_trainer_wood_lap_time_1_fast_excess_z_3y
+
+  - feature_name: p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+    feature_type: num
+    change_type: add
+    summary: 直近1走前レース時点の代表坂路調教1Fが、当時の trainer_cd 過去3年平均よりどれだけ速かったかを trainer 内標準偏差で正規化した excess z。
+    sections: [feature_names]
+    comparison_features: [p1_hanro_lap_time_1_z_tozai_day, p1_hanro_lap_time_1]
+    dbt_model_path: dbt/harp/models/intermediate/entity/int_race_entry_past_lag_base.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_p1_trainer_wood_lap_time_1_fast_excess_z_3y
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [p1_trainer_wood_lap_time_1_fast_excess_z_3y]
+    shap:
+      candidate_feature: p1_trainer_wood_lap_time_1_fast_excess_z_3y
+      comparison_features: [p1_wood_lap_time_1_z_tozai_day, p1_wood_lap_time_1]
+      report_run_label: p1_trainer_wood_lap_time_1_fast_excess_z_3y
+
+  - scenario_name: add_p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [p1_trainer_hanro_lap_time_1_fast_excess_z_3y]
+    shap:
+      candidate_feature: p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+      comparison_features: [p1_hanro_lap_time_1_z_tozai_day, p1_hanro_lap_time_1]
+      report_run_label: p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+
+  - scenario_name: add_both_p1_trainer_lap_time_1_fast_excess_z
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - p1_trainer_wood_lap_time_1_fast_excess_z_3y
+        - p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+
+  - scenario_name: replace_p1_wood_lap_time_1_with_trainer_fast_excess
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [p1_trainer_wood_lap_time_1_fast_excess_z_3y]
+      exclude_features: [p1_wood_lap_time_1]
+
+  - scenario_name: replace_p1_hanro_lap_time_1_with_trainer_fast_excess
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [p1_trainer_hanro_lap_time_1_fast_excess_z_3y]
+      exclude_features: [p1_hanro_lap_time_1]
+
+  - scenario_name: replace_both_p1_lap_time_1_with_trainer_fast_excess
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - p1_trainer_wood_lap_time_1_fast_excess_z_3y
+        - p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+      exclude_features:
+        - p1_wood_lap_time_1
+        - p1_hanro_lap_time_1

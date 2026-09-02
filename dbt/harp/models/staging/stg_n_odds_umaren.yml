@@ -1,0 +1,17 @@
+version: 2
+models:
+  - name: stg_n_odds_umaren
+    columns:
+      - name: race_id
+        description: ''
+      - name: horse_number_1
+        description: ''
+      - name: horse_number_2
+        description: ''
+      - name: pair_key
+        description: ''
+      - name: odds_umaren
+        description: ''
+      - name: popularity
+        description: ''
+

@@ -1,0 +1,70 @@
+version: 2
+models:
+  - name: feat_horse_turn_direction
+    description: "Horse-level 3-year history features by course turn_direction, excluding current day."
+    columns:
+      - name: kettonum
+        description: "Horse identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: "Race date used as the history cutoff date."
+        config:
+          meta: {}
+          tags: []
+      - name: turn_direction
+        description: "Course turning direction label from fct_race/course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_starts
+        description: "Past 3-year starts at the same turn_direction."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_places
+        description: "Past 3-year places at the same turn_direction."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at the same turn_direction."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_weighted_starts
+        description: "Exponentially weighted 3-year starts at the same turn_direction with half-life 180 days."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_weighted_places
+        description: "Exponentially weighted 3-year places at the same turn_direction with half-life 180 days."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_weighted_pos4_agari_synergy
+        description: "Exponentially weighted 3-year sum of pos4_agari_synergy at the same turn_direction with half-life 180 days."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_avg_pos4_agari_synergy
+        description: "same_turn_direction_past_pos4_agari_synergy / same_turn_direction_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_weighted_avg_pos4_agari_synergy
+        description: "same_turn_direction_past_weighted_pos4_agari_synergy / same_turn_direction_past_weighted_starts (weighted starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_place_rate
+        description: "same_turn_direction_past_places / same_turn_direction_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_weighted_place_rate
+        description: "same_turn_direction_past_weighted_places / same_turn_direction_past_weighted_starts (weighted starts > 0)."
+        config:
+          meta: {}
+          tags: []

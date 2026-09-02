@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: fct_race_entry_final_odds
+    description: "Final single-horse odds from n_odds_tanpuku for validation, post-race analysis, and prediction evaluation. This table is not a time-series snapshot and should not be used as pre-race training features."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: horse_number
+        description: "Horse number within the race."
+        tests:
+          - not_null
+      - name: odds_tansho
+        description: "Final win odds."
+      - name: odds_fukusho_low
+        description: "Final place odds lower bound."
+      - name: odds_fukusho_high
+        description: "Final place odds upper bound."
+      - name: odds_fukusho_avg
+        description: "Mean of final place odds lower and upper bounds."
+      - name: odds_fukusho_weighted_avg
+        description: "Weighted final place odds average: 0.7 * low + 0.3 * high."
+      - name: odds_source
+        description: "Final odds source relation."
+      - name: updated_at
+        description: "dbt model build timestamp."

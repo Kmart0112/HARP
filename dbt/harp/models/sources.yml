@@ -1,0 +1,4972 @@
+sources:
+  - name: published_manual
+    description: >
+      Manually refreshed published relations that should not be rebuilt in the default dbt workflow.
+      Odds snapshot tables here are normalized outputs derived from heavy historical `n_jodds_*`
+      sources and are the preferred source for training or analysis snapshots such as pre-race
+      10-minute odds.
+    schema: core
+    tables:
+      - name: fct_jodds_snapshot
+        description: >
+          Normalized single-horse odds snapshot table derived from the heavy historical
+          `n_jodds_tanpuku` source and refreshed outside the default training and mart workflow.
+          Use this as the source for learning and analysis snapshots such as pre-race 10-minute
+          odds. Do not use final `n_odds` odds as pre-race training features.
+        columns:
+          - name: race_id
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: happyo_time
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: horse_number
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds_tansho
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds_fukusho_low
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds_fukusho_high
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: popularity
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hassotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: fct_jodds_umaren_snapshot
+        description: >
+          Normalized umaren odds snapshot table derived from the heavy historical
+          `n_jodds_umaren` source and refreshed outside the default training and mart workflow.
+          Use this for reusable pre-race umaren odds snapshots instead of scanning raw
+          historical `n_jodds_umaren` in ordinary DAGs.
+        columns:
+          - name: race_id
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: happyo_time
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: horse_number_1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: horse_number_2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: pair_key
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds_umaren
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: popularity
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hassotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+  - name: raw
+    description: >
+      EveryDB2がJRA-VAN DataLabからpublic schemaへ取り込むraw source群。dbtでは
+      直接加工せず、staging modelで型変換・キー生成・速報/蓄積の使い分けを行う。
+      `n_`系は蓄積系テーブル群で、過去データ・セットアップデータ・今週データを含む
+      履歴参照や学習/検証の基礎に使う。`s_`系は速報系テーブル群で、今週開催分と
+      速報更新をrace-day用途で参照するための短期テーブル。EveryDB2の仕様上、
+      `s_`系は15日以上前のデータが自動削除されるため、再現性が必要なsnapshotは
+      downstreamで永続化すること。更新はdbtではなくEveryDB2の手動/自動更新で行われる。
+      開催週の`S_`行は出走馬名表、オッズ、馬体重、払戻、成績確定などのタイミングで
+      追加・上書きされるため、pre-race特徴量ではpost-race項目の混入に注意する。
+      確定後オッズはレース後に確定する情報なので、開催前予測の特徴量に混ぜると
+      leakageになる。
+    schema: public
+    tables:
+      - name: n_uma
+        description: >
+          EveryDB2 `N_UMA`の競走馬マスタ。血統登録番号を軸に馬名、性別、血統、
+          所属、馬主・生産者などの馬プロフィールを保持する蓄積系source。過去期間を
+          またいだhorse dimensionや血統特徴量の基礎に使う。主にセットアップデータと
+          蓄積情報の差分更新で保守され、速報用途で最新週だけを見たい場合でも
+          `S_UMA`ではなくこの履歴マスタとの整合を確認する。
+        columns:
+          - name: recordspec
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: datakubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: delkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: regdate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: deldate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: birthdate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bameikana
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bameieng
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: zaikyuflag
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umakigocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sexcd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hinsyucd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: keirocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum11
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei11
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum12
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei12
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum13
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei13
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infohansyokunum14
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ketto3infobamei14
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tozaicd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyosicode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyosiryakusyo
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syotai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: breedercode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: breedername
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sanchiname
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: banusicode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: banusiname
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ruikeihonsyoheiti
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ruikeihonsyosyogai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ruikeifukaheichi
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ruikeifukasyogai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ruikeisyutokuheichi
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ruikeisyutokusyogai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sogochakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sogochakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sogochakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sogochakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sogochakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sogochakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chuochakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chuochakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chuochakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chuochakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chuochakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chuochakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba1chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba1chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba1chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba1chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba1chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba1chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba2chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba2chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba2chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba2chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba2chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba2chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba3chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba3chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba3chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba3chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba3chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba3chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba4chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba4chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba4chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba4chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba4chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba4chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba5chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba5chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba5chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba5chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba5chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba5chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba6chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba6chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba6chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba6chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba6chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba6chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba7chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba7chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba7chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba7chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba7chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ba7chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai1chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai1chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai1chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai1chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai1chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai1chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai2chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai2chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai2chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai2chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai2chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai2chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai3chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai3chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai3chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai3chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai3chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai3chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai4chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai4chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai4chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai4chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai4chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai4chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai5chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai5chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai5chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai5chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai5chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai5chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai6chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai6chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai6chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai6chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai6chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai6chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai7chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai7chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai7chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai7chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai7chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai7chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai8chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai8chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai8chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai8chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai8chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai8chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai9chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai9chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai9chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai9chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai9chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai9chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai10chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai10chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai10chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai10chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai10chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai10chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai11chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai11chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai11chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai11chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai11chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai11chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai12chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai12chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai12chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai12chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai12chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyotai12chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori1chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori1chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori1chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori1chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori1chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori1chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori2chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori2chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori2chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori2chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori2chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori2chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori3chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori3chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori3chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori3chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori3chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori3chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori4chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori4chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori4chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori4chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori4chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori4chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori5chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori5chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori5chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori5chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori5chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori5chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori6chakukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori6chakukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori6chakukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori6chakukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori6chakukaisu5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori6chakukaisu6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyakusitu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyakusitu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyakusitu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyakusitu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racecount
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_uma_race
+        description: >
+          EveryDB2 `N_UMA_RACE`の馬毎レース情報。粒度はおおむね1レース1出走馬で、
+          出走馬属性、騎手・調教師、馬番、単勝人気、着順、通過順、走破時計などを持つ
+          蓄積系source。過去走・学習データ・レース後分析ではこちらを基本にする。
+          今週分も蓄積更新で入るが、開催前から成績確定後まで値が段階的に更新されるため、
+          race-dayのpre-race用途では`S_UMA_RACE`やstaging側のsnapshot条件と混ぜ方に注意する。
+        columns:
+          - name: recordspec
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: datakubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: wakuban
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umaban
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umakigocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sexcd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hinsyucd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: keirocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: barei
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tozaicd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyosicode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyosiryakusyo
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: banusicode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: banusiname
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukusyoku
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: futan
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: futanbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: blinker
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kisyucode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kisyucodebefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kisyuryakusyo
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kisyuryakusyobefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: minaraicd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: minaraicdbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bataijyu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: zogenfugo
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: zogensa
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ijyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nyusenjyuni
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kakuteijyuni
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dochakukubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dochakutosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: time
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chakusacd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chakusacdp
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chakusacdpp
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni1c
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni2c
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni3c
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni4c
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimel4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimel3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: timediff
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: recordupkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmtime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmgosap
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmgosam
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmjyuni
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyakusitukubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_race
+        description: >
+          EveryDB2 `N_RACE`のレース詳細。粒度は1レースで、開催日、場、回次、日次、
+          レース番号、条件、距離、コース、天候・馬場、発走時刻、ラップなどを保持する
+          蓄積系source。長期のレースcontextや学習特徴量の基礎に使う。レース情報は
+          木曜の出走馬名表、金土の出馬表、月曜の確定情報、不定期修正で更新されるため、
+          開催前推論では確定後にしか入らない項目を使わない。
+        columns:
+          - name: recordspec
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: datakubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: youbicd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokunum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hondai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukudai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kakko
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hondaieng
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukudaieng
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kakkoeng
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ryakusyo10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ryakusyo6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ryakusyo3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nkai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: gradecd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: gradecdbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syubetucd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kigocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuryocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokenname
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyoribefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: trackcd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: trackcdbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: coursekubuncd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: coursekubuncdbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokinbefore1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokinbefore2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokinbefore3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hassotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hassotimebefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: torokutosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syussotosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nyusentosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tenkocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sibababacd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dirtbabacd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime11
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime12
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime13
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime14
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime15
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime16
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime17
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime18
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime19
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime20
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime21
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime22
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime23
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime24
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime25
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syogaimiletime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimes3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimes4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimel3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimel4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: corner1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: corner2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: corner3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: corner4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: recordupkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_odds_tanpuku
+        description: >
+          EveryDB2 `N_ODDS_TANPUKU`の単勝・複勝オッズ。粒度は1レース1馬番で、
+          確定オッズと人気を保持する蓄積系source。HARPでは検証、レース後分析、
+          予測結果の評価で使う単独の確定オッズ入力として扱い、学習特徴量には使わない。
+          学習やbacktestで発走前時点を再現する場合は、`published_manual.fct_jodds_snapshot`
+          などの時点別snapshotを使う。確定後オッズはレース後情報なので、pre-race特徴量に
+          使うとleakageになる。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umaban
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tanodds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tanninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuoddslow
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuoddshigh
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_odds_umaren
+        description: >
+          EveryDB2 `N_ODDS_UMAREN`の馬連確定オッズ。粒度は1レース1馬番ペアで、
+          蓄積系の確定馬連オッズと人気を保持する。検証、払戻後の評価、レース後分析で使い、
+          学習特徴量には使わない。発走前時点の馬連オッズが必要な場合は
+          `published_manual.fct_jodds_umaren_snapshot`などの時点別snapshotに切り替える。
+          確定後オッズはレース後情報なので、pre-race特徴量に使うとleakageになる。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kumi
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_odds_wide
+        description: >
+          EveryDB2 `N_ODDS_WIDE`のワイド確定オッズ。粒度は1レース1馬番ペアで、
+          蓄積系の確定ワイドオッズ、下限/上限オッズ、人気を保持する。過去検証や
+          レース後分析向けで、学習特徴量には使わない。発走前時点のワイドオッズが
+          必要な場合は、`n_jodds`由来の時点別snapshotを別途作る。確定後オッズは
+          レース後情報なので、pre-race特徴量に使うとleakageになる。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kumi
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: oddslow
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: oddshigh
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: s_uma_race
+        description: >
+          EveryDB2 `S_UMA_RACE`の速報系馬毎レース情報。粒度はおおむね1レース1出走馬で、
+          今週開催分の出走馬名表、出馬表、馬体重、取消・除外、成績確定までの情報を
+          段階的に持つ。race-day推論や開催週のentry確認ではこちらを使う。`S_`系は
+          15日以上前のデータが自動削除され、同じレースでも提供タイミングにより値が
+          追加・上書きされるため、学習用履歴や再現検証にはそのまま使わずsnapshot化する。
+        columns:
+          - name: recordspec
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: datakubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: wakuban
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umaban
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umakigocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sexcd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hinsyucd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: keirocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: barei
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tozaicd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyosicode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyosiryakusyo
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: banusicode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: banusiname
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukusyoku
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: futan
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: futanbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: blinker
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kisyucode
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kisyucodebefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kisyuryakusyo
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kisyuryakusyobefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: minaraicd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: minaraicdbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bataijyu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: zogenfugo
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: zogensa
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ijyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nyusenjyuni
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kakuteijyuni
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dochakukubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dochakutosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: time
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chakusacd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chakusacdp
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chakusacdpp
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni1c
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni2c
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni3c
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni4c
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimel4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimel3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: bamei3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: timediff
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: recordupkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmtime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmgosap
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmgosam
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dmjyuni
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyakusitukubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: s_race
+        description: >
+          EveryDB2 `S_RACE`の速報系レース詳細。粒度は1レースで、今週開催分の
+          レース条件、距離、発走時刻、頭数、馬場・天候、確定後情報などを段階的に保持する。
+          race-dayのレースcontextではこちらを使い、長期履歴や確定済み分析では`N_RACE`を使う。
+          `S_`系は短期保持で、開催前後に値が変わるためpre-race特徴量では確定後項目の混入に注意する。
+        columns:
+          - name: recordspec
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: datakubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: youbicd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokunum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hondai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukudai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kakko
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hondaieng
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukudaieng
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kakkoeng
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ryakusyo10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ryakusyo6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ryakusyo3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nkai
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: gradecd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: gradecdbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syubetucd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kigocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuryocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokencd5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyokenname
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyori
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kyoribefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: trackcd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: trackcdbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: coursekubuncd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: coursekubuncdbefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokin7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: honsyokinbefore5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokin5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokinbefore1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokinbefore2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukasyokinbefore3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hassotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: hassotimebefore
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: torokutosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syussotosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nyusentosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tenkocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: sibababacd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: dirtbabacd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime11
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime12
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime13
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime14
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime15
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime16
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime17
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime18
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime19
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime20
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime21
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime22
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime23
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime24
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime25
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syogaimiletime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimes3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimes4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimel3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontimel4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: corner1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syukaisu1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: corner2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syukaisu2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: corner3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syukaisu3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: corner4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syukaisu4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyuni4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: recordupkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_harai
+        description: >
+          EveryDB2 `N_HARAI`の払戻情報。粒度は1レースで、単勝、複勝、枠連、馬連、
+          ワイド、馬単、3連複、3連単などの確定払戻を保持する蓄積系source。
+          レース後の評価、的中判定、回収率計算で使う。払戻確定後に提供される
+          post-race情報なので、開催前推論や学習特徴量の入力には混ぜない。
+        config:
+          meta: {}
+          tags: []
+        columns:
+          - name: recordspec
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: datakubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: torokutosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: syussotosu
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fuseirituflag9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tokubaraiflag9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanflag9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma11
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma12
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma13
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma14
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma15
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma16
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma17
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma18
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma19
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma20
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma21
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma22
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma23
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma24
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma25
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma26
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma27
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanuma28
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanwaku1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanwaku2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanwaku3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanwaku4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanwaku5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanwaku6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanwaku7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkanwaku8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkandowaku1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkandowaku2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkandowaku3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkandowaku4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkandowaku5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkandowaku6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkandowaku7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: henkandowaku8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyoumaban1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyopay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyoninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyoumaban2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyopay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyoninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyoumaban3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyopay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paytansyoninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoumaban1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyopay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoumaban2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyopay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoumaban3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyopay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoumaban4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyopay4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoninki4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoumaban5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyopay5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payfukusyoninki5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenkumi1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenpay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenkumi2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenpay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenkumi3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenpay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywakurenninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenkumi1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenpay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenkumi2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenpay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenkumi3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenpay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumarenninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidekumi1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidepay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywideninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidekumi2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidepay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywideninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidekumi3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidepay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywideninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidekumi4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidepay4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywideninki4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidekumi5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidepay5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywideninki5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidekumi6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidepay6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywideninki6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidekumi7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywidepay7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paywideninki7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1kumi1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1pay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1ninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1kumi2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1pay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1ninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1kumi3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1pay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payreserved1ninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatankumi1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanpay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatankumi2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanpay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatankumi3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanpay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatankumi4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanpay4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanninki4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatankumi5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanpay5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanninki5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatankumi6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanpay6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: payumatanninki6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukukumi1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukupay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukuninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukukumi2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukupay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukuninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukukumi3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukupay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrenpukuninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentankumi1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanpay1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanninki1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentankumi2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanpay2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanninki2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentankumi3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanpay3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanninki3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentankumi4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanpay4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanninki4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentankumi5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanpay5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanninki5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentankumi6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanpay6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: paysanrentanninki6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: s_odds_tanpuku
+        description: >
+          EveryDB2 `S_ODDS_TANPUKU`の速報系単勝・複勝オッズ。粒度は1レース1馬番で、
+          発売開始後に金土日で随時更新される今週分のオッズを保持する。確定情報も入り得るが、
+          現時点のHARPではrace-day推論や検証の正本には使っていない。確定オッズの検証用途は
+          `N_ODDS_TANPUKU`、当日の時点別/latest用途は`S_JODDS_TANPUKU`を優先する。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umaban
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tanodds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tanninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuoddslow
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuoddshigh
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: s_jodds_tanpuku
+        description: >
+          EveryDB2 `S_JODDS_TANPUKU`の速報系時系列単勝・複勝オッズ。粒度は1レース1馬番1発表時点で、
+          開催週の中間オッズをappend-onlyで時点別に保持する。race-day推論の当日用sourceだが、
+          当日分でも履歴が重い可能性があるため、通常の推論DAGでは必要列に絞った当日履歴へ
+          正規化し、latestへ圧縮して使う。現行の当日odds実装は、`int_race_day_odds_history`で
+          対象日をfull scanしてから、`int_race_day_odds_latest`で最新発表行へ圧縮する。
+          `S_`系の短期保持により古い開催分は消えるため、学習やbacktestに使う
+          時系列履歴は`N_JODDS_TANPUKU`由来のpublished snapshotを使う。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: happyotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umaban
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tanodds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tanninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuoddslow
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuoddshigh
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: s_jodds_umaren
+        description: >
+          EveryDB2 `S_JODDS_UMAREN`の速報系時系列馬連オッズ。粒度は1レース1馬番ペア1発表時点で、
+          開催週の馬連中間オッズを保持する。race-dayの最新馬連オッズや時点別推移の確認に使うが、
+          当日分でも重い可能性があるため、downstreamでは対象日・必要列に絞って扱う。
+          `S_`系は15日以上前のデータが自動削除されるため、再現性が必要な検証では
+          `N_JODDS_UMAREN`由来のpublished snapshotまたは永続snapshotを参照する。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: happyotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kumi
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: s_odds_wide
+        description: >
+          EveryDB2 `S_ODDS_WIDE`の速報系ワイドオッズ。粒度は1レース1馬番ペアで、
+          発売開始後に随時更新される今週分のワイドオッズを保持する。確定情報も入り得るが、
+          現時点のHARPではrace-day推論や検証の正本には使っていない。確定後の評価では
+          `N_ODDS_WIDE`を使い、時点別ワイドオッズが必要な場合は`*_JODDS_WIDE`由来の
+          snapshotを別途作る。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kumi
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: oddslow
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: oddshigh
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_jodds_tanpuku
+        description: >
+          EveryDB2 `N_JODDS_TANPUKU`の蓄積系時系列単勝・複勝オッズ。粒度は
+          1レース1馬番1発表時点で、中間オッズを時系列に保持する。過去のrace-day条件を
+          再現するbacktestや、締切前オッズ特徴量の検証で使う元データ。ただし非常に重いため、
+          通常の学習・分析DAGでは直接読まず、`published_manual.fct_jodds_snapshot`のような
+          正規化済みsnapshotをsourceにする。新しいsnapshotを作るときだけ対象範囲を絞って読む。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: happyotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: umaban
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tanodds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tanninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuoddslow
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuoddshigh
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: fukuninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_jodds_umaren
+        description: >
+          EveryDB2 `N_JODDS_UMAREN`の蓄積系時系列馬連オッズ。粒度は
+          1レース1馬番ペア1発表時点で、過去開催の馬連中間オッズを保持する。
+          馬連オッズの時点再現、backtest、発表時刻別の特徴量作成に使う元データ。ただし重いため、
+          通常DAGでは直接読まず、`published_manual.fct_jodds_umaren_snapshot`などの正規化済み
+          snapshotを優先する。最新表示だけが目的なら短期の`S_JODDS_UMAREN`から最新発表行を選ぶ。
+        columns:
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: year
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: monthday
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: jyocd
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kaiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: nichiji
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: racenum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: happyotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kumi
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: odds
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: ninki
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_wood_chip
+        description: >
+          EveryDB2 `N_WOOD_CHIP`のウッドチップ調教情報。粒度はおおむね1調教馬1調教日で、
+          美浦・栗東トレセンのウッドチップ追い切り時計を保持する蓄積系source。
+          HARPではworkout特徴量の基礎に使う。提供は調教がある日に不規則で、
+          天候・休日・トレセンごとの調教時間差に影響されるため、欠損は単純なデータ不備ではなく
+          非実施日/未提供日として扱う。
+        columns:
+          - name: recordspec
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: datakubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tresenkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyodate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: course
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: babaaround
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: reserved
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime10
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime9
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime8
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime7
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime6
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime5
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime1
+            description: ''
+            config:
+              meta: {}
+              tags: []
+      - name: n_hanro
+        description: >
+          EveryDB2 `N_HANRO`の坂路調教情報。粒度はおおむね1調教馬1調教日で、
+          美浦・栗東トレセンの坂路時計、ラップ、調教区分などを保持する蓄積系source。
+          HARPでは坂路由来のworkout特徴量に使う。提供は毎日不規則で、基本的に月曜はなく、
+          天候・休日・トレセン差で更新有無や時刻が変わるため、race entryとの結合では
+          対象日・直近週の取り方を明示する。
+        columns:
+          - name: recordspec
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: datakubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: makedate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: tresenkubun
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyodate
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: chokyotime
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: kettonum
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime4
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime3
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: harontime2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime2
+            description: ''
+            config:
+              meta: {}
+              tags: []
+          - name: laptime1
+            description: ''
+            config:
+              meta: {}
+              tags: []

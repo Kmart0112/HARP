@@ -1,0 +1,108 @@
+version: 1
+
+validation:
+  name: jockey_cluster_style_logit_diff_replacement
+  category: feature_engineering
+  change_summary: compare_jockey_cluster_style_logit_diff_replacement_variants
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_jockey_cluster_style_logit_diff_replacement_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_jockey_cluster_style_logit_diff_replacement_runs.csv"
+  run_log_dir: "jockey_cluster_style_logit_diff_replacement_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（jockey cluster/style logit diff replacement）"
+  background: "既存採用中の `jockey_cluster_avg_place_rate_corrected` と `jockey_style_place_rate_3y_smooth` を維持するか、overall 騎手力との差を logit 空間で持つ差分特徴へ置換・追加した方が良いかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`jockey_cluster_avg_diff_logit_smooth` は raw cluster rate より冗長性を減らしつつ、cluster 条件の相対上振れ・下振れを素直に表現できる。"
+    - "`jockey_style_avg_diff_logit_smooth` は raw running-style rate よりも overall 騎手力との差分として解釈しやすく、既存 style TE の単純な言い換えを超える可能性がある。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、追加・純置換・同時投入の 7 scenario を MLflow に残す。"
+  leakage_notes:
+    - "as-of: 両 candidate は `held_year_month` 単位で当月除外の過去集計から計算し、対象レース発走前に確定している。"
+    - "`logit差` は既存の過去集計列同士の変換差分であり、対象レース結果や払戻を使わない。"
+    - "将来情報不使用: いずれも対象年月より後のレースは参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`jockey_cluster_avg_place_rate_corrected` と `jockey_style_place_rate_3y_smooth` は baseline では維持し、candidate は各 scenario で明示的に include する。"
+    - "`replace_*` scenario は対応する raw 特徴を外し、candidate 側へ純置換する。"
+    - "`replace_both_raw_with_both_diff_logit` では cluster/style の raw 2列を同時に外し、candidate 2列へまとめて置換する。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: jockey_cluster_avg_diff_logit_smooth
+    feature_type: num
+    change_type: add
+    summary: "`course_cluster` 条件の平滑化複勝率と overall 騎手複勝率の logit 差分。"
+    sections: [feature_names]
+    comparison_features: [jockey_cluster_avg_place_rate_corrected, jockey_avg_place_rate_smooth]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_yearly_cluster.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_yearly_cluster.yml
+    final_column: mart.m_train_race_horse_past5.jockey_cluster_avg_diff_logit_smooth
+
+  - feature_name: jockey_style_avg_diff_logit_smooth
+    feature_type: num
+    change_type: add
+    summary: "`running style` 条件の平滑化複勝率と overall 騎手複勝率の logit 差分。"
+    sections: [feature_names]
+    comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_style.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_style.yml
+    final_column: mart.m_train_race_horse_past5.jockey_style_avg_diff_logit_smooth
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_cluster_diff_logit
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_diff_logit_smooth]
+      exclude_features: [jockey_style_avg_diff_logit_smooth]
+    shap:
+      candidate_feature: jockey_cluster_avg_diff_logit_smooth
+      comparison_features: [jockey_cluster_avg_place_rate_corrected, jockey_avg_place_rate_smooth]
+      report_run_label: jockey_cluster_diff_logit
+
+  - scenario_name: replace_cluster_with_diff_logit
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_diff_logit_smooth]
+      exclude_features: [jockey_cluster_avg_place_rate_corrected, jockey_style_avg_diff_logit_smooth]
+
+  - scenario_name: add_style_diff_logit
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_avg_diff_logit_smooth]
+      exclude_features: [jockey_cluster_avg_diff_logit_smooth]
+    shap:
+      candidate_feature: jockey_style_avg_diff_logit_smooth
+      comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+      report_run_label: jockey_style_diff_logit
+
+  - scenario_name: replace_style_with_diff_logit
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_avg_diff_logit_smooth]
+      exclude_features: [jockey_style_place_rate_3y_smooth, jockey_cluster_avg_diff_logit_smooth]
+
+  - scenario_name: add_both_diff_logit
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_diff_logit_smooth, jockey_style_avg_diff_logit_smooth]
+
+  - scenario_name: replace_both_raw_with_both_diff_logit
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_diff_logit_smooth, jockey_style_avg_diff_logit_smooth]
+      exclude_features: [jockey_cluster_avg_place_rate_corrected, jockey_style_place_rate_3y_smooth]

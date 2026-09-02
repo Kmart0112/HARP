@@ -1,0 +1,87 @@
+version: 1
+
+validation:
+  name: week1_trainer_haron_time_4_fast_excess_z
+  category: feature_engineering
+  change_summary: validate_week1_trainer_haron_time_4_fast_excess_z
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_week1_trainer_haron_time_4_fast_excess_z_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_week1_trainer_haron_time_4_fast_excess_z_runs.csv"
+  run_log_dir: "week1_trainer_haron_time_4_fast_excess_z_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（week1 trainer haron time 4 fast excess z）"
+  background: "一週前調教の raw `haron_time_4` を厩舎ごとの過去3年平均・標準偏差で正規化した relative z を、現行 base feature set への add-only で検証する。"
+  hypothesis_lines:
+    - "`trainer_week1_wood_haron_time_4_fast_excess_z_3y` は week1 wood 4F が厩舎の通常パターンをどれだけ上回ったかを表す signal になり得る。"
+    - "`trainer_week1_hanro_haron_time_4_fast_excess_z_3y` は week1 hanro 4F の厩舎内相対位置を表し、既存の 1F 系では取り切れない持続負荷の差を補える可能性がある。"
+    - "今回は一週前のみを対象に、week1 wood / week1 hanro の2本だけで add-on を確認する。"
+  leakage_notes:
+    - "as-of: いずれも対象レースの10-11日前までに確定している一週前調教時計のみを使う。"
+    - "集計境界: 厩舎基準は `held_year_month` ごとの直前36か月 rolling で、対象月は含めない。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "candidate は week1 の `trainer_week1_wood_haron_time_4_fast_excess_z_3y` と `trainer_week1_hanro_haron_time_4_fast_excess_z_3y` の2本のみ。"
+    - "week1 4F 系は `place_v1` に未採用のため、今回は replace ではなく add-only で比較する。"
+    - "SHAP の comparison では `week1_wood_haron_time_4_z_tozai_day` / `week1_hanro_haron_time_4_z_tozai_day` と raw `week1_haron_time_4` を参照する。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: trainer_week1_wood_haron_time_4_fast_excess_z_3y
+    feature_type: num
+    change_type: add
+    summary: 一週前の代表ウッド調教4Fが、同厩舎の過去3年平均よりどれだけ速いかを厩舎内標準偏差で正規化した relative z。
+    sections: [feature_names]
+    comparison_features: [week1_wood_haron_time_4_z_tozai_day, week1_wood_haron_time_4]
+    dbt_model_path: dbt/harp/models/features/workout/feat_workout_trainer_haron_time_4_metrics.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.trainer_week1_wood_haron_time_4_fast_excess_z_3y
+
+  - feature_name: trainer_week1_hanro_haron_time_4_fast_excess_z_3y
+    feature_type: num
+    change_type: add
+    summary: 一週前の代表坂路調教4Fが、同厩舎の過去3年平均よりどれだけ速いかを厩舎内標準偏差で正規化した relative z。
+    sections: [feature_names]
+    comparison_features: [week1_hanro_haron_time_4_z_tozai_day, week1_hanro_haron_time_4]
+    dbt_model_path: dbt/harp/models/features/workout/feat_workout_trainer_haron_time_4_metrics.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.trainer_week1_hanro_haron_time_4_fast_excess_z_3y
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_trainer_week1_wood_haron_time_4_fast_excess_z_3y
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [trainer_week1_wood_haron_time_4_fast_excess_z_3y]
+    shap:
+      candidate_feature: trainer_week1_wood_haron_time_4_fast_excess_z_3y
+      comparison_features: [week1_wood_haron_time_4_z_tozai_day, week1_wood_haron_time_4]
+      report_run_label: trainer_week1_wood_haron_time_4_fast_excess_z_3y
+
+  - scenario_name: add_trainer_week1_hanro_haron_time_4_fast_excess_z_3y
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [trainer_week1_hanro_haron_time_4_fast_excess_z_3y]
+    shap:
+      candidate_feature: trainer_week1_hanro_haron_time_4_fast_excess_z_3y
+      comparison_features: [week1_hanro_haron_time_4_z_tozai_day, week1_hanro_haron_time_4]
+      report_run_label: trainer_week1_hanro_haron_time_4_fast_excess_z_3y
+
+  - scenario_name: add_both_week1_trainer_haron_time_4_fast_excess_z
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - trainer_week1_wood_haron_time_4_fast_excess_z_3y
+        - trainer_week1_hanro_haron_time_4_fast_excess_z_3y

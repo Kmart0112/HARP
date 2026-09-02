@@ -1,0 +1,74 @@
+version: 2
+models:
+  - name: int_horse_same_cluster_daily_cum
+    columns:
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_time_diffs
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_weighted_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_weighted_places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_weighted_time_diffs
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_weighted_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_time_diffs
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []

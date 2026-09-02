@@ -1,0 +1,22 @@
+harp:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('HARP_DB_HOST', 'localhost') }}"
+      user: "{{ env_var('HARP_DB_USER', 'harp') }}"
+      password: "{{ env_var('HARP_DB_PASSWORD') }}"
+      port: "{{ env_var('HARP_DB_PORT', 5432) | int }}"
+      dbname: "{{ env_var('HARP_DB_NAME', 'harp') }}"
+      schema: "{{ env_var('HARP_DB_SCHEMA', 'public') }}"
+      threads: 4
+
+    mac:
+      type: postgres
+      host: "{{ env_var('HARP_DB_HOST', 'localhost') }}"
+      user: "{{ env_var('HARP_DB_USER', 'harp') }}"
+      password: "{{ env_var('HARP_DB_PASSWORD') }}"
+      port: "{{ env_var('HARP_DB_PORT', 5432) | int }}"
+      dbname: "{{ env_var('HARP_DB_NAME', 'harp') }}"
+      schema: "{{ env_var('HARP_DB_SCHEMA', 'public') }}"
+      threads: 4

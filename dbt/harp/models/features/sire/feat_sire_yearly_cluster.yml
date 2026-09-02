@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: feat_sire_yearly_cluster
+    columns:
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_wins_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_time_diffs_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_pos4_agari_synergy
+        description: "種牡馬×コースクラスタの pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []

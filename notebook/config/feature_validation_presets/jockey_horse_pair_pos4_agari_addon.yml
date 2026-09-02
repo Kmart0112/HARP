@@ -1,0 +1,123 @@
+version: 1
+
+validation:
+  name: jockey_horse_pair_pos4_agari_addon
+  category: feature_engineering
+  change_summary: validate_jockey_horse_pair_pos4_agari_addon
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_jockey_horse_pair_pos4_agari_addon_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_jockey_horse_pair_pos4_agari_addon_runs.csv"
+  run_log_dir: "jockey_horse_pair_pos4_agari_addon_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（jockey horse pair pos4/agari add-on）"
+  background: "jockey×horse 相性を、horse の現行 pos4/agari 系と同じ過去3年・180日 half-life の weighted average 表現で追加し、単独 add-on の効き方を正式フローで確認する。"
+  hypothesis_lines:
+    - "`jockey_horse_pair_weighted_avg_pos4_agari_synergy` は騎手全体強さでは拾えない pair 固有の噛み合いを補足できる。"
+    - "`course_cluster` と `turn_direction_surface` の条件版は、overall よりも文脈依存の相性を表せる可能性がある。"
+    - "初回は single_add 3 本に絞り、改善セットは metrics 確認後に同一 theme へ append する。"
+  leakage_notes:
+    - "as-of: いずれの pair 特徴量も `held_date` より前のレースのみを使い、対象レース当日の結果は参照しない。"
+    - "集計対象は `pos4_agari_synergy` と `is_place` の過去走由来のみで、払戻や対象レースの事後情報を使わない。"
+    - "将来情報不使用: pair history は直近3年かつ `hist.held_date < cur.held_date` に固定する。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "初回 preset は `baseline_existing` と single_add 3 本だけを持ち、改善セットは結果確認後に同じ preset へ追記する。"
+    - "比較軸は overall / course_cluster / turn_direction_surface に固定し、starts 系は mart・registry・scenario に含めない。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: jockey_horse_pair_weighted_avg_pos4_agari_synergy
+    feature_type: num
+    change_type: add
+    summary: jockey×horse 全体での過去3年・180日 half-life weighted average pos4_agari_synergy。
+    sections: [feature_names]
+    comparison_features: [jockey_avg_place_rate_smooth]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_horse_pair_metrics.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_horse_pair_metrics.yml
+    final_column: mart.m_train_race_horse_past5.jockey_horse_pair_weighted_avg_pos4_agari_synergy
+
+  - feature_name: jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+    feature_type: num
+    change_type: add
+    summary: jockey×horse × same course_cluster での過去3年・180日 half-life weighted average pos4_agari_synergy。
+    sections: [feature_names]
+    comparison_features: [jockey_cluster_avg_place_rate_corrected, same_cluster_past_weighted_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_horse_pair_metrics.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_horse_pair_metrics.yml
+    final_column: mart.m_train_race_horse_past5.jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+
+  - feature_name: jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy
+    feature_type: num
+    change_type: add
+    summary: jockey×horse × same turn_direction_surface での過去3年・180日 half-life weighted average pos4_agari_synergy。
+    sections: [feature_names]
+    comparison_features: [same_turn_direction_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_horse_pair_metrics.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_horse_pair_metrics.yml
+    final_column: mart.m_train_race_horse_past5.jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_pair_overall
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_horse_pair_weighted_avg_pos4_agari_synergy]
+    shap:
+      candidate_feature: jockey_horse_pair_weighted_avg_pos4_agari_synergy
+      comparison_features: [jockey_avg_place_rate_smooth]
+      report_run_label: jockey_horse_pair_overall
+
+  - scenario_name: add_pair_cluster
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy]
+    shap:
+      candidate_feature: jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+      comparison_features: [jockey_cluster_avg_place_rate_corrected, same_cluster_past_weighted_pos4_agari_synergy]
+      report_run_label: jockey_horse_pair_cluster
+
+  - scenario_name: add_pair_turn_surface
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy]
+    shap:
+      candidate_feature: jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy
+      comparison_features: [same_turn_direction_surface_avg_pos4_agari_synergy]
+      report_run_label: jockey_horse_pair_turn_surface
+
+  - scenario_name: add_pair_cluster_plus_turn_surface
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+        - jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy
+
+  - scenario_name: add_all_pair_features
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - jockey_horse_pair_weighted_avg_pos4_agari_synergy
+        - jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+        - jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy
+
+  - scenario_name: add_pair_best_two
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - jockey_horse_pair_weighted_avg_pos4_agari_synergy
+        - jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy

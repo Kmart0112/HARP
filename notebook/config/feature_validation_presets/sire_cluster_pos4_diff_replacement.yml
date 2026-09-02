@@ -1,0 +1,69 @@
+version: 1
+
+validation:
+  name: sire_cluster_pos4_diff_replacement
+  category: feature_engineering
+  change_summary: compare_sire_cluster_pos4_diff_replacement_variants
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_sire_cluster_pos4_diff_replacement_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_sire_cluster_pos4_diff_replacement_runs.csv"
+  run_log_dir: "sire_cluster_pos4_diff_replacement_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（sire cluster pos4 diff replacement）"
+  background: "種牡馬 `course_cluster` 条件の `pos4_agari_synergy` を raw 値のまま使う代わりに、`sire_avg_pos4_agari_synergy` との差分として持たせた方が冗長性を減らせるかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`same_cluster_sire_avg_pos4_agari_synergy_diff` は overall sire の脚質×上がり傾向を差し引くことで、cluster 条件の上振れ・下振れをより素直に表現できる可能性がある。"
+    - "現行 `same_cluster_sire_avg_pos4_agari_synergy` は `sire_avg_pos4_agari_synergy` と同方向に動きやすいため、差分化で冗長性が下がる余地がある。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、baseline / add / replace の 3 scenario を MLflow に残す。"
+  leakage_notes:
+    - "as-of: 両列とも `held_year_month` 単位で当月除外の過去集計のみから計算し、対象レース発走前に確定している。"
+    - "`same_cluster_sire_avg_pos4_agari_synergy_diff` は既存の past aggregate 同士の差分であり、対象レース結果や払戻を使わない。"
+    - "将来情報不使用: いずれも対象年月より後のレースは参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "現行 base には `same_cluster_sire_avg_pos4_agari_synergy` と `sire_avg_pos4_agari_synergy` が含まれる。candidate の `same_cluster_sire_avg_pos4_agari_synergy_diff` は未採用のため scenario ごとに明示的に include する。"
+    - "`replace_*` scenario では現行 cluster sire signal の `same_cluster_sire_avg_pos4_agari_synergy` を外し、差分列へ純置換する。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: same_cluster_sire_avg_pos4_agari_synergy_diff
+    feature_type: num
+    change_type: add
+    summary: "種牡馬×コースクラスタ pos4_agari_synergy と種牡馬 overall pos4_agari_synergy の差分。"
+    sections: [feature_names]
+    comparison_features: [same_cluster_sire_avg_pos4_agari_synergy, sire_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/features/sire/feat_sire_metrics.sql
+    dbt_yaml_path: dbt/harp/models/features/sire/feat_sire_metrics.yml
+    final_column: mart.m_train_race_horse_past5.same_cluster_sire_avg_pos4_agari_synergy_diff
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features: [same_cluster_sire_avg_pos4_agari_synergy_diff]
+
+  - scenario_name: add_same_cluster_sire_pos4_diff
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features: [same_cluster_sire_avg_pos4_agari_synergy_diff]
+      include_features: [same_cluster_sire_avg_pos4_agari_synergy_diff]
+    shap:
+      candidate_feature: same_cluster_sire_avg_pos4_agari_synergy_diff
+      comparison_features: [same_cluster_sire_avg_pos4_agari_synergy, sire_avg_pos4_agari_synergy]
+      report_run_label: same_cluster_sire_pos4_diff
+
+  - scenario_name: replace_cluster_pos4_with_pos4_diff
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_cluster_sire_avg_pos4_agari_synergy
+        - same_cluster_sire_avg_pos4_agari_synergy_diff
+      include_features: [same_cluster_sire_avg_pos4_agari_synergy_diff]

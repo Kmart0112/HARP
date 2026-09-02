@@ -1,0 +1,254 @@
+version: 2
+models:
+  - name: stg_n_race
+    columns:
+      - name: recordspec
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: datakubun
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: monthday
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyocd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kaiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: nichiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: racenum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hondai
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukudai
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kakko
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: gradecd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: syubetu_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: grade_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tenko_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyuryo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_kubun_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hassotime
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: torokutosu
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sibababacd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: dirtbabacd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: harontimes3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: harontimes4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: harontimel3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: harontimel4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime10
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime11
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime12
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime13
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime14
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime15
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime16
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime17
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: laptime18
+        description: ''
+        config:
+          meta: {}
+          tags: []

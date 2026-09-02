@@ -1,0 +1,29 @@
+version: 2
+models:
+  - name: feat_old_cd_yearly
+    columns:
+      - name: held_year
+        description: "開催年。"
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd
+        description: "年齢区分コード。0=古馬、1=2歳、2=3歳。"
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd_starts_3y
+        description: "old_cd ごとの過去3年出走数。対象年は含まない。"
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd_places_3y
+        description: "old_cd ごとの過去3年複勝数。対象年は含まない。"
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd_place_rate_3y
+        description: "old_cd ごとの過去3年複勝率。平滑化 prior 用。"
+        config:
+          meta: {}
+          tags: []

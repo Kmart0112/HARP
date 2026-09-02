@@ -1,0 +1,1761 @@
+schema_version: 0.3.0
+registry_name: mart_feature_registry
+managed_at: '2026-03-27'
+source_table: mart.m_train_race_horse_past5
+source_schema_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+inventory_snapshot:
+  mart_column_count: 319
+  registered_feature_count: 169
+  registered_cat_feature_count: 14
+selection_rules:
+  production:
+    include_statuses:
+    - 'on'
+  validation:
+    include_statuses:
+    - 'on'
+    - experimental
+role_policy:
+  feature: 数値特徴量
+  categorical_feature: カテゴリ特徴量
+  id: 識別子。入力には使わない
+  target: 教師信号。入力には使わない
+  meta: 補助列。レポートや join に使うが入力には使わない
+  leakage_excluded: mart にはあるがリーク観点で学習入力に使わない
+category_order:
+- identifiers
+- targets
+- odds_market
+- race_conditions
+- horse_profile
+- rest_rotation
+- pace_position
+- time_performance
+- agari_finish
+- condition_fit
+- bloodline
+- jockey
+- trainer
+- breeder
+- workout
+- gate_field
+- raw_categorical
+- uncategorized
+notes:
+- named feature set definitionsは持たず、各列の set_status を source of truth にする。
+- set_status の value は status と order を持ち、未記載の set は off とみなす。
+- production は on、validation は on + experimental を採用する。
+features:
+- name: num_starters
+  role: feature
+  category: race_conditions
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 1
+    place_rank_v1:
+      status: 'on'
+      order: 1
+    place_shinba_v1:
+      status: 'on'
+      order: 2
+    win_v1:
+      status: 'on'
+      order: 2
+- name: past_starts
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 2
+    win_v1:
+      status: 'on'
+      order: 3
+- name: past_places
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 3
+    win_v1:
+      status: 'on'
+      order: 4
+- name: distance_m
+  role: feature
+  category: race_conditions
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 4
+    place_rank_v1:
+      status: 'on'
+      order: 2
+    win_v1:
+      status: 'on'
+      order: 5
+- name: surface_condition
+  role: feature
+  category: race_conditions
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 5
+    win_v1:
+      status: 'on'
+      order: 6
+- name: p1_distance_m
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 7
+    win_v1:
+      status: 'on'
+      order: 7
+- name: condition_change_score
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 8
+    win_v1:
+      status: 'on'
+      order: 8
+- name: distance_change_score
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 9
+    win_v1:
+      status: 'on'
+      order: 9
+- name: surface_change_score
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 10
+    win_v1:
+      status: 'on'
+      order: 10
+- name: course_cluster_change_score
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 11
+    win_v1:
+      status: 'on'
+      order: 11
+- name: race_level
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 12
+    win_v1:
+      status: 'on'
+      order: 12
+- name: p1_race_level
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 13
+    win_v1:
+      status: 'on'
+      order: 13
+- name: h_weight
+  role: feature
+  category: horse_profile
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 14
+    place_rank_v1:
+      status: 'on'
+      order: 4
+    place_shinba_v1:
+      status: 'on'
+      order: 3
+    win_v1:
+      status: 'on'
+      order: 14
+- name: weight_change
+  role: feature
+  category: horse_profile
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 15
+    place_rank_v1:
+      status: 'on'
+      order: 5
+    win_v1:
+      status: 'on'
+      order: 15
+- name: p1_weight_change
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 16
+    win_v1:
+      status: 'on'
+      order: 16
+- name: p1_weight
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 17
+    win_v1:
+      status: 'on'
+      order: 17
+- name: kinryo
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 18
+    place_rank_v1:
+      status: 'on'
+      order: 6
+    win_v1:
+      status: 'on'
+      order: 18
+- name: age_month
+  role: feature
+  category: horse_profile
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 19
+    place_rank_v1:
+      status: 'on'
+      order: 7
+    win_v1:
+      status: 'on'
+      order: 19
+- name: age_days_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 20
+    win_v1:
+      status: 'on'
+      order: 20
+- name: age_days
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 21
+    place_rank_v1:
+      status: 'on'
+      order: 8
+    win_v1:
+      status: 'on'
+      order: 21
+- name: race_interval_days
+  role: feature
+  category: rest_rotation
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 22
+    place_rank_v1:
+      status: 'on'
+      order: 9
+    win_v1:
+      status: 'on'
+      order: 22
+- name: p2_race_interval_days
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 23
+    place_rank_v1:
+      status: 'on'
+      order: 10
+    win_v1:
+      status: 'on'
+      order: 23
+- name: horse_corner4_avg3
+  role: feature
+  category: pace_position
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 24
+    place_rank_v1:
+      status: 'on'
+      order: 11
+    win_v1:
+      status: 'on'
+      order: 24
+- name: race_avg_corner4
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 25
+    win_v1:
+      status: 'on'
+      order: 25
+- name: race_stddev_corner4
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 26
+    win_v1:
+      status: 'on'
+      order: 26
+- name: horse_corner4_sd3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 27
+    place_rank_v1:
+      status: 'on'
+      order: 12
+    win_v1:
+      status: 'on'
+      order: 27
+- name: horse_kinryo_avg3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 28
+    place_rank_v1:
+      status: 'on'
+      order: 13
+    win_v1:
+      status: 'on'
+      order: 28
+- name: p1_corner4
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 29
+    win_v1:
+      status: 'on'
+      order: 29
+- name: p2_corner4
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 30
+    win_v1:
+      status: 'on'
+      order: 30
+- name: p3_corner4
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 31
+    win_v1:
+      status: 'on'
+      order: 31
+- name: course_sashi_place_rate_5y
+  role: feature
+  category: pace_position
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 32
+    win_v1:
+      status: 'on'
+      order: 32
+- name: time_vs_avg_wavg5_recent
+  role: feature
+  category: time_performance
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 33
+    win_v1:
+      status: 'on'
+      order: 33
+  reports:
+  - notebook/report/features/20260310_wavg5_race_relative_validation_feature_definition_validation_report.md
+- name: time_vs_avg_wavg5_recent_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 34
+    win_v1:
+      status: 'on'
+      order: 34
+- name: time_vs_pace_avg_avg3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 35
+    win_v1:
+      status: 'on'
+      order: 35
+- name: time_vs_pace_avg_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 36
+    win_v1:
+      status: 'on'
+      order: 36
+- name: time_vs_avg_sd
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 37
+    win_v1:
+      status: 'on'
+      order: 37
+- name: time_diff_wavg5_recent
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 38
+    win_v1:
+      status: 'on'
+      order: 38
+- name: time_diff_wavg5_recent_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 39
+    win_v1:
+      status: 'on'
+      order: 39
+- name: time_diff_wavg5_recent_rank
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 40
+    win_v1:
+      status: 'on'
+      order: 40
+- name: agari3f_rank_avg3
+  role: feature
+  category: agari_finish
+- name: agari3f_rank_percentile_avg3
+  role: feature
+  category: agari_finish
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 119
+  reports:
+  - notebook/report/features/20260323_agari3f_rank_avg3_percentile_feature_definition_validation_report.md
+- name: p1_time_diff
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 41
+    win_v1:
+      status: 'on'
+      order: 41
+- name: p2_time_diff
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 42
+    win_v1:
+      status: 'on'
+      order: 42
+- name: p3_time_diff
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 43
+    win_v1:
+      status: 'on'
+      order: 43
+- name: p1_time_vs_pace_avg
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 44
+    win_v1:
+      status: 'on'
+      order: 44
+- name: p2_time_vs_pace_avg
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 45
+    win_v1:
+      status: 'on'
+      order: 45
+- name: p3_time_vs_pace_avg
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 46
+    win_v1:
+      status: 'on'
+      order: 46
+- name: pos4_agari_synergy_wavg5_recent
+  role: feature
+  category: agari_finish
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 47
+    win_v1:
+      status: 'on'
+      order: 47
+  reports:
+  - notebook/report/features/20260228_pos4_agari_trend_validation_report.md
+- name: pos4_agari_synergy_wavg5_recent_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 48
+    win_v1:
+      status: 'on'
+      order: 48
+- name: race_pos4_agari_synergy_wavg5_recent_median
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 49
+- name: pos4_agari_synergy_wavg5_recent_diff_top_in_race
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 50
+    win_v1:
+      status: 'on'
+      order: 49
+- name: pos4_agari_synergy_sd
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 51
+    win_v1:
+      status: 'on'
+      order: 50
+- name: pos4_agari_synergy_slope3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 52
+    win_v1:
+      status: 'on'
+      order: 51
+- name: pos4_agari_synergy_trend3_voladj
+  role: feature
+  category: uncategorized
+- name: pos4_agari_synergy_short_long_gap
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 54
+- name: p1_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 55
+    win_v1:
+      status: 'on'
+      order: 52
+- name: p2_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 56
+    win_v1:
+      status: 'on'
+      order: 53
+- name: p3_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 57
+    win_v1:
+      status: 'on'
+      order: 54
+- name: rel_agari_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 58
+    win_v1:
+      status: 'on'
+      order: 55
+- name: same_cluster_past_weighted_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 59
+    win_v1:
+      status: 'on'
+      order: 56
+- name: same_cluster_avg_pos4_agari_synergy_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 60
+    win_v1:
+      status: 'on'
+      order: 57
+- name: same_cluster_avg_pos4_agari_synergy_rank
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 61
+    win_v1:
+      status: 'on'
+      order: 58
+- name: same_cluster_avg_pos4_agari_synergy_avg3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 62
+    win_v1:
+      status: 'on'
+      order: 59
+- name: past_same_cluster_avg_pos4_as_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 63
+    win_v1:
+      status: 'on'
+      order: 60
+- name: same_cluster_past_weighted_starts
+  role: feature
+  category: uncategorized
+  set_status:
+    win_v1:
+      status: 'on'
+      order: 61
+- name: same_cluster_past_places
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 65
+    place_rank_v1:
+      status: 'on'
+      order: 19
+    win_v1:
+      status: 'on'
+      order: 62
+- name: same_distance_past_weighted_places
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 66
+    win_v1:
+      status: 'on'
+      order: 63
+- name: same_distance_weighted_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 67
+    win_v1:
+      status: 'on'
+      order: 64
+- name: same_distance_weighted_avg_pos4_agari_synergy_z
+  role: feature
+  category: uncategorized
+- name: same_surface_condition_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    win_v1:
+      status: 'on'
+      order: 65
+- name: pace_ntile1_place_rate
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 72
+    win_v1:
+      status: 'on'
+      order: 66
+- name: pace_ntile2_place_rate
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 73
+    win_v1:
+      status: 'on'
+      order: 67
+- name: pace_ntile3_place_rate
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 74
+    win_v1:
+      status: 'on'
+      order: 68
+- name: same_cluster_sire_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 75
+- name: same_cluster_sire_avg_pos4_agari_synergy_diff
+  role: feature
+  category: uncategorized
+- name: same_surface_dist_pm200_sire_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 76
+- name: same_old_cd_sire_past_starts
+  role: feature
+  category: uncategorized
+- name: same_old_cd_sire_avg_place_rate_smooth
+  role: feature
+  category: uncategorized
+- name: same_old_cd_sire_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 78
+  reports:
+  - notebook/report/features/20260325_sire_old_cd_te_addon_feature_definition_validation_report.md
+- name: same_old_cd_sire_avg_place_rate
+  role: feature
+  category: uncategorized
+- name: same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+  role: feature
+  category: uncategorized
+- name: same_sex_cd_sire_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 84
+  reports:
+  - notebook/report/features/20260327_sire_sex_cd_te_addon_feature_definition_validation_report.md
+- name: sire_is_early_phase_3y
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 77
+- name: sire_avg_pos4_agari_synergy
+  role: feature
+  category: bloodline
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 79
+  reports:
+  - notebook/report/features/20260302_sire_overall_te_with_readd_exploration_feature_definition_validation_report.md
+- name: jockey_starts_3y
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 84
+    win_v1:
+      status: 'on'
+      order: 74
+- name: jockey_place_rate_3y_logit_z_smooth
+  role: feature
+  category: jockey
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 85
+    win_v1:
+      status: 'on'
+      order: 75
+- name: jockey_avg_place_rate_smooth
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 86
+    win_v1:
+      status: 'on'
+      order: 76
+- name: jockey_cluster_avg_place_rate_corrected
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 87
+    place_rank_v1:
+      status: 'on'
+      order: 24
+    win_v1:
+      status: 'on'
+      order: 77
+- name: jockey_cluster_avg_diff_logit_smooth
+  role: feature
+  category: jockey
+- name: jockey_cluster_avg_place_rate_corrected_logit_z
+  role: feature
+  category: jockey
+- name: jockey_cluster_avg_place_rate_corrected_rank
+  role: feature
+  category: jockey
+- name: jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+  role: feature
+  category: jockey
+- name: jockey_surface_straight_distance_bucket_avg_diff_logit_smooth
+  role: feature
+  category: jockey
+- name: jockey_surface_turn_direction_place_rate_3y_smooth
+  role: feature
+  category: jockey
+- name: jockey_surface_turn_direction_avg_diff_logit_smooth
+  role: feature
+  category: jockey
+- name: jockey_turn_direction_place_rate_3y_smooth
+  role: feature
+  category: jockey
+- name: jockey_turn_direction_avg_diff_logit_smooth
+  role: feature
+  category: jockey
+- name: jockey_surface_jyo_avg_diff_logit_smooth
+  role: feature
+  category: jockey
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 116
+  reports:
+  - notebook/report/features/20260318_jockey_surface_jyo_cluster_replacement_feature_definition_validation_report.md
+- name: jockey_horse_pair_weighted_avg_pos4_agari_synergy
+  role: feature
+  category: jockey
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 117
+  reports:
+  - notebook/report/features/20260319_jockey_horse_pair_pos4_agari_addon_feature_definition_validation_report.md
+- name: jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+  role: feature
+  category: jockey
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 118
+  reports:
+  - notebook/report/features/20260319_jockey_horse_pair_pos4_agari_addon_feature_definition_validation_report.md
+- name: jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy
+  role: feature
+  category: jockey
+- name: jockey_pos4_bin5_place_rate_3y_smooth_hard
+  role: feature
+  category: jockey
+- name: jockey_pos4_bin5_place_rate_3y_smooth_soft
+  role: feature
+  category: jockey
+- name: jockey_pos4_bin5_relative_place_rate_3y_smooth_soft
+  role: feature
+  category: jockey
+- name: jockey_style_place_rate_3y_smooth
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 88
+    win_v1:
+      status: 'on'
+      order: 78
+- name: jockey_style_place_rate_3y_smooth_soft
+  role: feature
+  category: jockey
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 88
+  reports:
+  - notebook/report/features/20260326_jockey_pos4_bin_running_style_soft_combo_feature_definition_validation_report.md
+- name: jockey_style_relative_place_rate_3y_smooth
+  role: feature
+  category: jockey
+- name: jockey_style_base_diff_logit_smooth
+  role: feature
+  category: jockey
+- name: jockey_style_place_rate_3y_style_prior_smooth
+  role: feature
+  category: jockey
+- name: jockey_style_avg_diff_logit_smooth
+  role: feature
+  category: jockey
+- name: jockey_avg_place_rate_avg3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 89
+    win_v1:
+      status: 'on'
+      order: 79
+- name: race_avg_jockey_place_rate_smooth
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 90
+    win_v1:
+      status: 'on'
+      order: 80
+- name: trainer_place_rate_5y
+  role: feature
+  category: trainer
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 91
+    win_v1:
+      status: 'on'
+      order: 81
+- name: trainer_old_place_rate_5y
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 92
+    win_v1:
+      status: 'on'
+      order: 82
+- name: breeder_place_rate_5y
+  role: feature
+  category: breeder
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 93
+    win_v1:
+      status: 'on'
+      order: 83
+- name: wood_lap_time_1
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 94
+    place_rank_v1:
+      status: 'on'
+      order: 25
+    win_v1:
+      status: 'on'
+      order: 84
+- name: hanro_lap_time_1
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 95
+    place_rank_v1:
+      status: 'on'
+      order: 27
+    win_v1:
+      status: 'on'
+      order: 85
+- name: hanro_lap_time_2
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 96
+    place_rank_v1:
+      status: 'off'
+      order: 28
+    win_v1:
+      status: 'off'
+      order: 86
+- name: p1_wood_lap_time_1
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 97
+    win_v1:
+      status: 'on'
+      order: 87
+- name: p1_hanro_lap_time_1
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 98
+    win_v1:
+      status: 'on'
+      order: 88
+- name: p1_trainer_wood_lap_time_1_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 130
+- name: p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 131
+- name: week1_wood_lap_time_1
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 120
+  reports:
+  - notebook/report/features/20260324_week1_lap_time_1_addon_feature_definition_validation_report.md
+- name: week1_hanro_lap_time_1
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 121
+  reports:
+  - notebook/report/features/20260324_week1_lap_time_1_addon_feature_definition_validation_report.md
+- name: wood_lap_time_1_z_tozai_day
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 94
+  reports:
+  - notebook/report/features/20260325_current_lap_time_1_z_tozai_day_feature_definition_validation_report.md
+  - notebook/report/features/20260325_lap_time_1_z_tozai_day_replace_matrix_feature_definition_validation_report.md
+  - notebook/report/features/20260328_current_trainer_wood_lap_time_1_replace_recheck_feature_definition_validation_report.md
+- name: hanro_lap_time_1_z_tozai_day
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 95
+  reports:
+  - notebook/report/features/20260325_current_lap_time_1_z_tozai_day_feature_definition_validation_report.md
+  - notebook/report/features/20260325_lap_time_1_z_tozai_day_replace_matrix_feature_definition_validation_report.md
+  - notebook/report/features/20260328_current_trainer_hanro_lap_time_1_recheck_feature_definition_validation_report.md
+- name: week1_wood_lap_time_1_z_tozai_day
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 120
+  reports:
+  - notebook/report/features/20260325_lap_time_1_z_tozai_day_replace_matrix_feature_definition_validation_report.md
+- name: week1_hanro_lap_time_1_z_tozai_day
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 121
+  reports:
+  - notebook/report/features/20260325_lap_time_1_z_tozai_day_replace_matrix_feature_definition_validation_report.md
+- name: trainer_wood_lap_time_1_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 122
+  reports:
+  - notebook/report/features/20260328_current_trainer_lap_time_1_fast_excess_z_feature_definition_validation_report.md
+- name: trainer_hanro_lap_time_1_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 123
+  reports:
+  - notebook/report/features/20260328_current_trainer_lap_time_1_fast_excess_z_feature_definition_validation_report.md
+  - notebook/report/features/20260328_current_trainer_hanro_lap_time_1_recheck_feature_definition_validation_report.md
+- name: trainer_week1_wood_lap_time_1_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 124
+  reports:
+  - notebook/report/features/20260328_week1_trainer_lap_time_1_fast_excess_z_feature_definition_validation_report.md
+- name: trainer_week1_hanro_lap_time_1_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 125
+  reports:
+  - notebook/report/features/20260328_week1_trainer_lap_time_1_fast_excess_z_feature_definition_validation_report.md
+- name: trainer_wood_haron_time_4_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 126
+  reports:
+  - notebook/report/features/20260328_current_trainer_haron_time_4_fast_excess_z_feature_definition_validation_report.md
+- name: trainer_hanro_haron_time_4_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 127
+  reports:
+  - notebook/report/features/20260328_current_trainer_haron_time_4_fast_excess_z_feature_definition_validation_report.md
+- name: trainer_week1_wood_haron_time_4_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 128
+  reports:
+  - notebook/report/features/20260328_week1_trainer_haron_time_4_fast_excess_z_feature_definition_validation_report.md
+- name: trainer_week1_hanro_haron_time_4_fast_excess_z_3y
+  role: feature
+  category: workout
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 129
+  reports:
+  - notebook/report/features/20260328_week1_trainer_haron_time_4_fast_excess_z_feature_definition_validation_report.md
+- name: week1_wood_lap_time_2
+  role: feature
+  category: workout
+- name: week1_hanro_lap_time_2
+  role: feature
+  category: workout
+- name: week1_wood_haron_time_4
+  role: feature
+  category: workout
+- name: week1_hanro_haron_time_4
+  role: feature
+  category: workout
+- name: wood_haron_time_4
+  role: feature
+  category: workout
+- name: hanro_haron_time_4
+  role: feature
+  category: workout
+- name: wood_accel_flag
+  role: feature
+  category: workout
+- name: hanro_accel_flag
+  role: feature
+  category: workout
+- name: wood_4f1f_profile_cat3
+  role: categorical_feature
+  category: workout
+- name: hanro_4f1f_profile_cat3
+  role: categorical_feature
+  category: workout
+- name: wood_4f1f_profile_place_rate_3y_smooth
+  role: feature
+  category: workout
+- name: hanro_4f1f_profile_place_rate_3y_smooth
+  role: feature
+  category: workout
+- name: diff_gate_pp_5y
+  role: feature
+  category: gate_field
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 99
+    place_rank_v1:
+      status: 'on'
+      order: 29
+    win_v1:
+      status: 'on'
+      order: 89
+- name: diff_gate_pp_std_5y
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 100
+    place_rank_v1:
+      status: 'on'
+      order: 30
+    win_v1:
+      status: 'on'
+      order: 90
+- name: horse_number
+  role: meta
+  category: identifiers
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 101
+    place_rank_v1:
+      status: 'on'
+      order: 32
+    win_v1:
+      status: 'on'
+      order: 91
+- name: corner4_rate_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 102
+    win_v1:
+      status: 'on'
+      order: 92
+- name: top3_corner3_pos_var_5y
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 103
+    win_v1:
+      status: 'on'
+      order: 93
+- name: surface
+  role: categorical_feature
+  category: raw_categorical
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 104
+    place_rank_v1:
+      status: 'on'
+      order: 33
+    win_v1:
+      status: 'on'
+      order: 94
+- name: jyo_cd
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 105
+    place_rank_v1:
+      status: 'on'
+      order: 34
+    win_v1:
+      status: 'on'
+      order: 95
+- name: old_cd
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 106
+    place_rank_v1:
+      status: 'on'
+      order: 35
+    win_v1:
+      status: 'on'
+      order: 96
+- name: course_cluster
+  role: categorical_feature
+  category: raw_categorical
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 107
+    place_shinba_v1:
+      status: 'on'
+      order: 10
+    win_v1:
+      status: 'on'
+      order: 97
+- name: course_kubun_cd
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 108
+    win_v1:
+      status: 'on'
+      order: 98
+- name: tenko_cd
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 109
+    win_v1:
+      status: 'on'
+      order: 99
+- name: jyuryo_cd
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 110
+    win_v1:
+      status: 'on'
+      order: 100
+- name: sex_cd
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 111
+    place_rank_v1:
+      status: 'on'
+      order: 36
+    win_v1:
+      status: 'on'
+      order: 101
+- name: is_surface_changed
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 112
+    place_rank_v1:
+      status: 'on'
+      order: 37
+    win_v1:
+      status: 'on'
+      order: 102
+- name: is_shokyu
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 113
+    place_rank_v1:
+      status: 'on'
+      order: 38
+    win_v1:
+      status: 'on'
+      order: 103
+- name: tozai_cd
+  role: categorical_feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 114
+    win_v1:
+      status: 'on'
+      order: 104
+- name: p1_course_cluster
+  role: categorical_feature
+  category: raw_categorical
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 115
+    win_v1:
+      status: 'on'
+      order: 105
+- name: distance_change
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 3
+- name: time_vs_avg_avg3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 14
+- name: time_diff_avg3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 15
+- name: pos4_agari_synergy_avg3
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 16
+- name: same_cluster_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 17
+- name: same_cluster_past_starts
+  role: feature
+  category: condition_fit
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 18
+    place_v1:
+      status: 'on'
+      order: 64
+  reports:
+  - notebook/report/features/20260310_same_cluster_count_first_start_feature_definition_validation_report.md
+- name: sire_avg_place_rate
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 20
+- name: same_cluster_sire_avg_place_rate
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 21
+    place_shinba_v1:
+      status: 'on'
+      order: 6
+- name: same_age_sire_avg_place_rate
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 22
+    place_shinba_v1:
+      status: 'on'
+      order: 7
+- name: jockey_avg_place_rate
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 23
+    place_shinba_v1:
+      status: 'on'
+      order: 8
+- name: wood_lap_time_2
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 26
+- name: top3_corner3_pos_avg_5y
+  role: feature
+  category: uncategorized
+  set_status:
+    place_rank_v1:
+      status: 'on'
+      order: 31
+- name: odds_tansho
+  role: feature
+  category: uncategorized
+  set_status:
+    place_shinba_v1:
+      status: 'on'
+      order: 1
+- name: horse_number_ratio
+  role: feature
+  category: uncategorized
+  set_status:
+    place_shinba_v1:
+      status: 'on'
+      order: 4
+- name: kinryo_per_weight
+  role: feature
+  category: uncategorized
+  set_status:
+    place_shinba_v1:
+      status: 'on'
+      order: 5
+- name: jockey_cluster_avg_diff
+  role: feature
+  category: uncategorized
+  set_status:
+    place_shinba_v1:
+      status: 'on'
+      order: 9
+- name: straight_distance_m
+  role: feature
+  category: race_conditions
+- name: same_turn_direction_surface_past_starts
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 68
+- name: same_turn_direction_surface_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 69
+- name: same_turn_direction_surface_avg_pos4_agari_synergy_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 71
+  reports:
+  - notebook/report/features/20260327_turn_direction_surface_z_feature_definition_validation_report.md
+- name: same_homestretch_slope_surface_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 70
+- name: same_homestretch_slope_surface_avg_pos4_agari_synergy_z
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 70
+  reports:
+  - notebook/report/features/20260327_course_shape_relative_z_current_feature_definition_validation_report.md
+- name: same_homestretch_slope_surface_wavg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+- name: same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'off'
+      order: 71
+- name: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 71
+  reports:
+  - notebook/report/features/20260327_course_shape_weighted_pos4_feature_definition_validation_report.md
+- name: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z
+  role: feature
+  category: uncategorized
+- name: dam_avg_place_rate_smooth
+  role: feature
+  category: bloodline
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 79
+  reports:
+  - notebook/report/features/20260309_dam_damsire_overall_count_alias_feature_definition_validation_report.md
+- name: same_cluster_dam_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 80
+- name: damsire_starts_5y
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 81
+- name: damsire_avg_place_rate_smooth
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 82
+- name: damsire_avg_pos4_agari_synergy
+  role: feature
+  category: uncategorized
+  set_status:
+    place_v1:
+      status: 'on'
+      order: 83
+- name: log_odds_tansho
+  role: feature
+  category: odds_market
+  set_status:
+    win_v1:
+      status: 'on'
+      order: 1
+- name: same_cluster_sire_avg_place_rate_smooth
+  role: feature
+  category: uncategorized
+  set_status:
+    win_v1:
+      status: 'on'
+      order: 69
+- name: same_cluster_sire_avg_diff_logit
+  role: feature
+  category: uncategorized
+- name: same_surface_dist_pm200_sire_avg_place_rate
+  role: feature
+  category: uncategorized
+  set_status:
+    win_v1:
+      status: 'on'
+      order: 70
+- name: sire_starts_5y
+  role: feature
+  category: uncategorized
+  set_status:
+    win_v1:
+      status: 'on'
+      order: 71
+- name: sire_avg_place_rate_smooth
+  role: feature
+  category: uncategorized
+  set_status:
+    win_v1:
+      status: 'on'
+      order: 72
+- name: same_age_sire_avg_place_rate_smooth_prev_age
+  role: feature
+  category: uncategorized
+  set_status:
+    win_v1:
+      status: 'on'
+      order: 73
+- name: same_old_cd_sire_avg_place_rate_smooth_prev_old_cd
+  role: feature
+  category: uncategorized

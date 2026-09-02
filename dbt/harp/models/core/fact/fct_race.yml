@@ -1,0 +1,224 @@
+version: 2
+models:
+  - name: fct_race
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: round
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kaiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: nichiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_num
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_kubun_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tenko_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyuryo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_level
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: grade_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: num_starters
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten4f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f_race
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari4f_race
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hassotime
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_time_sec
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: updated_at
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_name
+        description: "Racecourse name in Japanese from course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: surface_name
+        description: "Surface label from course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd_label
+        description: "Human-readable label for the observed track_cd layout from course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: turn_direction
+        description: "Course turning direction label from course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: turn_direction_cd
+        description: "Turn direction code from course_feature_map. 1=right, 2=left, 3=straight."
+        config:
+          meta: {}
+          tags: []
+      - name: course_variant
+        description: "Layout variant within the same turn direction from course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: straight_distance_m
+        description: "Official JRA straight distance in meters from course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: elevation_diff_m
+        description: "Official JRA elevation difference in meters from course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: has_slope
+        description: "Whether the course has a notable slope or hill according to course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: has_homestretch_slope
+        description: "Whether the home straight toward the finish includes a notable slope according to course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: has_uphill_finish
+        description: "Whether the home straight includes a meaningful uphill finish according to course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: slope_feature_ja
+        description: "Short Japanese note about the slope profile from course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: source_url
+        description: "Official JRA course guide URL used by course_feature_map."
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_pace
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_ntile
+        description: ''
+        config:
+          meta: {}
+          tags: []

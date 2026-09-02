@@ -1,0 +1,34 @@
+version: 2
+models:
+  - name: feat_jockey_horse_pair_metrics
+    columns:
+      - name: kettonum
+        description: "Horse identifier for the jockey-horse pair feature row."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cd
+        description: "Jockey identifier for the jockey-horse pair feature row."
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: "As-of race date for the jockey-horse pair feature row."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_horse_pair_weighted_avg_pos4_agari_synergy
+        description: "Overall weighted average pos4_agari_synergy for the jockey-horse pair over the prior 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+        description: "Weighted average pos4_agari_synergy for the jockey-horse pair within the same course_cluster over the prior 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy
+        description: "Weighted average pos4_agari_synergy for the jockey-horse pair within the same turn_direction and surface over the prior 3 years."
+        config:
+          meta: {}
+          tags: []

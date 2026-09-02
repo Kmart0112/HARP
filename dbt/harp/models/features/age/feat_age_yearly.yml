@@ -1,0 +1,29 @@
+version: 2
+models:
+  - name: feat_age_yearly
+    columns:
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age_starts_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age_places_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age_place_rate_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []

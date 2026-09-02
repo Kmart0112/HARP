@@ -1,0 +1,78 @@
+version: 1
+
+validation:
+  name: agari3f_rank_avg3_percentile
+  category: feature_engineering
+  change_summary: compare_agari3f_rank_avg3_discrete_vs_percentile
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_agari3f_rank_avg3_percentile_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_agari3f_rank_avg3_percentile_runs.csv"
+  run_log_dir: "agari3f_rank_avg3_percentile_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（agari3f rank avg3 discrete vs percentile）"
+  background: "上がり3Fの race 内順位について、離散 rank avg3 と頭数補正 percentile avg3 のどちらが直近3走表現として良いかを比較する。"
+  hypothesis_lines:
+    - "`agari3f_rank_avg3` の離散化はノイズを潰し、木モデルにとって切りやすいバケット表現として効く可能性がある。"
+    - "`agari3f_rank_percentile_avg3` は頭数差を補正することで、少頭数戦と多頭数戦をまたいだ比較可能性を高められる可能性がある。"
+    - "両者とも既存の `rel_agari_z` と役割が近いため、まずは add-only で純増分を比べる。"
+  leakage_notes:
+    - "as-of: いずれも各過去レースで確定した agari3f と頭数から計算し、対象レースでは lag 済みの過去3走平均だけを使う。"
+    - "対象レース当日の着順・払戻・上がり順位は不使用。`hist.held_date < cur.held_date` の過去走だけで集約する。"
+    - "percentile は各過去レース内で `0=(最良)` から `1=(最下位寄り)` のスケールに正規化する。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`agari3f_rank_avg3` は従来の離散的な効き方を再現するため、平均後に切り捨て整数へ戻した。"
+    - "`agari3f_rank_percentile_avg3` は upstream で race 内相対順位を計算し、lag 後に avg3 化している。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: agari3f_rank_avg3
+    feature_type: num
+    change_type: add
+    summary: 直近3走の agari3f race 内順位平均を切り捨てで離散化した値。小さいほど良い。
+    sections: [feature_names]
+    comparison_features: [rel_agari_z, pos4_agari_synergy_wavg5_recent_z]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_entry_past_lag.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_entry_past_lag.yml
+    final_column: mart.m_train_race_horse_past5.agari3f_rank_avg3
+
+  - feature_name: agari3f_rank_percentile_avg3
+    feature_type: num
+    change_type: add
+    summary: 直近3走の agari3f race 内相対順位 percent 値平均。0 が最良、1 に近いほど後位。
+    sections: [feature_names]
+    comparison_features: [rel_agari_z, pos4_agari_synergy_wavg5_recent_z]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_entry_past_lag.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_entry_past_lag.yml
+    final_column: mart.m_train_race_horse_past5.agari3f_rank_percentile_avg3
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_agari3f_rank_avg3
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [agari3f_rank_avg3]
+    shap:
+      candidate_feature: agari3f_rank_avg3
+      comparison_features: [rel_agari_z, pos4_agari_synergy_wavg5_recent_z]
+      report_run_label: agari3f_rank_avg3
+
+  - scenario_name: add_agari3f_rank_percentile_avg3
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [agari3f_rank_percentile_avg3]
+    shap:
+      candidate_feature: agari3f_rank_percentile_avg3
+      comparison_features: [rel_agari_z, pos4_agari_synergy_wavg5_recent_z]
+      report_run_label: agari3f_rank_percentile_avg3

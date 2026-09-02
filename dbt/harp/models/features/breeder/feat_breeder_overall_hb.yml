@@ -1,0 +1,34 @@
+version: 2
+models:
+  - name: feat_breeder_overall_hb
+    columns:
+      - name: breeder_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_wins_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []

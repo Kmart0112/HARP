@@ -1,0 +1,101 @@
+version: 1
+
+validation:
+  name: jockey_cluster_relative_variants
+  category: feature_engineering
+  change_summary: compare_jockey_cluster_relative_variants_add_and_replace
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_jockey_cluster_relative_variants_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_jockey_cluster_relative_variants_runs.csv"
+  run_log_dir: "jockey_cluster_relative_variants_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（jockey cluster relative variants）"
+  background: "現行採用中の `jockey_cluster_avg_place_rate_corrected` を race 内相対表現へ置き換える余地があるかを確認するため、`logit_z` と `rank` の 2 方式を `place_v1` で add / replace の両方で formal validation する。"
+  hypothesis_lines:
+    - "`jockey_cluster_avg_place_rate_corrected_logit_z` は確率の圧縮をほどいたうえで race 内の相対優位を持てるため、raw cluster rate より安定して効く可能性がある。"
+    - "`jockey_cluster_avg_place_rate_corrected_rank` は同一レースの序列情報に圧縮することで、確率スケールの歪みや top tail 依存を抑えられる可能性がある。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、追加・純置換・同時追加の 5 scenario を比較する。"
+  leakage_notes:
+    - "as-of: いずれの candidate も `jockey_cluster_avg_place_rate_corrected` を race 内で再表現したもので、対象レース発走前に確定している。"
+    - "対象レース結果や払戻は不使用。race 内相対化も当該レースの事前特徴量のみから計算する。"
+    - "将来情報不使用: 対象レース以降の結果や派生集計は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`jockey_cluster_avg_place_rate_corrected` は baseline では維持し、candidate は各 scenario で明示的に include する。"
+    - "`replace_*` scenario は `jockey_cluster_avg_place_rate_corrected` を外し、candidate 1 本へ純置換する。"
+    - "`add_both_relative_variants` は 2 方式を同時に有効化し、related set としての重なりも確認する。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: jockey_cluster_avg_place_rate_corrected_logit_z
+    feature_type: num
+    change_type: add
+    summary: "`jockey_cluster_avg_place_rate_corrected` を empirical logit へ変換し、race 内平均と標準偏差で z 化した相対 cluster 適性。"
+    sections: [feature_names]
+    comparison_features: [jockey_cluster_avg_place_rate_corrected, jockey_cluster_avg_place_rate_corrected_rank]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.jockey_cluster_avg_place_rate_corrected_logit_z
+
+  - feature_name: jockey_cluster_avg_place_rate_corrected_rank
+    feature_type: num
+    change_type: add
+    summary: "`jockey_cluster_avg_place_rate_corrected` の race 内降順 rank。小さいほどそのレースで cluster 適性が高い。"
+    sections: [feature_names]
+    comparison_features: [jockey_cluster_avg_place_rate_corrected, jockey_cluster_avg_place_rate_corrected_logit_z]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.jockey_cluster_avg_place_rate_corrected_rank
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_cluster_logit_z
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_place_rate_corrected_logit_z]
+      exclude_features: [jockey_cluster_avg_place_rate_corrected_rank]
+    shap:
+      candidate_feature: jockey_cluster_avg_place_rate_corrected_logit_z
+      comparison_features: [jockey_cluster_avg_place_rate_corrected, jockey_cluster_avg_place_rate_corrected_rank]
+      report_run_label: jockey_cluster_logit_z
+
+  - scenario_name: replace_cluster_with_logit_z
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_place_rate_corrected_logit_z]
+      exclude_features: [jockey_cluster_avg_place_rate_corrected, jockey_cluster_avg_place_rate_corrected_rank]
+
+  - scenario_name: add_cluster_rank
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_place_rate_corrected_rank]
+      exclude_features: [jockey_cluster_avg_place_rate_corrected_logit_z]
+    shap:
+      candidate_feature: jockey_cluster_avg_place_rate_corrected_rank
+      comparison_features: [jockey_cluster_avg_place_rate_corrected, jockey_cluster_avg_place_rate_corrected_logit_z]
+      report_run_label: jockey_cluster_rank
+
+  - scenario_name: replace_cluster_with_rank
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_place_rate_corrected_rank]
+      exclude_features: [jockey_cluster_avg_place_rate_corrected, jockey_cluster_avg_place_rate_corrected_logit_z]
+
+  - scenario_name: add_both_relative_variants
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_cluster_avg_place_rate_corrected_logit_z, jockey_cluster_avg_place_rate_corrected_rank]

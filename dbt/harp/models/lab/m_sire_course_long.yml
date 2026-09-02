@@ -1,0 +1,79 @@
+version: 2
+models:
+  - name: m_sire_course_long
+    columns:
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: total_runs
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: total_runs_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wins_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_all
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: win_rate_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []

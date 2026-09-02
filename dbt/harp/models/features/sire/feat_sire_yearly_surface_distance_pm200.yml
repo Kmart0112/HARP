@@ -1,0 +1,49 @@
+version: 2
+models:
+  - name: feat_sire_yearly_surface_distance_pm200
+    columns:
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_wins_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_pos4_agari_synergy
+        description: "種牡馬×馬場×距離±200m の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []

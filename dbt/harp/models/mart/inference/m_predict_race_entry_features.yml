@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: m_predict_race_entry_features
+    description: "Thin inference output for a target race date. It joins latest race-day odds at the mart exit and should not contain feature calculation logic."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: odds_snapshot_type
+        description: "Odds snapshot timing selected for prediction. Expected value is latest."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date selected by target_held_date."

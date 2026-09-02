@@ -1,0 +1,120 @@
+version: 1
+
+validation:
+  name: sire_cluster_logit_diff_smooth_replacement
+  category: feature_engineering
+  change_summary: compare_sire_cluster_logit_diff_smooth_replacement_variants
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_sire_cluster_logit_diff_smooth_replacement_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_sire_cluster_logit_diff_smooth_replacement_runs.csv"
+  run_log_dir: "sire_cluster_logit_diff_smooth_replacement_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（sire cluster logit diff smooth replacement）"
+  background: "種牡馬 `course_cluster` 条件の複勝率 signal を、raw rate ではなく平滑化複勝率ベースの logit 差にした場合に、現行 `same_cluster_sire_avg_pos4_agari_synergy` より良い cluster sire 代表になれるかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`same_cluster_sire_avg_diff_logit` を平滑化複勝率ベースにすると、raw logit 差で出ていた極端値を抑えつつ、overall sire 力との差分として解釈しやすい形になる可能性がある。"
+    - "`same_cluster_sire_avg_place_rate_smooth` よりも、overall 平滑化複勝率を差し引いた logit 差の方が冗長性を下げて add-on / replace の両方で効く可能性がある。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、baseline / add / replace の 4 scenario を MLflow に残す。"
+  leakage_notes:
+    - "as-of: いずれの候補も `held_year_month` 単位で当月除外の過去集計のみから計算し、対象レース発走前に確定している。"
+    - "`same_cluster_sire_avg_diff_logit` は既存の平滑化 past aggregate 同士を logit 変換して差分化したもので、対象レース結果や払戻を使わない。"
+    - "将来情報不使用: いずれも対象年月より後のレースは参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "現行 base には `same_cluster_sire_avg_pos4_agari_synergy` が含まれ、`same_cluster_sire_avg_place_rate_smooth` と `same_cluster_sire_avg_diff_logit` は未採用のため scenario ごとに明示的に include する。"
+    - "`replace_*` scenario では現行 cluster sire signal の `same_cluster_sire_avg_pos4_agari_synergy` を外し、candidate 1本へ純置換する。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: same_cluster_sire_avg_place_rate_smooth
+    feature_type: num
+    change_type: add
+    summary: "種牡馬×コースクラスタの平滑化複勝率。"
+    sections: [feature_names]
+    comparison_features: [same_cluster_sire_avg_pos4_agari_synergy, same_cluster_sire_avg_diff_logit]
+    dbt_model_path: dbt/harp/models/features/sire/feat_sire_metrics.sql
+    dbt_yaml_path: dbt/harp/models/features/sire/feat_sire_metrics.yml
+    final_column: mart.m_train_race_horse_past5.same_cluster_sire_avg_place_rate_smooth
+
+  - feature_name: same_cluster_sire_avg_diff_logit
+    feature_type: num
+    change_type: add
+    summary: "種牡馬×コースクラスタの平滑化複勝率と overall 平滑化複勝率の logit 差分。"
+    sections: [feature_names]
+    comparison_features: [same_cluster_sire_avg_pos4_agari_synergy, same_cluster_sire_avg_place_rate_smooth]
+    dbt_model_path: dbt/harp/models/features/sire/feat_sire_metrics.sql
+    dbt_yaml_path: dbt/harp/models/features/sire/feat_sire_metrics.yml
+    final_column: mart.m_train_race_horse_past5.same_cluster_sire_avg_diff_logit
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_cluster_sire_avg_place_rate_smooth
+        - same_cluster_sire_avg_diff_logit
+
+  - scenario_name: add_same_cluster_sire_place_rate_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_cluster_sire_avg_place_rate_smooth
+        - same_cluster_sire_avg_diff_logit
+      include_features: [same_cluster_sire_avg_place_rate_smooth]
+    shap:
+      candidate_feature: same_cluster_sire_avg_place_rate_smooth
+      comparison_features: [same_cluster_sire_avg_pos4_agari_synergy, same_cluster_sire_avg_diff_logit]
+      report_run_label: same_cluster_sire_place_rate_smooth
+
+  - scenario_name: add_same_cluster_sire_diff_logit
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_cluster_sire_avg_place_rate_smooth
+        - same_cluster_sire_avg_diff_logit
+      include_features: [same_cluster_sire_avg_diff_logit]
+    shap:
+      candidate_feature: same_cluster_sire_avg_diff_logit
+      comparison_features: [same_cluster_sire_avg_pos4_agari_synergy, same_cluster_sire_avg_place_rate_smooth]
+      report_run_label: same_cluster_sire_diff_logit_smooth
+
+  - scenario_name: add_both_same_cluster_sire_place_rate_and_diff_logit
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_cluster_sire_avg_place_rate_smooth
+        - same_cluster_sire_avg_diff_logit
+      include_features:
+        - same_cluster_sire_avg_place_rate_smooth
+        - same_cluster_sire_avg_diff_logit
+
+  - scenario_name: replace_cluster_pos4_with_diff_logit
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_cluster_sire_avg_pos4_agari_synergy
+        - same_cluster_sire_avg_place_rate_smooth
+        - same_cluster_sire_avg_diff_logit
+      include_features: [same_cluster_sire_avg_diff_logit]
+
+  - scenario_name: replace_cluster_pos4_with_both_place_rate_and_diff_logit
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - same_cluster_sire_avg_pos4_agari_synergy
+        - same_cluster_sire_avg_place_rate_smooth
+        - same_cluster_sire_avg_diff_logit
+      include_features:
+        - same_cluster_sire_avg_place_rate_smooth
+        - same_cluster_sire_avg_diff_logit

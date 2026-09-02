@@ -1,0 +1,14 @@
+name: place_shinba_v1
+feature_names:
+- odds_tansho
+- num_starters
+- h_weight
+- horse_number_ratio
+- kinryo_per_weight
+- same_cluster_sire_avg_place_rate
+- same_age_sire_avg_place_rate
+- jockey_avg_place_rate
+- jockey_cluster_avg_diff
+- course_cluster
+cat_features:
+- course_cluster

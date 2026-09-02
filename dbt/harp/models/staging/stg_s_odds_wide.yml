@@ -1,0 +1,43 @@
+version: 2
+models:
+  - name: stg_s_odds_wide
+    columns:
+      - name: makedate
+        description: ''
+      - name: year
+        description: ''
+      - name: monthday
+        description: ''
+      - name: jyocd
+        description: ''
+      - name: kaiji
+        description: ''
+      - name: nichiji
+        description: ''
+      - name: racenum
+        description: ''
+      - name: kumi
+        description: ''
+      - name: oddslow
+        description: ''
+      - name: oddshigh
+        description: ''
+      - name: ninki
+        description: ''
+      - name: race_id
+        description: ''
+      - name: horse_number_1
+        description: ''
+      - name: horse_number_2
+        description: ''
+      - name: pair_key
+        description: ''
+      - name: odds_wide_low
+        description: ''
+      - name: odds_wide_high
+        description: ''
+      - name: odds_wide_mid
+        description: ''
+      - name: popularity
+        description: ''
+

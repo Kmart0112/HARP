@@ -1,0 +1,144 @@
+version: 2
+models:
+  - name: stg_s_race
+    columns:
+      - name: recordspec
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: datakubun
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: monthday
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyocd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kaiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: nichiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: racenum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hondai
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukudai
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kakko
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: gradecd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: syubetu_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kyori
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: grade_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyokencd5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: syussotosu
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sibababacd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: dirtbabacd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: harontimes3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: harontimes4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: harontimel3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: harontimel4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []

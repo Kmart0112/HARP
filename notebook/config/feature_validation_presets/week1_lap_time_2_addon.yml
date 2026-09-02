@@ -1,0 +1,86 @@
+version: 1
+
+validation:
+  name: week1_lap_time_2_addon
+  category: feature_engineering
+  change_summary: validate_week1_lap_time_2_addon
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_week1_lap_time_2_addon_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_week1_lap_time_2_addon_runs.csv"
+  run_log_dir: "week1_lap_time_2_addon_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（week1 lap time 2 add-on）"
+  background: "直前3-4日前の調教2Fに対して、10-11日前の1週前調教2Fを add-on として足す価値があるかを確認する。"
+  hypothesis_lines:
+    - "`week1_wood_lap_time_2` は直前の1F情報とは異なる中盤負荷を補足できる。"
+    - "`week1_hanro_lap_time_2` は坂路の1週前2Fの負荷を別軸で補足できる。"
+    - "初回は単独2本と両方 add だけを確認する。"
+  leakage_notes:
+    - "as-of: いずれも対象レースの10-11日前までに確定している調教時計のみを使う。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は使わない。"
+    - "将来情報不使用: `held_date` 以後の調教データは参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "candidate は `week1_wood_lap_time_2` と `week1_hanro_lap_time_2` の2本のみ。"
+    - "比較対象は既存の `wood_lap_time_2` / `hanro_lap_time_2`。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: week1_wood_lap_time_2
+    feature_type: num
+    change_type: add
+    summary: 10-11日前の代表ウッド調教から採用した2Fラップ時計。
+    sections: [feature_names]
+    comparison_features: [wood_lap_time_2]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.week1_wood_lap_time_2
+
+  - feature_name: week1_hanro_lap_time_2
+    feature_type: num
+    change_type: add
+    summary: 10-11日前の代表坂路調教から採用した2Fラップ時計。
+    sections: [feature_names]
+    comparison_features: [hanro_lap_time_2]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.week1_hanro_lap_time_2
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_week1_wood_lap_time_2
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [week1_wood_lap_time_2]
+    shap:
+      candidate_feature: week1_wood_lap_time_2
+      comparison_features: [wood_lap_time_2]
+      report_run_label: week1_wood_lap_time_2
+
+  - scenario_name: add_week1_hanro_lap_time_2
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [week1_hanro_lap_time_2]
+    shap:
+      candidate_feature: week1_hanro_lap_time_2
+      comparison_features: [hanro_lap_time_2]
+      report_run_label: week1_hanro_lap_time_2
+
+  - scenario_name: add_both_week1_lap_time_2
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - week1_wood_lap_time_2
+        - week1_hanro_lap_time_2

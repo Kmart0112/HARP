@@ -1,0 +1,86 @@
+version: 1
+
+validation:
+  name: current_accel_flag_addon
+  category: feature_engineering
+  change_summary: revalidate_current_accel_flags_after_logic_change
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_current_accel_flag_addon_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_current_accel_flag_addon_runs.csv"
+  run_log_dir: "current_accel_flag_addon_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（current accel flag add-on）"
+  background: "当週調教の `wood_accel_flag` / `hanro_accel_flag` を、現行ロジックに更新した mart を前提に `place_v1` への add-on 候補として再検証する。"
+  hypothesis_lines:
+    - "`wood_accel_flag` はラストの加速形を圧縮し、絶対時計だけでは拾えない質的差分を補足できる可能性がある。"
+    - "`hanro_accel_flag` は坂路の終い重点の形を圧縮し、既存の `hanro_lap_time_1` / `hanro_lap_time_2` に対する追加情報を持つ可能性がある。"
+    - "単独追加2本と両方追加を同一 theme で確認する。"
+  leakage_notes:
+    - "as-of: いずれも対象レースの3-4日前までに確定している当週調教から計算したフラグのみを使う。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は使わない。"
+    - "将来情報不使用: `held_date` 以後の調教データは参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "baseline は現行 `place_v1` をそのまま使う。"
+    - "candidate は `wood_accel_flag` と `hanro_accel_flag` の2本のみ。"
+    - "SHAP では `wood_lap_time_1` / `hanro_lap_time_1` を比較軸に依存形を見る。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: wood_accel_flag
+    feature_type: num
+    change_type: add
+    summary: 当週の代表ウッド調教が終いに向かって加速または維持できているかを表す二値フラグ。
+    sections: [feature_names]
+    comparison_features: [wood_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.wood_accel_flag
+
+  - feature_name: hanro_accel_flag
+    feature_type: num
+    change_type: add
+    summary: 当週の代表坂路調教が終いに向かって加速または維持できているかを表す二値フラグ。
+    sections: [feature_names]
+    comparison_features: [hanro_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.hanro_accel_flag
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_wood_accel_flag
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [wood_accel_flag]
+    shap:
+      candidate_feature: wood_accel_flag
+      comparison_features: [wood_lap_time_1]
+      report_run_label: wood_accel_flag
+
+  - scenario_name: add_hanro_accel_flag
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [hanro_accel_flag]
+    shap:
+      candidate_feature: hanro_accel_flag
+      comparison_features: [hanro_lap_time_1]
+      report_run_label: hanro_accel_flag
+
+  - scenario_name: add_both_accel_flags
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - wood_accel_flag
+        - hanro_accel_flag

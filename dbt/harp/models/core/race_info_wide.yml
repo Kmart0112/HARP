@@ -1,0 +1,69 @@
+version: 2
+models:
+  - name: race_info_wide
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: round
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: popularity
+        description: ''
+        config:
+          meta: {}
+          tags: []

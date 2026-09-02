@@ -1,0 +1,68 @@
+version: 2
+models:
+  - name: feat_jockey_pos4_bin
+    description: "Monthly rolling target encoding for jockey by 5-bin corner4 position ratio."
+    columns:
+      - name: jockey_cd
+        description: "Jockey code."
+        config:
+          meta: {}
+          tags: []
+        tests:
+          - not_null
+      - name: held_year_month
+        description: "Month bucket used for as-of rolling aggregation."
+        config:
+          meta: {}
+          tags: []
+        tests:
+          - not_null
+      - name: pos4_bin5
+        description: "Equal-width 5-bin bucket of actual corner4_pos: [0.0,0.2), [0.2,0.4), [0.4,0.6), [0.6,0.8), [0.8,1.0]."
+        config:
+          meta: {}
+          tags: []
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
+      - name: jockey_pos4_bin5_starts_3y
+        description: "Starts for the same jockey and pos4_bin5 over the previous 36 months, excluding the current month."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_places_3y
+        description: "Places for the same jockey and pos4_bin5 over the previous 36 months, excluding the current month."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_place_rate_3y
+        description: "Raw place rate for the same jockey and pos4_bin5 over the previous 36 months."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_place_rate_3y_smooth
+        description: "Smoothed place rate for the same jockey and pos4_bin5 over the previous 36 months."
+        config:
+          meta: {}
+          tags: []
+      - name: overall_pos4_bin5_starts_3y
+        description: "Overall starts for the same pos4_bin5 over the previous 36 months."
+        config:
+          meta: {}
+          tags: []
+      - name: overall_pos4_bin5_places_3y
+        description: "Overall places for the same pos4_bin5 over the previous 36 months."
+        config:
+          meta: {}
+          tags: []
+      - name: overall_pos4_bin5_place_rate_3y_smooth
+        description: "Smoothed overall place rate for the same pos4_bin5 over the previous 36 months."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_relative_place_rate_3y_smooth
+        description: "Ratio of same-jockey smoothed place rate to overall pos4_bin5 smoothed place rate."
+        config:
+          meta: {}
+          tags: []

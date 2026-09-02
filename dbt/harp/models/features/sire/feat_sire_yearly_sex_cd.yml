@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: feat_sire_yearly_sex_cd
+    columns:
+      - name: sire_id
+        description: "種牡馬 ID。"
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: "開催年月。対象月の直前までで rolling を切る。"
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd
+        description: "性別コード。1=牡, 2=牝, 3=セン。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_sex_cd_sire_starts_5y
+        description: "種牡馬×sex_cd の過去5年出走数。対象月は含まない。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_sex_cd_sire_places_5y
+        description: "種牡馬×sex_cd の過去5年複勝数。対象月は含まない。"
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd_place_rate_3y_prior
+        description: "sex_cd 全体の過去3年複勝率。平滑化 prior。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_sex_cd_sire_avg_pos4_agari_synergy
+        description: "種牡馬×sex_cd の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        description: "種牡馬×sex_cd の複勝率を sex_cd 全体 prior で平滑化した5年 rolling。"
+        config:
+          meta: {}
+          tags: []

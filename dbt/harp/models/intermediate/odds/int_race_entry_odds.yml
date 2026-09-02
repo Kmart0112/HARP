@@ -1,0 +1,29 @@
+version: 2
+models:
+  - name: int_race_entry_odds
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_popularity
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: j_odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []

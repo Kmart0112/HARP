@@ -1,0 +1,199 @@
+version: 2
+models:
+  - name: fct_race_entry
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: h_weight
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: h_weight_bin
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: weight_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: dm_rank
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kinryo
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tozai_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: gate_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: popularity
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: result_order
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: blinker_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: running_style_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: rank_1c
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: rank_2c
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: rank_3c
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: rank_4c
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari4f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_sec
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: dam_id
+        description: 'Dam horse identifier carried from stg_n_uma.dam_id.'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_id
+        description: 'Damsire identifier carried from stg_n_uma.damsire_id.'
+        config:
+          meta: {}
+          tags: []
+      - name: birth_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_win
+        description: ''
+        config:
+          meta: {}
+          tags: []

@@ -1,0 +1,93 @@
+version: 1
+
+validation:
+  name: time_diff_avg3_relative_variants
+  category: feature_engineering
+  change_summary: compare_time_diff_avg3_relative_variants
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_time_diff_avg3_relative_variants_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_time_diff_avg3_relative_variants_runs.csv"
+  run_log_dir: "time_diff_avg3_relative_variants_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（time_diff_avg3 relative variants）"
+  background: "現行 base feature_set には `time_diff_rank` / `time_diff_z` / `time_diff_robust` が入っていないため、`time_diff_avg3` の race 内 relative 表現を add-only の同条件で比較する。"
+  hypothesis_lines:
+    - "`time_diff_avg3` の relative 表現を `rank / z / robust` の 3 方式で比較する。"
+    - "3 方式のうち 1 本だけを winner 候補とし、`DeltaAUC > 1e-5` かつ `DeltaLogLoss < -1e-5` を満たせば採用候補とする。"
+    - "未達の場合は relative best を記録し、保留または不採用判断の材料にする。"
+  leakage_notes:
+    - "as-of: `time_diff_avg3` は過去走由来であり、対象レース発走前に確定している。"
+    - "対象レース結果の情報は不使用。race 内の z / robust / rank は当該レースの事前特徴量のみから算出する。"
+    - "将来情報不使用: 当該レース以降の結果や派生集計は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`time_diff_rank` / `time_diff_z` / `time_diff_robust` は base に未採用のため、各 scenario で対象 feature を明示的に include する。"
+    - "`baseline_existing` は reference であり winner 候補には含めない。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: time_diff_rank
+    feature_type: num
+    change_type: add
+    summary: race内で `time_diff_avg3` を昇順 rank 化した relative 表現。
+    sections: [feature_names]
+    comparison_features: [time_diff_z, time_diff_robust]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.time_diff_rank
+
+  - feature_name: time_diff_z
+    feature_type: num
+    change_type: add
+    summary: race内で `time_diff_avg3` を平均と標準偏差で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [time_diff_rank, time_diff_robust]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.time_diff_z
+
+  - feature_name: time_diff_robust
+    feature_type: num
+    change_type: add
+    summary: race内で `time_diff_avg3` を median と IQR で標準化した robust scale。
+    sections: [feature_names]
+    comparison_features: [time_diff_rank, time_diff_z]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.time_diff_robust
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: relative_rank_only
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [time_diff_rank]
+      exclude_features: [time_diff_z, time_diff_robust]
+
+  - scenario_name: relative_z_only
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [time_diff_z]
+      exclude_features: [time_diff_rank, time_diff_robust]
+
+  - scenario_name: relative_robust_only
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [time_diff_robust]
+      exclude_features: [time_diff_rank, time_diff_z]
+    shap:
+      candidate_feature: time_diff_robust
+      comparison_features: [time_diff_rank, time_diff_z]
+      report_run_label: time_diff_robust

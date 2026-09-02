@@ -1,0 +1,24 @@
+version: 2
+models:
+  - name: feat_age
+    columns:
+      - name: age
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []

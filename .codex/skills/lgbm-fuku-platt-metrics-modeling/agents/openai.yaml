@@ -1,0 +1,4 @@
+interface:
+  display_name: "LGBM Fuku Platt Metrics Modeling"
+  short_description: "Run modular LGBM metrics flow with uv isolated dbt/python commands."
+  default_prompt: "Use $lgbm-fuku-platt-metrics-modeling to run the metrics flow via `HARP_DB_URL=... uv run python notebook/prd/lgbm_fuku_platt_metrics.py`, using pinned isolated dbt commands and `notebook/config/features.yml` for standalone metrics runs. In formal feature validation, treat `pipeline/config/feature_registry.yml` as the source of truth, let the validation job render the temporary feature YAML for the notebook, and register any newly added mart column in the registry before running validation. Use `notebook/report/features` for integrated validation reports, `notebook/report/shap` for SHAP reports, and `notebook/report/results` for run CSV/log artifacts."

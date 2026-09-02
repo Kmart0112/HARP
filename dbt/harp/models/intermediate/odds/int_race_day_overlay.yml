@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: int_race_day_overlay
+    description: "Race-entry live overlay keyed by race, horse, and odds snapshot type. This model uses latest s_jodds odds and centralizes body weight, scratch status, and fallback race-day condition fields."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: odds_snapshot_type
+        description: "Odds snapshot timing. Always latest for race-day overlay, even when live odds are missing."
+        tests:
+          - not_null
+      - name: snapshot_at
+        description: "Odds publication time when available, otherwise the model build timestamp for missing-live-odds rows."
+      - name: horse_number
+        description: "Horse number within the race."
+      - name: odds_tansho
+        description: "Win odds."
+      - name: odds_fukusho_low
+        description: "Place odds lower bound."
+      - name: odds_fukusho_high
+        description: "Place odds upper bound."
+      - name: odds_fukusho_avg
+        description: "Mean of place odds lower and upper bounds."
+      - name: odds_fukusho_weighted_avg
+        description: "Weighted place odds average."
+      - name: popularity
+        description: "Popularity rank, preferring odds snapshot then速報 entry then declared entry."
+      - name: h_weight
+        description: "Horse body weight, preferring速報 entry then declared entry."
+      - name: weight_change
+        description: "Body weight change, preferring速報 entry then declared entry."
+      - name: weather_cd
+        description: "Weather code. Currently fallback from fct_race_basic."
+      - name: surface_condition_cd
+        description: "Surface condition bucket. Currently fallback from fct_race_basic."
+      - name: live_num_starters
+        description: "Starter count used for race-day context. Currently planned_num_starters fallback."
+      - name: ijyo_cd
+        description: "Abnormal finish / scratch / exclusion code."
+      - name: is_scratched
+        description: "True when ijyo_cd is present."
+      - name: odds_source
+        description: "Odds source relation, or missing_live_odds when no valid live odds row is available."
+      - name: updated_at
+        description: "dbt model build timestamp."

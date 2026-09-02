@@ -1,0 +1,112 @@
+version: 1
+
+validation:
+  name: course_shape_weighted_pos4
+  category: feature_engineering
+  change_summary: compare_weighted_course_shape_pos4_features_against_current_raw_features
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_course_shape_weighted_pos4_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_course_shape_weighted_pos4_runs.csv"
+  run_log_dir: "course_shape_weighted_pos4_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（course shape weighted pos4）"
+  background: "採用済みの `same_homestretch_slope_surface_avg_pos4_agari_synergy` と `same_straight_distance_bucket_surface_avg_pos4_agari_synergy` について、指数減衰付きの weighted average 表現が add-on または純置換で勝てるかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`same_homestretch_slope_surface_wavg_pos4_agari_synergy` は直近適性を強めに反映することで raw average の鈍さを補える可能性がある。"
+    - "`same_straight_distance_bucket_surface_wavg_pos4_agari_synergy` も同様に、距離帯適性の近時変化を raw average より素直に捉えられる可能性がある。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、baseline / add / replace を MLflow に残す。"
+  leakage_notes:
+    - "両候補とも過去3年の事前確定情報だけを指数減衰集計した値であり、対象レース結果や払戻は使わない。"
+    - "減衰 weighting は過去レース日時にのみ依存し、対象レース以降の将来情報は不使用。"
+    - "将来情報不使用: 対象レース以降の結果や派生集計は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "candidate 2列は baseline では未採用のため、各 add scenario で明示的に include する。"
+    - "`replace_*` scenario では対応する raw average を外し、weighted average へ純置換する。"
+    - "`add_both_weighted_course_shape_pos4` は 2 列同時投入の相互作用を見る。"
+    - "source registry は実行中に書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: same_homestretch_slope_surface_wavg_pos4_agari_synergy
+    feature_type: num
+    change_type: add
+    summary: "`same_homestretch_slope_surface` 条件での pos4_agari_synergy を指数減衰平均した weighted course-shape 適性。"
+    sections: [feature_names]
+    comparison_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.same_homestretch_slope_surface_wavg_pos4_agari_synergy
+
+  - feature_name: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy
+    feature_type: num
+    change_type: add
+    summary: "`same_straight_distance_bucket_surface` 条件での pos4_agari_synergy を指数減衰平均した weighted course-shape 適性。"
+    sections: [feature_names]
+    comparison_features: [same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.same_straight_distance_bucket_surface_wavg_pos4_agari_synergy
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_homestretch_weighted_pos4
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_homestretch_slope_surface_wavg_pos4_agari_synergy]
+    shap:
+      candidate_feature: same_homestretch_slope_surface_wavg_pos4_agari_synergy
+      comparison_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy]
+      report_run_label: same_homestretch_slope_surface_wavg_pos4_agari_synergy
+
+  - scenario_name: add_straight_distance_bucket_weighted_pos4
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_straight_distance_bucket_surface_wavg_pos4_agari_synergy]
+    shap:
+      candidate_feature: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy
+      comparison_features: [same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+      report_run_label: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy
+
+  - scenario_name: add_both_weighted_course_shape_pos4
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - same_homestretch_slope_surface_wavg_pos4_agari_synergy
+        - same_straight_distance_bucket_surface_wavg_pos4_agari_synergy
+
+  - scenario_name: replace_homestretch_raw_with_weighted
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_homestretch_slope_surface_wavg_pos4_agari_synergy]
+      exclude_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy]
+
+  - scenario_name: replace_straight_distance_bucket_raw_with_weighted
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_straight_distance_bucket_surface_wavg_pos4_agari_synergy]
+      exclude_features: [same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+
+  - scenario_name: replace_both_course_shape_raw_with_weighted
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - same_homestretch_slope_surface_wavg_pos4_agari_synergy
+        - same_straight_distance_bucket_surface_wavg_pos4_agari_synergy
+      exclude_features:
+        - same_homestretch_slope_surface_avg_pos4_agari_synergy
+        - same_straight_distance_bucket_surface_avg_pos4_agari_synergy

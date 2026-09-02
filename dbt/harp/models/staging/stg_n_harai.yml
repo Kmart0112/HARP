@@ -1,0 +1,1074 @@
+version: 2
+models:
+  - name: stg_n_harai
+    columns:
+      - name: recordspec
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: datakubun
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: makedate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: monthday
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyocd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kaiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: nichiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: racenum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: torokutosu
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: syussotosu
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fuseirituflag9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tokubaraiflag9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanflag9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma10
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma11
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma12
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma13
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma14
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma15
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma16
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma17
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma18
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma19
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma20
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma21
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma22
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma23
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma24
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma25
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma26
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma27
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanuma28
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanwaku1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanwaku2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanwaku3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanwaku4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanwaku5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanwaku6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanwaku7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkanwaku8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkandowaku1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkandowaku2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkandowaku3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkandowaku4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkandowaku5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkandowaku6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkandowaku7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: henkandowaku8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyoumaban1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyopay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyoninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyoumaban2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyopay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyoninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyoumaban3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyopay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paytansyoninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoumaban1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyopay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoumaban2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyopay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoumaban3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyopay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoumaban4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyopay4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoninki4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoumaban5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyopay5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payfukusyoninki5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenkumi1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenpay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenkumi2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenpay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenkumi3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenpay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywakurenninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenkumi1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenpay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenkumi2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenpay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenkumi3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenpay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumarenninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidekumi1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidepay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywideninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidekumi2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidepay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywideninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidekumi3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidepay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywideninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidekumi4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidepay4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywideninki4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidekumi5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidepay5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywideninki5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidekumi6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidepay6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywideninki6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidekumi7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywidepay7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paywideninki7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1kumi1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1pay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1ninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1kumi2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1pay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1ninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1kumi3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1pay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payreserved1ninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatankumi1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanpay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatankumi2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanpay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatankumi3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanpay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatankumi4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanpay4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanninki4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatankumi5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanpay5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanninki5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatankumi6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanpay6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: payumatanninki6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukukumi1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukupay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukuninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukukumi2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukupay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukuninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukukumi3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukupay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrenpukuninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentankumi1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanpay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanninki1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentankumi2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanpay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanninki2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentankumi3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanpay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanninki3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentankumi4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanpay4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanninki4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentankumi5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanpay5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanninki5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentankumi6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanpay6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: paysanrentanninki6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tansyo_umaban1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tansyo_umaban2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tansyo_pay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tansyo_pay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_umaban1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_umaban2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_umaban3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_umaban4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_umaban5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_pay1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_pay2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_pay3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_pay4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukusyo_pay5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []

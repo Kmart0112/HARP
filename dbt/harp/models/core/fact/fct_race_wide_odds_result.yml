@@ -1,0 +1,34 @@
+version: 2
+models:
+  - name: fct_race_wide_odds_result
+    columns:
+      - name: race_id
+        description: ''
+      - name: horse_number_1
+        description: ''
+      - name: horse_number_2
+        description: ''
+      - name: pair_key
+        description: ''
+      - name: odds_popularity
+        description: ''
+      - name: odds_wide_low
+        description: ''
+      - name: odds_wide_high
+        description: ''
+      - name: odds_wide_mid
+        description: ''
+      - name: odds_snapshot_time_10min
+        description: 'NULL for now because wide 10-minute time-series source is not available in the current DB.'
+      - name: odds_popularity_10min
+        description: 'NULL for now because wide 10-minute time-series source is not available in the current DB.'
+      - name: odds_wide_low_10min
+        description: 'NULL for now because wide 10-minute time-series source is not available in the current DB.'
+      - name: odds_wide_high_10min
+        description: 'NULL for now because wide 10-minute time-series source is not available in the current DB.'
+      - name: odds_wide_mid_10min
+        description: 'NULL for now because wide 10-minute time-series source is not available in the current DB.'
+      - name: pay_wide
+        description: ''
+      - name: pay_popularity
+        description: ''

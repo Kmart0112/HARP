@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: feat_jockey_yearly_cluster
+    columns:
+      - name: jockey_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_starts_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_places_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_place_rate_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_place_rate_3y_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/course-cluster place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []

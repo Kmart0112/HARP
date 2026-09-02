@@ -1,0 +1,29 @@
+version: 2
+models:
+  - name: feat_sex_cd_yearly
+    columns:
+      - name: held_year
+        description: "開催年。"
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd
+        description: "性別コード。1=牡, 2=牝, 3=セン。"
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd_starts_3y
+        description: "sex_cd ごとの過去3年出走数。対象年は含まない。"
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd_places_3y
+        description: "sex_cd ごとの過去3年複勝数。対象年は含まない。"
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd_place_rate_3y
+        description: "sex_cd ごとの過去3年複勝率。種牡馬×sex_cd TE の平滑化 prior 用。"
+        config:
+          meta: {}
+          tags: []

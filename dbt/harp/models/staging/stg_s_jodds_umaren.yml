@@ -1,0 +1,40 @@
+version: 2
+models:
+  - name: stg_s_jodds_umaren
+    columns:
+      - name: makedate
+        description: ''
+      - name: year
+        description: ''
+      - name: monthday
+        description: ''
+      - name: jyocd
+        description: ''
+      - name: kaiji
+        description: ''
+      - name: nichiji
+        description: ''
+      - name: racenum
+        description: ''
+      - name: happyotime
+        description: ''
+      - name: kumi
+        description: ''
+      - name: odds
+        description: ''
+      - name: ninki
+        description: ''
+      - name: race_id
+        description: ''
+      - name: horse_number_1
+        description: ''
+      - name: horse_number_2
+        description: ''
+      - name: pair_key
+        description: ''
+      - name: popularity
+        description: ''
+      - name: odds_umaren
+        description: ''
+      - name: happyo_time
+        description: ''

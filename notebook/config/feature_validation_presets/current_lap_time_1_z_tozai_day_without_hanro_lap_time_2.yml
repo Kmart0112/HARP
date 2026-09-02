@@ -1,0 +1,116 @@
+version: 1
+
+validation:
+  name: current_lap_time_1_z_tozai_day_without_hanro_lap_time_2
+  category: feature_engineering
+  change_summary: validate_current_lap_time_1_z_tozai_day_with_hanro_lap_time_2_off
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_current_lap_time_1_z_tozai_day_without_hanro_lap_time_2_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_current_lap_time_1_z_tozai_day_without_hanro_lap_time_2_runs.csv"
+  run_log_dir: "current_lap_time_1_z_tozai_day_without_hanro_lap_time_2_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（current lap time 1 z by tozai day with hanro_lap_time_2 off）"
+  background: "当週調教の `lap_time_1` を `tozai_cd × chokyo_date` 単位で標準化した z-score を、`hanro_lap_time_2` を外した基準で raw 調教時計に対する add-on と置換候補の両面から検証する。"
+  hypothesis_lines:
+    - "`wood_lap_time_1_z_tozai_day` は `hanro_lap_time_2` を外した基準でも、生の `wood_lap_time_1` より日次・東西差を吸収した signal を持つ可能性がある。"
+    - "`hanro_lap_time_1_z_tozai_day` は `hanro_lap_time_2` を外した条件なら、坂路 raw 1F の代替表現としてより素直に効く可能性がある。"
+    - "今回は当週のみを対象に、単独 add・両方 add・family 単位の raw 置換を同一 theme で確認する。"
+  leakage_notes:
+    - "as-of: いずれも対象レースの3-4日前までに確定している当週調教時計のみを使う。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は使わない。"
+    - "将来情報不使用: `held_date` 以後の調教データは参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "baseline では `hanro_lap_time_2` を明示的に exclude する。"
+    - "candidate は `wood_lap_time_1_z_tozai_day` と `hanro_lap_time_1_z_tozai_day` の2本のみ。"
+    - "add scenario では raw `lap_time_1` を残し、replace scenario では対応する raw だけを family 単位で外して z を入れる。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: wood_lap_time_1_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 当週の代表ウッド調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [wood_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.wood_lap_time_1_z_tozai_day
+
+  - feature_name: hanro_lap_time_1_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 当週の代表坂路調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [hanro_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.hanro_lap_time_1_z_tozai_day
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features: [hanro_lap_time_2]
+
+  - scenario_name: add_wood_lap_time_1_z_tozai_day
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features: [hanro_lap_time_2]
+      include_features: [wood_lap_time_1_z_tozai_day]
+    shap:
+      candidate_feature: wood_lap_time_1_z_tozai_day
+      comparison_features: [wood_lap_time_1]
+      report_run_label: wood_lap_time_1_z_tozai_day
+
+  - scenario_name: add_hanro_lap_time_1_z_tozai_day
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features: [hanro_lap_time_2]
+      include_features: [hanro_lap_time_1_z_tozai_day]
+    shap:
+      candidate_feature: hanro_lap_time_1_z_tozai_day
+      comparison_features: [hanro_lap_time_1]
+      report_run_label: hanro_lap_time_1_z_tozai_day
+
+  - scenario_name: add_both_lap_time_1_z_tozai_day
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features: [hanro_lap_time_2]
+      include_features:
+        - wood_lap_time_1_z_tozai_day
+        - hanro_lap_time_1_z_tozai_day
+
+  - scenario_name: replace_wood_lap_time_1_with_z
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [wood_lap_time_1_z_tozai_day]
+      exclude_features: [hanro_lap_time_2, wood_lap_time_1]
+
+  - scenario_name: replace_hanro_lap_time_1_with_z
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features: [hanro_lap_time_2, hanro_lap_time_1]
+      include_features: [hanro_lap_time_1_z_tozai_day]
+
+  - scenario_name: replace_both_lap_time_1_with_z
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - hanro_lap_time_2
+        - wood_lap_time_1
+        - hanro_lap_time_1
+      include_features:
+        - wood_lap_time_1_z_tozai_day
+        - hanro_lap_time_1_z_tozai_day

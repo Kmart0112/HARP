@@ -1,0 +1,79 @@
+version: 2
+models:
+  - name: fct_race_odds_result
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_fukusho_low
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_fukusho_high
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_fukusho_avg
+        description: 'Mean of odds_fukusho_low and odds_fukusho_high.'
+        config:
+          meta: {}
+          tags: []
+      - name: odds_fukusho_weighted_avg
+        description: 'Legacy weighted average of fukusho odds (0.7 * low + 0.3 * high).'
+        config:
+          meta: {}
+          tags: []
+      - name: pay_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pay_fukusho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: j_odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: j_popularity
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: j_odds_fukusho_low
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: j_odds_fukusho_high
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: j_odds_fukusho_avg
+        description: 'Mean of j_odds_fukusho_low and j_odds_fukusho_high.'
+        config:
+          meta: {}
+          tags: []
+      - name: j_odds_fukusho_weighted_avg
+        description: 'Legacy weighted average of JRA fukusho odds (0.7 * low + 0.3 * high).'
+        config:
+          meta: {}
+          tags: []

@@ -1,0 +1,20 @@
+version: 2
+models:
+  - name: feat_jockey_yearly_surface_style
+    columns:
+      - name: jockey_cd
+        description: "Jockey code."
+      - name: held_year_month
+        description: "Month bucket for feature as-of date."
+      - name: surface
+        description: "Surface code (0 turf, 1 dirt)."
+      - name: running_style
+        description: "Running style derived from horse past-race trend in feat_race_relative_z."
+      - name: jockey_surface_style_starts_3y
+        description: "Past starts over prior 3 years for same jockey, surface, and running style."
+      - name: jockey_surface_style_places_3y
+        description: "Past places over prior 3 years for same jockey, surface, and running style."
+      - name: jockey_surface_style_place_rate_3y
+        description: "Place rate over prior 3 years for same jockey, surface, and running style."
+      - name: jockey_surface_style_place_rate_3y_smooth
+        description: "Smoothed place rate over prior 3 years for same jockey, surface, and running style."

@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: feat_damsire_yearly_overall
+    columns:
+      - name: damsire_id
+        description: '母父馬コード。feat_race_entry_base.damsire_id を月次集計した主体キー。'
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: '対象月。集計対象はこの月より前の過去月のみ。'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_starts_5y
+        description: '母父馬ごとの過去5年相当月次窓の出走数。'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_places_5y
+        description: '母父馬ごとの過去5年相当月次窓の複勝数。'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_avg_place_rate
+        description: '母父馬ごとの過去5年相当月次窓の複勝率。'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_avg_place_rate_smooth
+        description: '母父馬ごとの過去5年相当月次窓の複勝率を全体複勝率へ shrink した値。'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_avg_pos4_agari_synergy
+        description: '母父馬ごとの過去5年相当月次窓の pos4_agari_synergy 平均。'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_avg_time_diff
+        description: '母父馬ごとの過去5年相当月次窓の time_diff 平均。'
+        config:
+          meta: {}
+          tags: []

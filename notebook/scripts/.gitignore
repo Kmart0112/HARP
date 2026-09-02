@@ -1,0 +1,16 @@
+*
+!.gitignore
+!benchmark_db_to_parquet.py
+!run_dam_damsire_overall_te_validation.py
+!run_homestretch_slope_straight_distance_validation.py
+!run_jockey_cluster_vs_distance_jyo_validation.py
+!run_jockey_surface_conditional_te_validation.py
+!run_pace_front_disadvantage_past3_validation.py
+!run_pos4_agari_wavg5_median_iqr_validation.py
+!run_pos4_agari_wavg5_robust_vs_z_validation.py
+!run_raw_course_features_validation.py
+!run_sire_conditional_pos4_vs_place_validation.py
+!run_sire_overall_te_validation.py
+!run_sire_usage_period_validation.py
+!run_ten3f_vs_avg_past3_validation.py
+!run_turn_direction_course_shape_validation.py

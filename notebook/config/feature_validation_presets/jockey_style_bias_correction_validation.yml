@@ -1,0 +1,138 @@
+version: 1
+
+validation:
+  name: jockey_style_bias_correction_validation
+  category: feature_engineering
+  change_summary: compare_jockey_style_bias_corrected_variants
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_jockey_style_bias_correction_validation_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_jockey_style_bias_correction_validation_runs.csv"
+  run_log_dir: "jockey_style_bias_correction_validation_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（jockey style bias correction validation）"
+  background: "既存採用中の `jockey_style_place_rate_3y_smooth` を維持するか、脚質そのものの前有利バイアスを補正した相対化・style-prior 平滑化・style base との差分 logit 特徴へ追加または置換した方が良いかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`jockey_style_relative_place_rate_3y_smooth` は脚質そのものの前有利を差し引いた相対適性を表し、raw style TE より解釈しやすい。"
+    - "`jockey_style_place_rate_3y_style_prior_smooth` は少サンプル時の shrink 先を脚質別ベース率に合わせることで、raw style TE より自然に安定化する。"
+    - "`jockey_style_base_diff_logit_smooth` は overall running-style の base rate を logit 空間で差し引くことで、割合よりも対称な補正表現になる。"
+    - "add と replace の両方を比較し、`jockey_style_place_rate_3y_smooth` の冗長性も同時に判定する。"
+  leakage_notes:
+    - "as-of: 各 candidate は `held_year_month` 単位で当月除外の過去集計から計算し、対象レース発走前に確定している。"
+    - "`jockey_style_relative_place_rate_3y_smooth` は過去の same-jockey/style rate と overall style rate の比であり、対象レース結果や払戻を使わない。"
+    - "`jockey_style_place_rate_3y_style_prior_smooth` は過去の same-jockey/style 集計に overall style の smoothed base rate を prior として加えるだけで、将来情報は使わない。"
+    - "`jockey_style_base_diff_logit_smooth` は同じ過去集計列同士を logit 変換して差分化したもので、対象レース結果や払戻を使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`jockey_style_place_rate_3y_smooth` は baseline では維持し、candidate は各 scenario で明示的に include する。"
+    - "`replace_*` scenario は `jockey_style_place_rate_3y_smooth` を外し、candidate 側へ純置換する。"
+    - "`replace_raw_style_with_both_bias_corrected` では raw style TE を外し、relative と style-prior の 2 列をまとめて投入する。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: jockey_style_relative_place_rate_3y_smooth
+    feature_type: num
+    change_type: add
+    summary: "`same jockey × running style` の平滑化複勝率を overall running-style の平滑化複勝率で割った相対複勝率。"
+    sections: [feature_names]
+    comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_style.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_style.yml
+    final_column: mart.m_train_race_horse_past5.jockey_style_relative_place_rate_3y_smooth
+
+  - feature_name: jockey_style_place_rate_3y_style_prior_smooth
+    feature_type: num
+    change_type: add
+    summary: "overall running-style の平滑化複勝率を prior に使った same-jockey/style の平滑化複勝率。"
+    sections: [feature_names]
+    comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_style.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_style.yml
+    final_column: mart.m_train_race_horse_past5.jockey_style_place_rate_3y_style_prior_smooth
+
+  - feature_name: jockey_style_base_diff_logit_smooth
+    feature_type: num
+    change_type: add
+    summary: "same-jockey/style の平滑化複勝率から overall running-style の平滑化複勝率を logit 空間で引いた差分。"
+    sections: [feature_names]
+    comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_style.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_style.yml
+    final_column: mart.m_train_race_horse_past5.jockey_style_base_diff_logit_smooth
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_style_relative_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_relative_place_rate_3y_smooth]
+      exclude_features: [jockey_style_place_rate_3y_style_prior_smooth]
+    shap:
+      candidate_feature: jockey_style_relative_place_rate_3y_smooth
+      comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+      report_run_label: jockey_style_relative_smooth
+
+  - scenario_name: replace_raw_style_with_relative_smooth
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_relative_place_rate_3y_smooth]
+      exclude_features: [jockey_style_place_rate_3y_smooth, jockey_style_place_rate_3y_style_prior_smooth]
+
+  - scenario_name: add_style_prior_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_place_rate_3y_style_prior_smooth]
+      exclude_features: [jockey_style_relative_place_rate_3y_smooth]
+    shap:
+      candidate_feature: jockey_style_place_rate_3y_style_prior_smooth
+      comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+      report_run_label: jockey_style_prior_smooth
+
+  - scenario_name: replace_raw_style_with_style_prior_smooth
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_place_rate_3y_style_prior_smooth]
+      exclude_features: [jockey_style_place_rate_3y_smooth, jockey_style_relative_place_rate_3y_smooth]
+
+  - scenario_name: add_both_style_bias_corrected
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_relative_place_rate_3y_smooth, jockey_style_place_rate_3y_style_prior_smooth]
+
+  - scenario_name: replace_raw_style_with_both_bias_corrected
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_relative_place_rate_3y_smooth, jockey_style_place_rate_3y_style_prior_smooth]
+      exclude_features: [jockey_style_place_rate_3y_smooth]
+
+  - scenario_name: add_style_base_diff_logit_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_base_diff_logit_smooth]
+      exclude_features: [jockey_style_relative_place_rate_3y_smooth, jockey_style_place_rate_3y_style_prior_smooth]
+    shap:
+      candidate_feature: jockey_style_base_diff_logit_smooth
+      comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+      report_run_label: jockey_style_base_diff_logit_smooth
+
+  - scenario_name: replace_raw_style_with_style_base_diff_logit_smooth
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_base_diff_logit_smooth]
+      exclude_features: [jockey_style_place_rate_3y_smooth, jockey_style_relative_place_rate_3y_smooth, jockey_style_place_rate_3y_style_prior_smooth]

@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: int_race_entry_outcome
+    description: "Post-race supervised labels joined to feature matrix by training marts."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+      - name: result_order
+        description: "Final placing."
+      - name: is_win
+        description: "True when result_order is 1."
+      - name: is_place
+        description: "True when result_order is in the place-paying range."

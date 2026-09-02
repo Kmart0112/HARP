@@ -1,0 +1,124 @@
+version: 2
+models:
+  - name: feat_course_pace_time
+    columns:
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_ntile
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_count
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_time_sec
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_agari3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_race_pace
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_ten3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_ten4f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_count_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_time_sec_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_agari3f_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_race_pace_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_ten3f_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_ten4f_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: std_time_sec_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: std_agari3f_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: std_race_pace_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: std_ten3f_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: std_ten4f_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []

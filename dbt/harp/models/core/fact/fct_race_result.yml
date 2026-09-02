@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: fct_race_result
+    description: "Race-level result fact for fields only available after the race is finalized."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+      - name: ten3f
+        description: "Normalized front 3F time."
+      - name: ten4f
+        description: "Front 4F time."
+      - name: agari3f_race
+        description: "Race final 3F time."
+      - name: agari4f_race
+        description: "Race final 4F time."
+      - name: race_time_sec
+        description: "Race time in seconds from lap components."
+      - name: race_pace
+        description: "ten3f - agari3f_race."
+      - name: ten3f_ntile
+        description: "Three-bucket pace rank within race condition partitions."
+      - name: final_weather_cd
+        description: "Final weather code."
+      - name: final_surface_condition_cd
+        description: "Final surface condition bucket."

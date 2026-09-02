@@ -1,0 +1,54 @@
+version: 2
+models:
+  - name: feat_course_profile
+    columns:
+      - name: jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: gate_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: cum_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: diff_gate_pp_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: diff_gate_pp_std_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p_place_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []

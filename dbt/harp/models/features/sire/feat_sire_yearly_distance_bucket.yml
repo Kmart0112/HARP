@@ -1,0 +1,39 @@
+version: 2
+models:
+  - name: feat_sire_yearly_distance_bucket
+    columns:
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_bucket_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_dist_bucket_sire_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_dist_bucket_sire_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_dist_bucket_sire_wins_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_dist_bucket_sire_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []

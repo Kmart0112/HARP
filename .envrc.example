@@ -1,0 +1,35 @@
+# direnv config (copy to .envrc)
+# Usage:
+#   cp .envrc.example .envrc
+#   direnv allow
+#
+# This exports variables from .env.<HARP_ENV> (if exists) and .env (if exists)
+# into your shell whenever you cd into this repo.
+
+set -a
+
+# Default env name
+: "${HARP_ENV:=local}"
+
+if [ -f ".env.${HARP_ENV}" ]; then
+  . ".env.${HARP_ENV}"
+fi
+
+if [ -f ".env" ]; then
+  . ".env"
+fi
+
+if [ -f ".env.local" ]; then
+  . ".env.local"
+fi
+
+# Cognee variables are also loaded from .env when present.
+# Example keys:
+#   LLM_PROVIDER=openai
+#   LLM_MODEL=gpt-4o-mini
+#   HARP_COGNEE_SYSTEM_ROOT=outputs/cognee/system
+#   HARP_COGNEE_DATA_ROOT=outputs/cognee/data
+# Local-only secrets:
+#   .env.local -> LLM_API_KEY=...
+
+set +a

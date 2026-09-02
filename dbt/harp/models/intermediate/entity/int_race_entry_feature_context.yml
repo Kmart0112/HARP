@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: int_race_entry_feature_context
+    description: "Odds-free training/backtest feature input context. It combines declared race-entry fields with race metadata and excludes result-derived fields."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+      - name: horse_number
+        description: "Horse number within the race."
+      - name: gate_number
+        description: "Gate/frame number."
+      - name: h_weight
+        description: "Resolved horse body weight."
+      - name: h_weight_bin
+        description: "Resolved body-weight bucket."
+      - name: weight_change
+        description: "Resolved body weight change."
+      - name: weather_cd
+        description: "Resolved weather code."
+      - name: surface_condition_cd
+        description: "Resolved surface condition bucket."
+      - name: num_starters
+        description: "Resolved starter count."
+      - name: is_scratched
+        description: "True when the entry has an abnormal/scratch code."
+      - name: entry_status
+        description: "Entry lifecycle status from int_race_entry_spine."
+      - name: is_prediction_target
+        description: "True for active entries without finalized result."
+      - name: course_cluster
+        description: "Course cluster."
+      - name: turn_direction
+        description: "Course turn direction."
+      - name: straight_distance_bucket
+        description: "Bucketed course straight distance."
+      - name: age_month
+        description: "Age in months using existing HARP convention."
+      - name: age_days
+        description: "Age in days for young-horse races."
+      - name: kinryo_adj
+        description: "Sex-adjusted assigned weight."
+      - name: ensei_type
+        description: "Travel/expedition category."
+      - name: updated_at
+        description: "dbt model build timestamp."

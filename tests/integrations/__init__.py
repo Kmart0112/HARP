@@ -1,0 +1,1 @@
+"""Real adapter contract tests."""

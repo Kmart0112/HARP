@@ -1,0 +1,302 @@
+version: 2
+models:
+  - name: feat_workout_wood_4f1f_profile_cat3_yearly
+    columns:
+      - name: held_year_month
+        description: "対象月。出力の rolling 指標は当月直前36か月のみを参照する。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_cat3
+        description: "current wood の 4F×1F 3x3 joint category。`0` は欠損、`1..9` は fastest/fastest から slowest/slowest。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_cat3_starts_3y
+        description: "current wood 4F×1F category ごとの過去3年出走数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_cat3_places_3y
+        description: "current wood 4F×1F category ごとの過去3年複勝数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_place_rate_3y
+        description: "current wood 4F×1F category ごとの過去3年生複勝率。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_place_rate_3y_smooth
+        description: "current wood 4F×1F category ごとの過去3年複勝率を global prior 0.213 と疑似件数20で平滑化した TE。"
+        config:
+          meta: {}
+          tags: []
+
+  - name: feat_workout_hanro_4f1f_profile_cat3_yearly
+    columns:
+      - name: held_year_month
+        description: "対象月。出力の rolling 指標は当月直前36か月のみを参照する。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_cat3
+        description: "current hanro の 4F×1F 3x3 joint category。`0` は欠損、`1..9` は fastest/fastest から slowest/slowest。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_cat3_starts_3y
+        description: "current hanro 4F×1F category ごとの過去3年出走数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_cat3_places_3y
+        description: "current hanro 4F×1F category ごとの過去3年複勝数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_place_rate_3y
+        description: "current hanro 4F×1F category ごとの過去3年生複勝率。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_place_rate_3y_smooth
+        description: "current hanro 4F×1F category ごとの過去3年複勝率を global prior 0.213 と疑似件数20で平滑化した TE。"
+        config:
+          meta: {}
+          tags: []
+
+  - name: feat_workout_profile_metrics
+    columns:
+      - name: race_id
+        description: "Race key."
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: "Horse identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_place_rate_3y_smooth
+        description: "対象馬の current wood 4F×1F category に対応する過去3年 smoothed TE。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_place_rate_3y_smooth
+        description: "対象馬の current hanro 4F×1F category に対応する過去3年 smoothed TE。"
+        config:
+          meta: {}
+          tags: []
+
+  - name: feat_workout_trainer_lap_time_1_yearly
+    columns:
+      - name: trainer_cd
+        description: "Trainer code."
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: "対象月。出力の rolling 指標は当月直前36か月のみを参照する。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_lap_time_1_starts_3y
+        description: "trainer_cd ごとの current wood 最終1F の過去3年観測数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_lap_time_1_mean_3y
+        description: "trainer_cd ごとの current wood 最終1F の過去3年平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_lap_time_1_std_3y
+        description: "trainer_cd ごとの current wood 最終1F の過去3年標準偏差。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_lap_time_1_starts_3y
+        description: "trainer_cd ごとの current hanro 最終1F の過去3年観測数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_lap_time_1_mean_3y
+        description: "trainer_cd ごとの current hanro 最終1F の過去3年平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_lap_time_1_std_3y
+        description: "trainer_cd ごとの current hanro 最終1F の過去3年標準偏差。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_lap_time_1_starts_3y
+        description: "trainer_cd ごとの week1 wood 最終1F の過去3年観測数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_lap_time_1_mean_3y
+        description: "trainer_cd ごとの week1 wood 最終1F の過去3年平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_lap_time_1_std_3y
+        description: "trainer_cd ごとの week1 wood 最終1F の過去3年標準偏差。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_lap_time_1_starts_3y
+        description: "trainer_cd ごとの week1 hanro 最終1F の過去3年観測数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_lap_time_1_mean_3y
+        description: "trainer_cd ごとの week1 hanro 最終1F の過去3年平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_lap_time_1_std_3y
+        description: "trainer_cd ごとの week1 hanro 最終1F の過去3年標準偏差。"
+        config:
+          meta: {}
+          tags: []
+
+  - name: feat_workout_trainer_lap_time_1_metrics
+    columns:
+      - name: race_id
+        description: "Race key."
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: "Horse identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_lap_time_1_fast_excess_z_3y
+        description: "current wood 最終1F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_lap_time_1_fast_excess_z_3y
+        description: "current hanro 最終1F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_lap_time_1_fast_excess_z_3y
+        description: "week1 wood 最終1F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_lap_time_1_fast_excess_z_3y
+        description: "week1 hanro 最終1F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。"
+        config:
+          meta: {}
+          tags: []
+
+  - name: feat_workout_trainer_haron_time_4_yearly
+    columns:
+      - name: trainer_cd
+        description: "Trainer code."
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: "対象月。出力の rolling 指標は当月直前36か月のみを参照する。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_haron_time_4_starts_3y
+        description: "trainer_cd ごとの current wood 4F の過去3年観測数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_haron_time_4_mean_3y
+        description: "trainer_cd ごとの current wood 4F の過去3年平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_haron_time_4_std_3y
+        description: "trainer_cd ごとの current wood 4F の過去3年標準偏差。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_haron_time_4_starts_3y
+        description: "trainer_cd ごとの current hanro 4F の過去3年観測数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_haron_time_4_mean_3y
+        description: "trainer_cd ごとの current hanro 4F の過去3年平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_haron_time_4_std_3y
+        description: "trainer_cd ごとの current hanro 4F の過去3年標準偏差。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_haron_time_4_starts_3y
+        description: "trainer_cd ごとの week1 wood 4F の過去3年観測数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_haron_time_4_mean_3y
+        description: "trainer_cd ごとの week1 wood 4F の過去3年平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_haron_time_4_std_3y
+        description: "trainer_cd ごとの week1 wood 4F の過去3年標準偏差。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_haron_time_4_starts_3y
+        description: "trainer_cd ごとの week1 hanro 4F の過去3年観測数。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_haron_time_4_mean_3y
+        description: "trainer_cd ごとの week1 hanro 4F の過去3年平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_haron_time_4_std_3y
+        description: "trainer_cd ごとの week1 hanro 4F の過去3年標準偏差。"
+        config:
+          meta: {}
+          tags: []
+
+  - name: feat_workout_trainer_haron_time_4_metrics
+    columns:
+      - name: race_id
+        description: "Race key."
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: "Horse identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_haron_time_4_fast_excess_z_3y
+        description: "current wood 4F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_haron_time_4_fast_excess_z_3y
+        description: "current hanro 4F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_haron_time_4_fast_excess_z_3y
+        description: "week1 wood 4F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_haron_time_4_fast_excess_z_3y
+        description: "week1 hanro 4F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。"
+        config:
+          meta: {}
+          tags: []

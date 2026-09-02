@@ -1,0 +1,37 @@
+version: 2
+seeds:
+  - name: course_feature_map
+    description: "Flat-race course attributes at the grain (jyo_cd, surface, track_cd). Turf values use the official JRA course guide baseline figures when a venue has multiple A/B/C course settings. Obstacle courses are excluded because current flat seeds/models use surface in (0, 1)."
+    columns:
+      - name: jyo_cd
+        description: "Racecourse code."
+      - name: jyo_name
+        description: "Racecourse name in Japanese."
+      - name: surface
+        description: "Surface code. 0=turf, 1=dirt."
+      - name: surface_name
+        description: "Surface label."
+      - name: track_cd
+        description: "Track code from raw x_RACE.TrackCD."
+      - name: track_cd_label
+        description: "Human-readable label for the observed track_cd layout."
+      - name: turn_direction
+        description: "Course turning direction label. straight is used for Niigata turf 1000m."
+      - name: turn_direction_cd
+        description: "Turn direction code. 1=right, 2=left, 3=straight."
+      - name: course_variant
+        description: "Layout variant within the same turn direction."
+      - name: straight_distance_m
+        description: "Official JRA straight distance in meters."
+      - name: elevation_diff_m
+        description: "Official JRA elevation difference in meters. Null when the official page does not give a dedicated value for the variant."
+      - name: has_slope
+        description: "Whether the course has a notable slope or hill according to the JRA course guide."
+      - name: has_homestretch_slope
+        description: "Whether the home straight toward the finish includes a notable slope."
+      - name: has_uphill_finish
+        description: "Whether the home straight includes a meaningful uphill finish."
+      - name: slope_feature_ja
+        description: "Short Japanese note about the slope profile."
+      - name: source_url
+        description: "Official JRA course guide URL used as the main source."

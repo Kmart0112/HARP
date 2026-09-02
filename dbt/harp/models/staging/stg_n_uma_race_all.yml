@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: stg_n_uma_race_all
+    description: "Typed n_uma_race staging model that keeps pre-result rows. Existing stg_n_uma_race keeps only completed normal result rows for historical training compatibility."
+    columns:
+      - name: race_id
+        description: "Race identifier derived from year, monthday, jyo, kaiji, nichiji, and racenum."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+      - name: datakubun
+        description: "JVLink data category / lifecycle code."
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: horse_name
+        description: "Horse name."
+      - name: age
+        description: "Horse age at the race."
+      - name: h_weight
+        description: "Horse body weight when available."
+      - name: weight_change
+        description: "Body weight change when available."
+      - name: dm_rank
+        description: "Data mining rank when present in the source."
+      - name: sex_cd
+        description: "Horse sex code."
+      - name: kinryo
+        description: "Assigned weight carried by the horse."
+      - name: tozai_cd
+        description: "East/west stable code."
+      - name: jockey_cd
+        description: "Jockey code."
+      - name: jockey_cat
+        description: "Local coarse jockey category used by existing HARP features."
+      - name: trainer_cd
+        description: "Trainer code."
+      - name: horse_number
+        description: "Horse number within the race."
+      - name: gate_number
+        description: "Gate/frame number."
+      - name: popularity
+        description: "Popularity rank when available."
+      - name: odds_tansho
+        description: "Win odds from the race-entry record when available."
+      - name: result_order
+        description: "Final placing. Null for pre-result rows."
+      - name: rank_1c
+        description: "First-corner position. Null before result is available."
+      - name: rank_2c
+        description: "Second-corner position. Null before result is available."
+      - name: rank_3c
+        description: "Third-corner position. Null before result is available."
+      - name: rank_4c
+        description: "Fourth-corner position. Null before result is available."
+      - name: agari3f
+        description: "Horse final 3F time. Null before result is available."
+      - name: agari4f
+        description: "Horse final 4F time. Null before result is available."
+      - name: time_diff
+        description: "Time difference to winner. Null before result is available."
+      - name: time_sec
+        description: "Running time in seconds. Null before result is available."
+      - name: running_style_cd
+        description: "Actual running style code when available."
+      - name: blinker_cd
+        description: "Blinker code."
+      - name: ijyo_cd
+        description: "Abnormal finish / scratch / exclusion code. Null for normal entries."
+      - name: has_result
+        description: "True when final result_order is available."

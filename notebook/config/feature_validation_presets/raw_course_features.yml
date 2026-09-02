@@ -1,0 +1,142 @@
+version: 1
+
+validation:
+  name: raw_course_features
+  category: feature_engineering
+  change_summary: add_raw_course_features
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_raw_course_features_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_raw_course_features_runs.csv"
+  run_log_dir: "raw_course_features_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（raw course features）"
+  background: "既存採用済みのコース形状系特徴量は条件別履歴集計が中心のため、当該レース raw 属性の追加価値を確認する。"
+  hypothesis_lines:
+    - "`turn_direction` は左右回り・直線コース差を直接補足できる。"
+    - "`straight_distance_m` は直線長を bucket より細かく表現できる。"
+    - "`has_homestretch_slope` はゴール前坂の有無を直接補足できる。"
+  leakage_notes:
+    - "as-of: 3列ともレース確定前に既知の静的コース属性。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は不使用。"
+    - "将来情報不使用: 当該レースに紐づく静的属性のみ使用。"
+    - "補足: SHAP はリーク疑い確認の補助判定として実施。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: turn_direction
+    feature_type: cat
+    change_type: add
+    summary: 当該レースの左右回り/直線コース区分をそのまま使う。
+    sections: [feature_names, cat_features]
+    comparison_features: [same_turn_direction_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.turn_direction
+
+  - feature_name: straight_distance_m
+    feature_type: num
+    change_type: add
+    summary: 当該レースの公式直線長をメートル値のまま使う。
+    sections: [feature_names]
+    comparison_features: [same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.straight_distance_m
+
+  - feature_name: has_homestretch_slope
+    feature_type: cat
+    change_type: add
+    summary: 当該レースのゴール前坂有無をそのまま使う。
+    sections: [feature_names, cat_features]
+    comparison_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.has_homestretch_slope
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - same_turn_direction_surface_avg_pos4_agari_synergy
+        - same_homestretch_slope_surface_avg_pos4_agari_synergy
+        - same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+
+  - scenario_name: add_turn_direction_raw
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - same_turn_direction_surface_avg_pos4_agari_synergy
+        - same_homestretch_slope_surface_avg_pos4_agari_synergy
+        - same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+        - turn_direction
+      include_cat_features: [turn_direction]
+    shap:
+      candidate_feature: turn_direction
+      comparison_features: [same_turn_direction_surface_avg_pos4_agari_synergy]
+      report_run_label: raw_course_turn_direction
+
+  - scenario_name: add_straight_distance_raw
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - same_turn_direction_surface_avg_pos4_agari_synergy
+        - same_homestretch_slope_surface_avg_pos4_agari_synergy
+        - same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+        - straight_distance_m
+    shap:
+      candidate_feature: straight_distance_m
+      comparison_features: [same_straight_distance_bucket_surface_avg_pos4_agari_synergy]
+      report_run_label: raw_course_straight_distance_m
+
+  - scenario_name: add_homestretch_slope_raw
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - same_turn_direction_surface_avg_pos4_agari_synergy
+        - same_homestretch_slope_surface_avg_pos4_agari_synergy
+        - same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+        - has_homestretch_slope
+      include_cat_features: [has_homestretch_slope]
+    shap:
+      candidate_feature: has_homestretch_slope
+      comparison_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy]
+      report_run_label: raw_course_has_homestretch_slope
+
+  - scenario_name: add_all_raw
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - same_turn_direction_surface_avg_pos4_agari_synergy
+        - same_homestretch_slope_surface_avg_pos4_agari_synergy
+        - same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+        - turn_direction
+        - straight_distance_m
+        - has_homestretch_slope
+      include_cat_features:
+        - turn_direction
+        - has_homestretch_slope
+
+  - scenario_name: replace_course_condition_history_with_raw
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - turn_direction
+        - straight_distance_m
+        - has_homestretch_slope
+      include_cat_features:
+        - turn_direction
+        - has_homestretch_slope

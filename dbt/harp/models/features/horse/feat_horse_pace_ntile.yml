@@ -1,0 +1,95 @@
+version: 2
+models:
+  - name: feat_horse_pace_ntile
+    description: "Horse-level 3-year history features by pace bucket ten3f_ntile (1..3), excluding current day. ten3f_ntile is built in races.sql using ntile(3) over (partition by jyo_cd, distance_m, surface, surface_condition_cd, track_cd order by ten3f). Raw field definitions: https://everydb.iwinz.net/edb2_manual/."
+    columns:
+      - name: kettonum
+        description: "Horse identifier from raw n_uma_race.KettoNum (x_UMA_RACE)."
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: "Race date used as the history cutoff date. History condition: hist.held_date < cur.held_date and hist.held_date >= cur.held_date - interval '3 years'."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_starts
+        description: "3-year starts where ten3f_ntile=1. SQL aggregation: coalesce(sum(hist.starts_on_day), 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_places
+        description: "3-year places where ten3f_ntile=1. SQL aggregation: coalesce(sum(hist.places_on_day), 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_pos4_agari_synergy
+        description: "3-year sum of pos4_agari_synergy where ten3f_ntile=1."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_avg_pos4_agari_synergy
+        description: "pace_ntile1_past_pos4_agari_synergy / pace_ntile1_past_starts (only when starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_place_rate
+        description: "pace_ntile1_past_places / pace_ntile1_past_starts (only when starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_starts
+        description: "3-year starts where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_places
+        description: "3-year places where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_pos4_agari_synergy
+        description: "3-year sum of pos4_agari_synergy where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_avg_pos4_agari_synergy
+        description: "pace_ntile2_past_pos4_agari_synergy / pace_ntile2_past_starts (only when starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_place_rate
+        description: "pace_ntile2_past_places / pace_ntile2_past_starts (only when starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_starts
+        description: "3-year starts where ten3f_ntile=3."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_places
+        description: "3-year places where ten3f_ntile=3."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_pos4_agari_synergy
+        description: "3-year sum of pos4_agari_synergy where ten3f_ntile=3."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_avg_pos4_agari_synergy
+        description: "pace_ntile3_past_pos4_agari_synergy / pace_ntile3_past_starts (only when starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_place_rate
+        description: "pace_ntile3_past_places / pace_ntile3_past_starts (only when starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_fast_minus_slow_place_rate
+        description: "Pace sensitivity delta: pace_ntile1_place_rate - pace_ntile3_place_rate (both starts > 0)."
+        config:
+          meta: {}
+          tags: []

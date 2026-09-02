@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: feat_sire_yearly_age
+    columns:
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age_place_rate_3y_prior
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_pos4_agari_synergy
+        description: "種牡馬×年齢の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_place_rate_smooth_prev_age
+        description: ''
+        config:
+          meta: {}
+          tags: []

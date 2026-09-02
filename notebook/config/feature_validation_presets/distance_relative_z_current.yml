@@ -1,0 +1,65 @@
+version: 1
+
+validation:
+  name: distance_relative_z_current
+  category: feature_engineering
+  change_summary: compare_same_distance_weighted_pos4_relative_z_against_current_active_representation
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_distance_relative_z_current_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_distance_relative_z_current_runs.csv"
+  run_log_dir: "distance_relative_z_current_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（distance relative z current）"
+  background: "現行採用中の `same_distance_weighted_avg_pos4_agari_synergy` について、race 内 `z` に再表現した relative 版が add-on または純置換で勝てるかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`same_distance_weighted_avg_pos4_agari_synergy_z` は同距離適性の相対優位を raw 値より直接表現できる可能性がある。"
+    - "`replace_same_distance_raw_with_relative_z` が勝てば、distance の条件適性は raw absolute より race-relative representation が自然だと判断できる。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、baseline / add / replace を MLflow に残す。"
+  leakage_notes:
+    - "候補は過去3年の事前確定情報だけから作られた `same_distance_weighted_avg_pos4_agari_synergy` を race 内平均と標準偏差で標準化した値であり、対象レース結果や払戻は使わない。"
+    - "race 内 z は対象レースの事前特徴量だけで計算し、将来情報は不使用。"
+    - "将来情報不使用: 対象レース以降の結果や派生集計は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`add_same_distance_relative_z` は現行 raw distance signal への add-on を見る。"
+    - "`replace_same_distance_raw_with_relative_z` は現行採用中の `same_distance_weighted_avg_pos4_agari_synergy` を z 版へ置換する。"
+    - "source registry は実行中に書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: same_distance_weighted_avg_pos4_agari_synergy_z
+    feature_type: num
+    change_type: add
+    summary: "`same_distance_weighted_avg_pos4_agari_synergy` を race 内平均と標準偏差で z 化した relative 距離適性。"
+    sections: [feature_names]
+    comparison_features: [same_distance_weighted_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.same_distance_weighted_avg_pos4_agari_synergy_z
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_same_distance_relative_z
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_distance_weighted_avg_pos4_agari_synergy_z]
+    shap:
+      candidate_feature: same_distance_weighted_avg_pos4_agari_synergy_z
+      comparison_features: [same_distance_weighted_avg_pos4_agari_synergy]
+      report_run_label: same_distance_weighted_avg_pos4_agari_synergy_z
+
+  - scenario_name: replace_same_distance_raw_with_relative_z
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_distance_weighted_avg_pos4_agari_synergy_z]
+      exclude_features: [same_distance_weighted_avg_pos4_agari_synergy]

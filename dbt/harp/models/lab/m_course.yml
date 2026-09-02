@@ -1,0 +1,64 @@
+version: 2
+models:
+  - name: m_course
+    columns:
+      - name: jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: total_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_pace_type
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_agari3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: avg_ten3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari_good_place_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_pos_place_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari_good_win_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_pos_win_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []

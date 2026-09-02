@@ -1,0 +1,125 @@
+version: 2
+models:
+  - name: m_corner4_prediction_compare
+    description: "Exploratory comparison table for lightweight corner4_pos prediction rules without heavy model training."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: "Horse pedigree identifier used as the runner key."
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: "Race date."
+        config:
+          meta: {}
+          tags: []
+      - name: held_year
+        description: "Held year derived from held_date."
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: "Racecourse code."
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: "Race distance in meters."
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: "Surface code."
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: "Track course code."
+        config:
+          meta: {}
+          tags: []
+      - name: race_level
+        description: "Race class level."
+        config:
+          meta: {}
+          tags: []
+      - name: result_order
+        description: "Official finish order."
+        config:
+          meta: {}
+          tags: []
+      - name: is_place
+        description: "Whether the runner finished in the place positions."
+        config:
+          meta: {}
+          tags: []
+      - name: num_starters
+        description: "Number of starters in the race."
+        config:
+          meta: {}
+          tags: []
+      - name: actual_corner4_pos
+        description: "Actual 4th-corner position ratio within the field."
+        config:
+          meta: {}
+          tags: []
+      - name: num_past3_races
+        description: "Number of available past-3 races for lag-based features."
+        config:
+          meta: {}
+          tags: []
+      - name: num_past5_races
+        description: "Number of available past-5 races for lag-based features."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_last1
+        description: "Uses only the most recent past race corner4 position."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_avg3
+        description: "Simple average of the most recent three corner4 positions."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_wavg3_recent
+        description: "Recency-weighted average over the most recent three corner4 positions."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_endpoint_trend3
+        description: "Endpoint trend extrapolation from p3 to p1 for the next race."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_ols3_next
+        description: "Linear regression forecast for the next race using the most recent three corner4 positions."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_avg5
+        description: "Simple average of the most recent five corner4 positions."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_wavg5_recent
+        description: "Recency-weighted average over the most recent five corner4 positions."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_endpoint_trend5
+        description: "Endpoint trend extrapolation from p5 to p1 for the next race."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_wavg5_plus_trend5
+        description: "Weighted average over five races adjusted by the simple trend estimate."
+        config:
+          meta: {}
+          tags: []

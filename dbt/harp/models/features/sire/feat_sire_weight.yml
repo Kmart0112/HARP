@@ -1,0 +1,39 @@
+version: 2
+models:
+  - name: feat_sire_weight
+    columns:
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: h_weight_bin
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_wins_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []

@@ -1,0 +1,20 @@
+version: 2
+models:
+  - name: feat_jockey_yearly_surface_straight_distance_bucket
+    columns:
+      - name: jockey_cd
+        description: "Jockey code."
+      - name: held_year_month
+        description: "Month bucket for feature as-of date."
+      - name: surface
+        description: "Surface code (0 turf, 1 dirt)."
+      - name: straight_distance_bucket
+        description: "Straight-distance bucket derived from straight_distance_m: 1=<300, 2=300-349, 3=350-399, 4=400-499, 5=>=500."
+      - name: jockey_surface_straight_distance_bucket_starts_3y
+        description: "Past starts over prior 3 years for same jockey, surface, and straight-distance bucket."
+      - name: jockey_surface_straight_distance_bucket_places_3y
+        description: "Past places over prior 3 years for same jockey, surface, and straight-distance bucket."
+      - name: jockey_surface_straight_distance_bucket_place_rate_3y
+        description: "Place rate over prior 3 years for same jockey, surface, and straight-distance bucket."
+      - name: jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+        description: "Smoothed place rate over prior 3 years for same jockey, surface, and straight-distance bucket."

@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: fct_race_basic
+    description: "Race-level fact for fields known before race results are finalized. Race-day overlay may override weather, going, and starter count."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+      - name: held_year
+        description: "Race year."
+      - name: held_year_month
+        description: "Race month."
+      - name: race_name
+        description: "Race name."
+      - name: jyo_cd
+        description: "Racecourse code."
+      - name: distance_m
+        description: "Race distance in meters."
+      - name: surface
+        description: "Surface code. 0=turf, 1=dirt."
+      - name: base_surface_condition_cd
+        description: "Pre-result/fallback surface condition bucket."
+      - name: base_weather_cd
+        description: "Pre-result/fallback weather code."
+      - name: planned_num_starters
+        description: "Registered or planned number of starters."
+      - name: track_cd
+        description: "Track code."
+      - name: hassotime
+        description: "Scheduled post time."
+      - name: course_cluster
+        description: "Course cluster from course_cluster_map."
+      - name: turn_direction
+        description: "Course turn direction."
+      - name: straight_distance_m
+        description: "Official straight distance in meters."
+      - name: has_homestretch_slope
+        description: "Whether the homestretch has a notable slope."

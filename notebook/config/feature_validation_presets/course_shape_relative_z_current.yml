@@ -1,0 +1,101 @@
+version: 1
+
+validation:
+  name: course_shape_relative_z_current
+  category: feature_engineering
+  change_summary: compare_course_shape_relative_z_features_against_current_active_representations
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_course_shape_relative_z_current_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_course_shape_relative_z_current_runs.csv"
+  run_log_dir: "course_shape_relative_z_current_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（course shape relative z current）"
+  background: "現行採用中の `same_homestretch_slope_surface_avg_pos4_agari_synergy` と `same_straight_distance_bucket_surface_wavg_pos4_agari_synergy` について、race 内 `z` に再表現した relative 版が add-on または純置換で勝てるかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`same_homestretch_slope_surface_avg_pos4_agari_synergy_z` は同レース内の坂適性の相対優位を raw 値より直接表現できる可能性がある。"
+    - "`same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z` は採用済み wavg のレース内比較優位を追加で表現できる可能性がある。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、baseline / add / replace を MLflow に残す。"
+  leakage_notes:
+    - "両候補とも過去3年の事前確定情報だけから作られた条件別 aggregate を race 内平均と標準偏差で標準化した値であり、対象レース結果や払戻は使わない。"
+    - "race 内 z は対象レースの事前特徴量だけで計算し、将来情報は不使用。"
+    - "将来情報不使用: 対象レース以降の結果や派生集計は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`same_homestretch_slope_surface_avg_pos4_agari_synergy_z` は raw homestretch signal との add / replace を見る。"
+    - "`same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z` は採用済み wavg straight-distance signal との add / replace を見る。"
+    - "`add_both_course_shape_relative_z` は 2 列同時投入の相互作用を見る。"
+    - "source registry は実行中に書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: same_homestretch_slope_surface_avg_pos4_agari_synergy_z
+    feature_type: num
+    change_type: add
+    summary: "`same_homestretch_slope_surface_avg_pos4_agari_synergy` を race 内平均と標準偏差で z 化した relative 坂適性。"
+    sections: [feature_names]
+    comparison_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.same_homestretch_slope_surface_avg_pos4_agari_synergy_z
+
+  - feature_name: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z
+    feature_type: num
+    change_type: add
+    summary: "`same_straight_distance_bucket_surface_wavg_pos4_agari_synergy` を race 内平均と標準偏差で z 化した relative 直線距離帯適性。"
+    sections: [feature_names]
+    comparison_features: [same_straight_distance_bucket_surface_wavg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_homestretch_relative_z
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy_z]
+    shap:
+      candidate_feature: same_homestretch_slope_surface_avg_pos4_agari_synergy_z
+      comparison_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy]
+      report_run_label: same_homestretch_slope_surface_avg_pos4_agari_synergy_z
+
+  - scenario_name: add_straight_distance_bucket_wavg_relative_z
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z]
+    shap:
+      candidate_feature: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z
+      comparison_features: [same_straight_distance_bucket_surface_wavg_pos4_agari_synergy]
+      report_run_label: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z
+
+  - scenario_name: add_both_course_shape_relative_z
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - same_homestretch_slope_surface_avg_pos4_agari_synergy_z
+        - same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z
+
+  - scenario_name: replace_homestretch_raw_with_relative_z
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy_z]
+      exclude_features: [same_homestretch_slope_surface_avg_pos4_agari_synergy]
+
+  - scenario_name: replace_straight_distance_bucket_wavg_with_relative_z
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z]
+      exclude_features: [same_straight_distance_bucket_surface_wavg_pos4_agari_synergy]

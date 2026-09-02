@@ -1,0 +1,39 @@
+version: 2
+models:
+  - name: feat_jockey_yearly_surface_condition
+    columns:
+      - name: jockey_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_condition_starts_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_condition_places_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_condition_place_rate_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_condition_place_rate_3y_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []

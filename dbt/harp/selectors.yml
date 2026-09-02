@@ -1,0 +1,70 @@
+selectors:
+  - name: training_default
+    description: Default training and mart workflow without rebuilding the heavy fct_jodds_snapshot model.
+    definition:
+      union:
+        - method: fqn
+          value: m_train_race_horse_past5
+          parents: true
+        - method: fqn
+          value: m_train_race_horse_past5_features
+          parents: true
+        - method: fqn
+          value: m_race_entry_context
+          parents: true
+        - method: fqn
+          value: fct_race
+          parents: true
+        - method: fqn
+          value: fct_race_odds_result
+          parents: true
+        - method: fqn
+          value: feat_race_entry_base
+          parents: true
+
+  - name: manual_fct_jodds_snapshot_refresh
+    description: Manual refresh path for the heavy fct_jodds_snapshot model.
+    definition:
+      method: fqn
+      value: fct_jodds_snapshot
+      parents: true
+
+  - name: manual_fct_jodds_umaren_snapshot_refresh
+    description: Manual refresh path for the heavy fct_jodds_umaren_snapshot model.
+    definition:
+      method: fqn
+      value: fct_jodds_umaren_snapshot
+      parents: true
+
+  - name: race_week_prepare
+    description: Build static weekly race inputs and common feature matrix.
+    definition:
+      union:
+        - method: tag
+          value: race_week_static
+        - method: tag
+          value: feature_matrix
+
+  - name: race_day_update
+    description: Refresh race-day live overlay, feature context/matrix, and inference output.
+    definition:
+      union:
+        - method: tag
+          value: race_day_live
+        - method: tag
+          value: inference
+
+  - name: race_day_odds_update
+    description: Refresh only the race-day odds tables from append-only s_jodds before feature-matrix joins.
+    definition:
+      method: tag
+      value: race_day_odds
+
+  - name: post_race_finalize
+    description: Refresh post-race outcomes and training output.
+    definition:
+      union:
+        - method: tag
+          value: post_race
+        - method: tag
+          value: training

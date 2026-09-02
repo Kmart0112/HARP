@@ -1,0 +1,35 @@
+version: 1
+
+validation:
+  name: template_feature_selection
+  category: feature_selection
+  change_summary: describe_selection_theme
+  experiment_name: feature_selection
+
+outputs:
+  report_file: "{date}_template_feature_selection_report.md"
+  runs_csv_file: "{date}_template_feature_selection_runs.csv"
+  decisions_csv_file: "{date}_template_feature_selection_decisions.csv"
+  selected_contract_file: "template_feature_selection_selected_{date}.yml"
+  run_log_dir: "template_feature_selection_logs_{date}"
+
+selection:
+  base_feature_set_name: place_v1
+  target_contract_path: contracts/features/place/template_feature_selection_selected.yaml
+  aggregate_groups:
+    - group_id: sample_aggregate_group
+      aggregate_features: [aggregate_feature_a]
+      source_features: [source_feature_a]
+  variant_groups:
+    - group_id: sample_variant_group
+      candidates: [variant_a, variant_b]
+
+report:
+  title: "特徴量整理レポート（template）"
+  background: "ここに背景を書く。"
+  hypothesis_lines:
+    - "ここに仮説を書く。"
+  leakage_notes:
+    - "ここに前提を書く。"
+  implementation_notes:
+    - "base feature set と比較方針を書く。"

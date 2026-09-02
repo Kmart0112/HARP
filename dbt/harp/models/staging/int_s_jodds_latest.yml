@@ -1,0 +1,40 @@
+version: 2
+models:
+  - name: int_s_jodds_latest
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: happyo_time
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_fukusho_low
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_fukusho_high
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: popularity
+        description: ''
+        config:
+          meta: {}
+          tags: []
+

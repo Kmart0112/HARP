@@ -1,0 +1,214 @@
+version: 2
+models:
+  - name: feat_sire_metrics
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_career_months
+        description: "種牡馬ごとの最古 held_year_month から対象レース月までの経過月数（0始まり）。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_is_early_phase_3y
+        description: "種牡馬使用初期フラグ。sire_career_months < 36 で 1、それ以外は 0。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_pos4_agari_synergy
+        description: "種牡馬全体の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_time_diff
+        description: "種牡馬全体の time_diff 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: age_place_rate_3y_prior
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd_place_rate_3y_prior
+        description: "old_cd 全体の過去3年複勝率。種牡馬×old_cd 平滑化の prior。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_pos4_agari_synergy
+        description: "種牡馬×コースクラスタの pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_place_rate_smooth_prev_age
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_pos4_agari_synergy
+        description: "種牡馬×年齢の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_past_starts
+        description: "種牡馬×old_cd の過去5年出走数。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_place_rate_smooth_prev_old_cd
+        description: "種牡馬×old_cd の複勝率を old_cd 全体 prior で平滑化した5年 rolling。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_place_rate
+        description: "種牡馬×old_cd の生の過去5年複勝率。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_pos4_agari_synergy
+        description: "種牡馬×old_cd の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        description: "種牡馬×sex_cd の複勝率を sex_cd 全体 prior で平滑化した5年 rolling。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_sex_cd_sire_avg_pos4_agari_synergy
+        description: "種牡馬×sex_cd の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_place_rate_smooth
+        description: "種牡馬×old_cd の複勝率を overall sire prior でも補完した平滑化版。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_place_rate_5y_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_pos4_agari_synergy
+        description: "種牡馬×馬場×距離±200m の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_diff
+        description: "種牡馬×old_cd 複勝率と種牡馬 overall 複勝率の差。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_pos4_agari_synergy_diff
+        description: "種牡馬×コースクラスタ pos4_agari_synergy と種牡馬 overall pos4_agari_synergy の差。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_diff_logit
+        description: "種牡馬×コースクラスタの平滑化複勝率と overall 平滑化複勝率の logit 差。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_diff_logit
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_diff_logit
+        description: "種牡馬×old_cd 複勝率と overall 複勝率の logit 差。"
+        config:
+          meta: {}
+          tags: []

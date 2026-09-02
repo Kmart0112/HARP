@@ -1,0 +1,118 @@
+version: 1
+
+validation:
+  name: current_p1_week1_lap_time_1_z_bundle_without_week1_raw
+  category: feature_engineering
+  change_summary: validate_current_p1_week1_lap_time_1_z_bundle_without_week1_raw
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_current_p1_week1_lap_time_1_z_bundle_without_week1_raw_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_current_p1_week1_lap_time_1_z_bundle_without_week1_raw_runs.csv"
+  run_log_dir: "current_p1_week1_lap_time_1_z_bundle_without_week1_raw_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（current p1 week1 lap time 1 z bundle without week1 raw）"
+  background: "当週と直近1走前の `lap_time_1` z bundle に加えて、1週前の `lap_time_1` z もまとめて追加し、`week1 raw` を外した基準で bundle の増分価値を確認する。"
+  hypothesis_lines:
+    - "`week1_wood_lap_time_1_z_tozai_day` と `week1_hanro_lap_time_1_z_tozai_day` を current/p1 z bundle に加えると、week1 raw を外した状態でも 1 週前 signal を相対化した形で取り戻せる可能性がある。"
+    - "前回 `week1 raw off` で改善した current+p1 z bundle に week1 z を足すと、AUC と確率品質の両方でさらに上積みできる可能性がある。"
+    - "今回は add の有効性確認が目的なので、baseline と add_all の2比較に絞る。"
+  leakage_notes:
+    - "as-of: いずれも対象レース前に確定している当週・1週前調教時計と、過去レース時点で既知だった p1 調教時計のみを使う。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は使わない。"
+    - "将来情報不使用: `p1_*` は lag により過去レース時点の特徴量を参照している。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "baseline では `hanro_lap_time_2` と `week1_wood_lap_time_1` / `week1_hanro_lap_time_1` を明示的に exclude する。"
+    - "candidate は current 2本、p1 2本、week1 2本の計6本。"
+    - "add scenario は raw current / raw p1 を残しつつ、current+p1+week1 の z 群をまとめて追加する。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: wood_lap_time_1_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 当週の代表ウッド調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [wood_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.wood_lap_time_1_z_tozai_day
+
+  - feature_name: hanro_lap_time_1_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 当週の代表坂路調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [hanro_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.hanro_lap_time_1_z_tozai_day
+
+  - feature_name: p1_wood_lap_time_1_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 直近1走前レース時点の代表ウッド調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [p1_wood_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.p1_wood_lap_time_1_z_tozai_day
+
+  - feature_name: p1_hanro_lap_time_1_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 直近1走前レース時点の代表坂路調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [p1_hanro_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.p1_hanro_lap_time_1_z_tozai_day
+
+  - feature_name: week1_wood_lap_time_1_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 1週前の代表ウッド調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [week1_wood_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.week1_wood_lap_time_1_z_tozai_day
+
+  - feature_name: week1_hanro_lap_time_1_z_tozai_day
+    feature_type: num
+    change_type: add
+    summary: 1週前の代表坂路調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。
+    sections: [feature_names]
+    comparison_features: [week1_hanro_lap_time_1]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.week1_hanro_lap_time_1_z_tozai_day
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - hanro_lap_time_2
+        - week1_wood_lap_time_1
+        - week1_hanro_lap_time_1
+
+  - scenario_name: add_all_current_p1_week1_lap_time_1_z
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      exclude_features:
+        - hanro_lap_time_2
+        - week1_wood_lap_time_1
+        - week1_hanro_lap_time_1
+      include_features:
+        - wood_lap_time_1_z_tozai_day
+        - hanro_lap_time_1_z_tozai_day
+        - p1_wood_lap_time_1_z_tozai_day
+        - p1_hanro_lap_time_1_z_tozai_day
+        - week1_wood_lap_time_1_z_tozai_day
+        - week1_hanro_lap_time_1_z_tozai_day

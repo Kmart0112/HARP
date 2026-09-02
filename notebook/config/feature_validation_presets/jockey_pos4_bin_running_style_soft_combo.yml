@@ -1,0 +1,145 @@
+version: 1
+
+validation:
+  name: jockey_pos4_bin_running_style_soft_combo
+  category: feature_engineering
+  change_summary: validate_jockey_pos4_bin_running_style_soft_combo
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_jockey_pos4_bin_running_style_soft_combo_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_jockey_pos4_bin_running_style_soft_combo_runs.csv"
+  run_log_dir: "jockey_pos4_bin_running_style_soft_combo_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（jockey pos4 bin + running style soft combo）"
+  background: "jockey_style の hard join を pos4 hard/soft と running_style soft に置き換えたり併用したりして、既存構成より改善する組み合わせがあるかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`jockey_pos4_bin5_place_rate_3y_smooth_hard` は既存 `jockey_style_place_rate_3y_smooth` の置換候補として有効である。"
+    - "`jockey_pos4_bin5_place_rate_3y_smooth_soft` は hard bin の境界ノイズを減らし、置換後の上乗せ要素として効く可能性がある。"
+    - "`jockey_style_place_rate_3y_smooth_soft` は `running_style_avg3` を使った soft interpolation により、既存 hard style join より滑らかに騎手適性を反映できる。"
+  leakage_notes:
+    - "as-of: `feat_jockey_pos4_bin` と `feat_jockey_style` は `held_year_month` 単位で当月除外の過去集計から計算し、対象レース発走前に確定している。"
+    - "`pred_pos4_for_jockey_te` は対象馬の過去走由来 `horse_corner4_wavg5_recent -> avg5 -> avg3` のみを使う。"
+    - "`jockey_style_place_rate_3y_smooth_soft` は `running_style_avg3` を重みに使うが、対象レース結果は参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`jockey_style_place_rate_3y_smooth` は baseline では維持し、replace scenario のみで外す。"
+    - "relative 系は前回弱かったため今回の組み合わせ比較から外す。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: jockey_pos4_bin5_place_rate_3y_smooth_hard
+    feature_type: num
+    change_type: add
+    summary: "pred_pos4 の hard 5-bin で join した same-jockey pos4_bin の平滑化複勝率。"
+    sections: [feature_names]
+    comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_pos4_bin.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_pos4_bin.yml
+    final_column: mart.m_train_race_horse_past5.jockey_pos4_bin5_place_rate_3y_smooth_hard
+
+  - feature_name: jockey_pos4_bin5_place_rate_3y_smooth_soft
+    feature_type: num
+    change_type: add
+    summary: "pred_pos4 の soft 5-bin 重みで集約した same-jockey pos4_bin の平滑化複勝率。"
+    sections: [feature_names]
+    comparison_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard, jockey_style_place_rate_3y_smooth]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_pos4_bin.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_pos4_bin.yml
+    final_column: mart.m_train_race_horse_past5.jockey_pos4_bin5_place_rate_3y_smooth_soft
+
+  - feature_name: jockey_style_place_rate_3y_smooth_soft
+    feature_type: num
+    change_type: add
+    summary: "running_style_avg3 の soft interpolation で集約した same-jockey running_style の平滑化複勝率。"
+    sections: [feature_names]
+    comparison_features: [jockey_style_place_rate_3y_smooth, jockey_pos4_bin5_place_rate_3y_smooth_soft]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.jockey_style_place_rate_3y_smooth_soft
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_jockey_pos4_bin_hard_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard]
+      exclude_features: [jockey_pos4_bin5_place_rate_3y_smooth_soft, jockey_style_place_rate_3y_smooth_soft]
+    shap:
+      candidate_feature: jockey_pos4_bin5_place_rate_3y_smooth_hard
+      comparison_features: [jockey_style_place_rate_3y_smooth, jockey_avg_place_rate_smooth]
+      report_run_label: jockey_pos4_bin_hard_smooth
+
+  - scenario_name: add_jockey_pos4_bin_soft_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_pos4_bin5_place_rate_3y_smooth_soft]
+      exclude_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard, jockey_style_place_rate_3y_smooth_soft]
+    shap:
+      candidate_feature: jockey_pos4_bin5_place_rate_3y_smooth_soft
+      comparison_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard, jockey_style_place_rate_3y_smooth]
+      report_run_label: jockey_pos4_bin_soft_smooth
+
+  - scenario_name: replace_jockey_style_with_pos4_bin_hard_smooth
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard]
+      exclude_features: [jockey_style_place_rate_3y_smooth, jockey_pos4_bin5_place_rate_3y_smooth_soft, jockey_style_place_rate_3y_smooth_soft]
+
+  - scenario_name: replace_jockey_style_with_pos4_bin_hard_add_pos4_bin_soft
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard, jockey_pos4_bin5_place_rate_3y_smooth_soft]
+      exclude_features: [jockey_style_place_rate_3y_smooth, jockey_style_place_rate_3y_smooth_soft]
+
+  - scenario_name: add_jockey_style_soft_smooth
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_place_rate_3y_smooth_soft]
+      exclude_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard, jockey_pos4_bin5_place_rate_3y_smooth_soft]
+    shap:
+      candidate_feature: jockey_style_place_rate_3y_smooth_soft
+      comparison_features: [jockey_style_place_rate_3y_smooth, jockey_pos4_bin5_place_rate_3y_smooth_soft]
+      report_run_label: jockey_style_soft_smooth
+
+  - scenario_name: replace_jockey_style_with_jockey_style_soft_smooth
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_style_place_rate_3y_smooth_soft]
+      exclude_features: [jockey_style_place_rate_3y_smooth, jockey_pos4_bin5_place_rate_3y_smooth_hard, jockey_pos4_bin5_place_rate_3y_smooth_soft]
+
+  - scenario_name: add_jockey_pos4_bin_soft_and_jockey_style_soft_smooth
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_pos4_bin5_place_rate_3y_smooth_soft, jockey_style_place_rate_3y_smooth_soft]
+      exclude_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard]
+
+  - scenario_name: replace_jockey_style_with_pos4_bin_hard_add_jockey_style_soft_smooth
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_pos4_bin5_place_rate_3y_smooth_hard, jockey_style_place_rate_3y_smooth_soft]
+      exclude_features: [jockey_style_place_rate_3y_smooth, jockey_pos4_bin5_place_rate_3y_smooth_soft]
+
+  - scenario_name: replace_jockey_style_with_pos4_bin_hard_add_pos4_bin_soft_and_jockey_style_soft_smooth
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - jockey_pos4_bin5_place_rate_3y_smooth_hard
+        - jockey_pos4_bin5_place_rate_3y_smooth_soft
+        - jockey_style_place_rate_3y_smooth_soft
+      exclude_features: [jockey_style_place_rate_3y_smooth]

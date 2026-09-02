@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: feat_horse_distance
+    columns:
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_avg_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []

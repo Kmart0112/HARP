@@ -1,0 +1,79 @@
+version: 1
+
+validation:
+  name: template_feature_set
+  category: feature_engineering
+  change_summary: describe_your_change
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_template_feature_set_report.md"
+  runs_csv_file: "{date}_template_feature_set_runs.csv"
+  run_log_dir: "template_feature_set_logs_{date}"
+
+report:
+  title: "特徴量検証レポート（template）"
+  background: "ここに背景を書く。"
+  hypothesis_lines:
+    - "ここに仮説を書く。"
+  leakage_notes:
+    - "ここにリーク境界を書く。"
+  implementation_notes:
+    - "base feature_set と検証方針を書く。"
+    - "必須比較: baseline_existing / 各 candidate の単体 add / candidate all add / 類似既存特徴量との置換。"
+    - "新規追加特徴量は SHAP 必須。関連特徴を複数追加する場合は、そのセットを同時に enable した SHAP scenario も入れる。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: candidate_feature
+    feature_type: num
+    change_type: add
+    summary: 特徴量の作り方と意味の1行要約。
+    sections: [feature_names]
+    comparison_features: [similar_existing_feature]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.candidate_feature
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_candidate_feature
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [candidate_feature]
+      include_cat_features: []
+    shap:
+      candidate_feature: candidate_feature
+      comparison_features: [similar_existing_feature]
+      report_run_label: candidate_feature
+
+  - scenario_name: add_all_candidate_features
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [candidate_feature]
+      include_cat_features: []
+
+  # If multiple related candidates are added together, add another SHAP-reviewed
+  # feature_set_add scenario where the whole related set is enabled and
+  # comparison_features names the other related features to inspect as a set.
+
+  - scenario_name: replace_existing_with_candidate
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [candidate_feature]
+      exclude_features: [similar_existing_feature]
+
+# Required minimum pattern:
+# 1. baseline_existing
+# 2. one single_add scenario per target feature
+# 3. one feature_set_add scenario that enables all target features together
+# 4. one or more replace_existing scenarios for similar existing features
+# When there is only one candidate feature, single_add and feature_set_add may resolve to the same effective set.

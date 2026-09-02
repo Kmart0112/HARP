@@ -1,0 +1,215 @@
+openapi: 3.1.0
+info:
+  title: HARP Predict Place API Contract
+  version: "1.0.0"
+  description: Contract-first API definition for Track 1.
+
+paths:
+  /v1/health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /v1/predict/place:
+    post:
+      summary: Predict place probabilities and EV rows
+      operationId: predictPlace
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredictPlaceRequest"
+      responses:
+        "200":
+          description: Prediction rows returned synchronously
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictPlaceResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - version
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        version:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    PredictPlaceRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        from_date:
+          type: string
+          format: date
+          description: held_date >= from_date
+        to_date:
+          type: string
+          format: date
+          description: held_date <= to_date
+        limit:
+          type: integer
+          minimum: 1
+        fukusho_type:
+          type: string
+          enum:
+            - odds_fukusho_low
+            - odds_fukusho_high
+            - odds_fukusho_avg
+            - odds_fukusho_weighted_avg
+          default: odds_fukusho_avg
+        edge_threshold:
+          type: number
+          default: 0.1
+        artifact_id:
+          type: string
+          enum:
+            - place_v1
+            - place_platt_v1
+          default: place_v1
+
+    PredictionRow:
+      type: object
+      additionalProperties: false
+      required:
+        - held_date
+        - jyo_name
+        - round
+        - horse_number
+        - horse_name
+        - edge
+        - p_place
+        - kelly_fraction
+        - kelly_bet_amount
+        - surface
+        - distance_m
+        - popularity
+        - odds_fukusho_low
+        - odds_fukusho_high
+        - odds
+        - ev_return
+      properties:
+        held_date:
+          type: string
+          format: date
+        jyo_name:
+          type: string
+        round:
+          oneOf:
+            - type: integer
+            - type: string
+        horse_number:
+          type: integer
+        horse_name:
+          type: string
+        edge:
+          type: number
+        p_place:
+          type: number
+        kelly_fraction:
+          type: number
+        kelly_bet_amount:
+          type: number
+        surface:
+          oneOf:
+            - type: integer
+            - type: string
+        distance_m:
+          type: integer
+        popularity:
+          oneOf:
+            - type: integer
+            - type: string
+        odds_fukusho_low:
+          type: number
+        odds_fukusho_high:
+          type: number
+        odds:
+          type: number
+        ev_return:
+          type: number
+
+    PredictPlaceResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - request_id
+        - artifact_id
+        - from_date
+        - to_date
+        - summary
+        - predictions
+      properties:
+        request_id:
+          type: string
+        artifact_id:
+          type: string
+          enum:
+            - place_v1
+            - place_platt_v1
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
+        summary:
+          type: object
+          additionalProperties: false
+          required:
+            - rows_total
+            - rows_edge
+          properties:
+            rows_total:
+              type: integer
+              minimum: 0
+            rows_edge:
+              type: integer
+              minimum: 0
+        predictions:
+          type: array
+          items:
+            $ref: "#/components/schemas/PredictionRow"
+
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string

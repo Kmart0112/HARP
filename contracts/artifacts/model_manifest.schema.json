@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contracts/artifacts/model_manifest.schema.json",
+  "title": "Model Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "model_type",
+    "artifact_path",
+    "schema_version",
+    "feature_names",
+    "cat_features",
+    "train_window",
+    "created_at_utc",
+    "metrics"
+  ],
+  "properties": {
+    "model_type": {
+      "type": "string",
+      "enum": [
+        "place",
+        "place_platt",
+        "win"
+      ]
+    },
+    "artifact_path": {
+      "type": "string",
+      "pattern": "^(pipeline/artifacts/models|notebook/prd/outputs/artifacts)/.+\\.pkl$"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "feature_names": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "cat_features": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "train_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "train_year_start",
+        "train_year_end",
+        "test_year"
+      ],
+      "properties": {
+        "train_year_start": {
+          "type": "integer"
+        },
+        "train_year_end": {
+          "type": "integer"
+        },
+        "test_year": {
+          "type": "integer"
+        }
+      }
+    },
+    "created_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "auc",
+        "brier",
+        "logloss"
+      ],
+      "properties": {
+        "auc": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "brier": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "logloss": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "source_table": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "git_commit": {
+      "type": "string"
+    }
+  }
+}

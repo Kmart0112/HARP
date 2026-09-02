@@ -1,0 +1,110 @@
+version: 2
+models:
+  - name: stg_s_jodds_tanpuku
+    columns:
+      - name: makedate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: monthday
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyocd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kaiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: nichiji
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: racenum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: happyotime
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: umaban
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tanodds
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tanninki
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukuoddslow
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukuoddshigh
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: fukuninki
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: popularity
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_fukusho_low
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_fukusho_high
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: happyo_time
+        description: ''
+        config:
+          meta: {}
+          tags: []
+

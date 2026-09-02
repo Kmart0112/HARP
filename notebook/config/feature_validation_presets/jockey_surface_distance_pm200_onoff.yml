@@ -1,0 +1,58 @@
+version: 1
+
+validation:
+  name: jockey_surface_distance_pm200_onoff
+  category: feature_engineering
+  change_summary: recheck_jockey_surface_distance_pm200_onoff_with_shap
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_jockey_surface_distance_pm200_onoff_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_jockey_surface_distance_pm200_onoff_runs.csv"
+  run_log_dir: "jockey_surface_distance_pm200_onoff_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（jockey surface×distance pm200 on/off）"
+  background: "既存の 2026-03-03 比較では `jockey_surface_dist_pm200_place_rate_3y_smooth` は raw の add-on として改善幅がほぼゼロで不採用だった。今回は `surface×distance` の有無だけを formal validation で再確認し、SHAP も付けて on/off 判断を残す。"
+  hypothesis_lines:
+    - "`jockey_surface_dist_pm200_place_rate_3y_smooth` は過去比較では弱かったが、現行の `place_v1` ベースで再確認すると限定的な改善余地が残っているかもしれない。"
+    - "今回のテーマは `surface×distance` の有無だけを確認するもので、`jockey_cluster_avg_place_rate_corrected` の置換判断は含めない。"
+    - "判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、SHAP では単調性・閾値・tail 依存を併せて確認する。"
+  leakage_notes:
+    - "`jockey_surface_dist_pm200_place_rate_3y_smooth` は `held_year_month` 単位で当月除外の過去集計であり、対象レース発走前に確定している。"
+    - "集計元は過去レースの `is_place` で、対象レースの将来情報や払戻情報は使わない。"
+    - "今回の validation は feature on/off の比較のみで、dbt SQL や registry の source of truth は実行中に変更しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`jockey_surface_dist_pm200_place_rate_3y_smooth` は base に未採用のため、candidate scenario で明示的に include する。"
+    - "比較は `baseline_existing` と `add_surface_distance_pm200` の 2 scenario のみに限定し、`cluster` 置換や他 jockey TE の比較は行わない。"
+    - "SHAP は `add_surface_distance_pm200` のみで実施し、comparison feature として `jockey_cluster_avg_place_rate_corrected` を見る。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: jockey_surface_dist_pm200_place_rate_3y_smooth
+    feature_type: num
+    change_type: add
+    summary: "同一騎手×同一馬場で距離±200m以内における過去3年の平滑化複勝率。"
+    sections: [feature_names]
+    comparison_features: [jockey_cluster_avg_place_rate_corrected]
+    dbt_model_path: dbt/harp/models/features/jockey/feat_jockey_yearly_surface_distance.sql
+    dbt_yaml_path: dbt/harp/models/features/jockey/feat_jockey_yearly_surface_distance.yml
+    final_column: mart.m_train_race_horse_past5.jockey_surface_dist_pm200_place_rate_3y_smooth
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_surface_distance_pm200
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [jockey_surface_dist_pm200_place_rate_3y_smooth]
+    shap:
+      candidate_feature: jockey_surface_dist_pm200_place_rate_3y_smooth
+      comparison_features: [jockey_cluster_avg_place_rate_corrected]
+      report_run_label: jockey_surface_distance_pm200

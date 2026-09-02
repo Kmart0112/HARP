@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: fct_race_entry_declared
+    description: "Race-entry fact for fields known before the result is finalized. Keeps abnormal/scratch rows and does not expose result-derived columns."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+      - name: datakubun
+        description: "JVLink data category / lifecycle code."
+      - name: horse_name
+        description: "Horse name."
+      - name: age
+        description: "Horse age at the race."
+      - name: h_weight
+        description: "Horse body weight when available. Race-day overlay may override this value."
+      - name: h_weight_bin
+        description: "Body-weight bucket using the existing HARP binning convention."
+      - name: weight_change
+        description: "Horse body weight change when available. Race-day overlay may override this value."
+      - name: sex_cd
+        description: "Horse sex code."
+      - name: kinryo
+        description: "Assigned weight carried by the horse."
+      - name: tozai_cd
+        description: "East/west stable code."
+      - name: horse_number
+        description: "Horse number within the race."
+      - name: gate_number
+        description: "Gate/frame number."
+      - name: popularity
+        description: "Popularity rank when available. Race-day overlay may override this value."
+      - name: odds_tansho
+        description: "Win odds from the entry row when available. Odds snapshot models should be preferred for model features."
+      - name: jockey_cd
+        description: "Jockey code."
+      - name: jockey_cat
+        description: "Local coarse jockey category used by existing HARP features."
+      - name: trainer_cd
+        description: "Trainer code."
+      - name: blinker_cd
+        description: "Blinker code."
+      - name: ijyo_cd
+        description: "Abnormal finish / scratch / exclusion code. Null for normal entries."
+      - name: is_scratched_or_excluded
+        description: "True when ijyo_cd is present."
+      - name: has_result
+        description: "True when final result_order exists in the source row."
+      - name: sire_cat
+        description: "Local coarse sire category from stg_n_uma."
+      - name: breeder_cat
+        description: "Local coarse breeder category from stg_n_uma."
+      - name: breeder_cd
+        description: "Breeder code."
+      - name: trainer_cat
+        description: "Local coarse trainer category from stg_n_uma."
+      - name: sire_id
+        description: "Sire identifier."
+      - name: sire_name
+        description: "Sire name."
+      - name: dam_id
+        description: "Dam identifier."
+      - name: damsire_id
+        description: "Damsire identifier."
+      - name: birth_date
+        description: "Horse birth date."

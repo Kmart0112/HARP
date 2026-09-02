@@ -1,0 +1,65 @@
+schema_version: "1.0.0"
+source_table: "mart.m_train_race_horse_past5"
+description: "Contract for mart input features used by Greenfield Track 1."
+
+core_required:
+  - name: race_id
+    type: string
+    nullable: false
+  - name: horse_number
+    type: integer
+    nullable: false
+  - name: held_date
+    type: date
+    nullable: false
+  - name: held_year
+    type: integer
+    nullable: false
+
+training_required:
+  - name: is_place
+    type: integer
+    nullable: false
+  - name: is_win
+    type: integer
+    nullable: false
+
+# NOTE:
+#   Feature lists (name / feature_names / cat_features) are defined in:
+#     contracts/features/*/*.yaml
+#   This file keeps the column/validation contract only.
+
+external_dependencies:
+  core.fct_race_odds_result:
+    required_columns:
+      - race_id
+      - horse_number
+      - odds_fukusho_low
+      - odds_fukusho_high
+      - odds_fukusho_avg
+      - odds_tansho
+  core.race_info_wide:
+    required_columns:
+      - race_id
+      - horse_number
+      - held_date
+      - jyo_name
+      - round
+      - horse_name
+      - surface
+      - distance_m
+      - popularity
+
+validation_rules:
+  unique_keys:
+    - race_id
+    - horse_number
+  required_for_predict_output:
+    - held_date
+    - jyo_name
+    - round
+    - horse_number
+    - horse_name
+    - surface
+    - distance_m
+    - popularity

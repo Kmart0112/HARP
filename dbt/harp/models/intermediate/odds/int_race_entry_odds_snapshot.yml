@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: int_race_entry_odds_snapshot
+    description: "Training/backtest odds snapshots normalized by odds_snapshot_type from published_manual.fct_jodds_snapshot. Final n_odds is intentionally kept in fct_race_entry_final_odds for validation instead of training features."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: horse_number
+        description: "Horse number within the race."
+        tests:
+          - not_null
+      - name: odds_snapshot_type
+        description: "Odds snapshot timing for training/backtest. Currently pre10m only."
+        tests:
+          - not_null
+      - name: snapshot_at
+        description: "Odds publication time when available."
+      - name: odds_tansho
+        description: "Win odds."
+      - name: odds_fukusho_low
+        description: "Place odds lower bound."
+      - name: odds_fukusho_high
+        description: "Place odds upper bound."
+      - name: odds_fukusho_avg
+        description: "Mean of place odds lower and upper bounds."
+      - name: odds_fukusho_weighted_avg
+        description: "Weighted place odds average: 0.7 * low + 0.3 * high."
+      - name: popularity
+        description: "Popularity rank when available."
+      - name: odds_source
+        description: "Source relation used for the snapshot."
+      - name: updated_at
+        description: "dbt model build timestamp."

@@ -1,0 +1,28 @@
+version: 2
+models:
+  - name: feat_jockey_yearly_surface_distance
+    columns:
+      - name: jockey_cd
+        description: "Jockey code."
+      - name: held_year_month
+        description: "Month bucket for feature as-of date."
+      - name: surface
+        description: "Surface code (0 turf, 1 dirt)."
+      - name: distance_m
+        description: "Race distance in meters."
+      - name: jockey_surface_distance_starts_3y
+        description: "Past starts over prior 3 years for same jockey, surface, and exact distance."
+      - name: jockey_surface_distance_places_3y
+        description: "Past places over prior 3 years for same jockey, surface, and exact distance."
+      - name: jockey_surface_distance_place_rate_3y
+        description: "Place rate over prior 3 years for same jockey, surface, and exact distance."
+      - name: jockey_surface_distance_place_rate_3y_smooth
+        description: "Smoothed place rate over prior 3 years for same jockey, surface, and exact distance."
+      - name: jockey_surface_dist_pm200_starts_3y
+        description: "Past starts over prior 3 years for same jockey and surface, distance within +/-200m."
+      - name: jockey_surface_dist_pm200_places_3y
+        description: "Past places over prior 3 years for same jockey and surface, distance within +/-200m."
+      - name: jockey_surface_dist_pm200_place_rate_3y
+        description: "Place rate over prior 3 years for same jockey and surface, distance within +/-200m."
+      - name: jockey_surface_dist_pm200_place_rate_3y_smooth
+        description: "Smoothed place rate over prior 3 years for same jockey and surface, distance within +/-200m."

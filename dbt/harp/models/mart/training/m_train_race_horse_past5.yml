@@ -1,0 +1,1910 @@
+version: 2
+models:
+  - name: m_train_race_horse_past5
+    description: "Training mart based on int_race_entry_enriched with joined historical features. Raw field definitions: EveryDB EDB2 manual x_RACE / x_UMA_RACE."
+    columns:
+      - name: jyo_cd
+        config:
+          meta: {}
+          tags: []
+        description: "Racecourse code from raw n_race.JyoCD (EveryDB x_RACE)."
+      - name: distance_m
+        config:
+          meta: {}
+          tags: []
+        description: "Race distance in meters from raw n_race.Kyori (EveryDB x_RACE)."
+      - name: surface
+        config:
+          meta: {}
+          tags: []
+        description: "Surface derived from TrackCD: turf=0 (10-22), dirt=1 (23-29)."
+      - name: turn_direction
+        config:
+          meta: {}
+          tags: []
+        description: "Course turning direction carried from int_race_entry_enriched/course_feature_map."
+      - name: straight_distance_m
+        config:
+          meta: {}
+          tags: []
+        description: "Official straight distance in meters carried from int_race_entry_enriched/course_feature_map."
+      - name: has_homestretch_slope
+        config:
+          meta: {}
+          tags: []
+        description: "Whether the course home straight includes a notable slope, carried from int_race_entry_enriched/course_feature_map."
+      - name: track_cd
+        description: "Track course code from raw n_race.TrackCD (EveryDB x_RACE)."
+        config:
+          meta: {}
+          tags: []
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: running_style
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: jockey_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_horse_pair_weighted_avg_pos4_agari_synergy
+        description: "Overall weighted average pos4_agari_synergy for the current jockey-horse pair over the prior 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+        description: "Weighted average pos4_agari_synergy for the current jockey-horse pair within the same course cluster over the prior 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_horse_pair_same_turn_dir_surface_wavg_pos4_agari_synergy
+        description: "Weighted average pos4_agari_synergy for the current jockey-horse pair within the same turn direction and surface over the prior 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_id
+        config:
+          meta: {}
+          tags: []
+        description: "Race key built as YYYY + MMDD + JyoCD + Kaiji + Nichiji + RaceNum."
+      - name: kettonum
+        config:
+          meta: {}
+          tags: []
+        description: "Horse identifier from raw n_uma_race.KettoNum (EveryDB x_UMA_RACE)."
+      - name: held_date
+        config:
+          meta: {}
+          tags: []
+        description: "Race date built from Year + MonthDay."
+      - name: gate_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: popularity_ratio
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: surface_condition
+        config:
+          meta: {}
+          tags: []
+        description: "Surface condition code selected from SibaBabaCD/DirtBabaCD by surface."
+      - name: surface_condition_cd
+        description: "Normalized going class: good=1, standard=2, bad/heavy=3."
+        config:
+          meta: {}
+          tags: []
+      - name: result_order
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: blinker_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: popularity
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: is_win
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_place
+        description: "Place flag: 1 when (num_starters < 8 and result_order <= 2) or (num_starters >= 8 and result_order <= 3), else 0."
+        config:
+          meta: {}
+          tags: []
+      - name: tenko_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyuryo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_kubun_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_level
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: h_weight
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: weight_change
+        config:
+          meta: {}
+          tags: []
+        description: "Body weight delta (kg) from ZogenSa with sign ZogenFugo in n_uma_race."
+      - name: age
+        config:
+          meta: {}
+          tags: []
+        description: "Horse age from raw n_uma_race.Barei (EveryDB x_UMA_RACE)."
+      - name: age_month
+        description: "Age in months: age * 12 + extract(month from held_date)."
+        config:
+          meta: {}
+          tags: []
+      - name: age_days
+        description: "Age in days: held_date - birth_date when old_cd in (1,2)."
+        config:
+          meta: {}
+          tags: []
+      - name: dm_rank
+        config:
+          meta: {}
+          tags: []
+        description: "DM ranking from raw n_uma_race.DMJyuni (EveryDB x_UMA_RACE)."
+      - name: held_month
+        description: "Month of race date: extract(month from held_date)."
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number_ratio
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kinryo
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kinryo_adj
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: num_starters
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: jockey_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_corrected
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_corrected_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_place_rate_corrected
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_place_rate_corrected_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_diff_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/course-cluster place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_starts_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_places_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_dist_pm200_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey and surface, distance within +/-200m, over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey and surface, straight-distance bucket, over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_straight_distance_bucket_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/surface/straight-distance-bucket place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_turn_direction_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey and surface, turn_direction, over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_turn_direction_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/surface/turn_direction place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_turn_direction_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey and turn_direction over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_turn_direction_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/turn_direction place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_jyo_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey, surface, and racecourse over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_jyo_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/surface/racecourse place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_surface_style_place_rate_3y_smooth
+        description: "Smoothed place rate for same jockey, surface, and running style over the previous 3 years."
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tozai_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: j_odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: log_odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ensei_type
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_vs_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_vs_avg_z
+        description: "From int_race_entry_metrics. (ten3f - avg_ten3f_5y) / std_ten3f_5y for same course condition bucket."
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_avg_z
+        description: "From int_race_entry_metrics. (avg_ten3f_5y - ten3f) / std_ten3f_5y. Larger means faster-than-average pace."
+        config:
+          meta: {}
+          tags: []
+      - name: ten4f_vs_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_z
+        description: "From int_race_entry_metrics. z-score of pos4_good within race."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_front_disadvantage
+        description: "ten3f_avg_z + pos4_z. Indicator for front-runner disadvantage under faster pace."
+        config:
+          meta: {}
+          tags: []
+      - name: wood_lap_time_1
+        description: "Representative wood work final 1F from 3-4 days before the race."
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_lap_time_1_fast_excess_z_3y
+        description: "current wood 最終1F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wood_haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_wood_haron_time_4_fast_excess_z_3y
+        description: "current wood 4F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_lap_time_1_z_tozai_day
+        description: "tozai_cd × chokyo_date の representative wood peer group 内で正規化した current wood 最終1F z-score。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_haron_time_4_z_tozai_day
+        description: "tozai_cd × chokyo_date の representative wood peer group 内で正規化した current wood 4F z-score。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_cat3
+        description: "Current wood 4F z-score と最終1F z-score を 3x3 にビン化した joint category を整数で持つ。`0` は欠損、`1..9` は fastest/fastest から slowest/slowest。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_place_rate_3y_smooth
+        description: "Current wood の 4F×1F 3x3 category に対する過去3年 smoothed 複勝率 TE。対象月は含めず、global prior 0.213 と疑似件数20で平滑化。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_tozai_cd
+        description: "tozai code from the representative current wood workout row carried through int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: wood_late_sharpness
+        description: "Finish sharpness derived from representative current wood 4F/1F in int_race_entry_enriched. Larger values mean the final 1F is faster relative to the preceding 3F average."
+        config:
+          meta: {}
+          tags: []
+      - name: wood_haron_time_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wood_haron_time_6_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wood_lap_time_1_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wood_accel_flag
+        description: "Acceleration flag for the selected wood work from 3-4 days before the race. Equal splits count as acceleration."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_lap_time_1
+        description: "Representative wood work final 1F from 10-11 days before the race."
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_lap_time_1_fast_excess_z_3y
+        description: "week1 wood 最終1F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_wood_haron_time_4_fast_excess_z_3y
+        description: "week1 wood 4F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_lap_time_1_z_tozai_day
+        description: "tozai_cd × chokyo_date の representative wood peer group 内で正規化した week1 wood 最終1F z-score。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_haron_time_4_z_tozai_day
+        description: "tozai_cd × chokyo_date の representative wood peer group 内で正規化した week1 wood 4F z-score。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_tozai_cd
+        description: "tozai code from the representative week1 wood workout row carried through int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_late_sharpness
+        description: "Finish sharpness derived from representative week1 wood 4F/1F in int_race_entry_enriched. Larger values mean the final 1F is faster relative to the preceding 3F average."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_haron_time_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_haron_time_6_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_lap_time_1_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_accel_flag
+        description: "Acceleration flag for the selected wood work from 10-11 days before the race. Equal splits count as acceleration."
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_lap_time_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_lap_time_1_fast_excess_z_3y
+        description: "current hanro 最終1F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_hanro_haron_time_4_fast_excess_z_3y
+        description: "current hanro 4F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_lap_time_1_z_tozai_day
+        description: "tozai_cd × chokyo_date の representative hanro peer group 内で正規化した current hanro 最終1F z-score。peer group は lap_time_1 <= 14。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_haron_time_4_z_tozai_day
+        description: "tozai_cd × chokyo_date の representative hanro peer group 内で正規化した current hanro 4F z-score。peer group は lap_time_1 <= 14。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_cat3
+        description: "Current hanro 4F z-score と最終1F z-score を 3x3 にビン化した joint category を整数で持つ。`0` は欠損、`1..9` は fastest/fastest から slowest/slowest。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_place_rate_3y_smooth
+        description: "Current hanro の 4F×1F 3x3 category に対する過去3年 smoothed 複勝率 TE。対象月は含めず、global prior 0.213 と疑似件数20で平滑化。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_tozai_cd
+        description: "tozai code from the representative current hanro workout row carried through int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_late_sharpness
+        description: "Finish sharpness derived from representative current hanro 4F/1F in int_race_entry_enriched. Larger values mean the final 1F is faster relative to the preceding 3F average."
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_haron_time_4_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_lap_time_1_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_accel_flag
+        description: "Acceleration flag for the selected hanro work from 3-4 days before the race. Equal splits count as acceleration."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_lap_time_1
+        description: "Representative hanro work final 1F from 10-11 days before the race."
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_lap_time_1_fast_excess_z_3y
+        description: "week1 hanro 最終1F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_week1_hanro_haron_time_4_fast_excess_z_3y
+        description: "week1 hanro 4F が trainer_cd の過去3年平均よりどれだけ速いかを、trainer 内標準偏差で正規化した z 値。正ほど厩舎基準より速い。対象月は含めない。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_lap_time_1_z_tozai_day
+        description: "tozai_cd × chokyo_date の representative hanro peer group 内で正規化した week1 hanro 最終1F z-score。peer group は lap_time_1 <= 14。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_haron_time_4_z_tozai_day
+        description: "tozai_cd × chokyo_date の representative hanro peer group 内で正規化した week1 hanro 4F z-score。peer group は lap_time_1 <= 14。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_tozai_cd
+        description: "tozai code from the representative week1 hanro workout row carried through int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_late_sharpness
+        description: "Finish sharpness derived from representative week1 hanro 4F/1F in int_race_entry_enriched. Larger values mean the final 1F is faster relative to the preceding 3F average."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_haron_time_4_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_lap_time_1_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_accel_flag
+        description: "Acceleration flag for the selected hanro work from 10-11 days before the race. Equal splits count as acceleration."
+        config:
+          meta: {}
+          tags: []
+      - name: cum_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: diff_gate_pp_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: diff_gate_pp_std_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p_place_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: top3_corner3_pos_avg_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: top3_corner3_pos_var_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_shokyu
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_level_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_race_level
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_jockey_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_distance_m
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: is_surface_changed
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_interval_days
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_race_interval_days
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_corner4_avg3
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: pos4_agari_synergy_sd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_rel_agari3f_avg3
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: agari3f_rank_avg3
+        description: '直近3走の agari3f race 内順位平均を切り捨てで離散化した値。小さいほど良い。'
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f_rank_percentile_avg3
+        description: '直近3走の agari3f race 内相対順位 percent 値平均。0 が最良、1 に近いほど後位。'
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_time_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_time_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_time_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_ten3f_vs_avg
+        description: 'feat_race_entry_past_lag 由来。直近1走前レースの ten3f_vs_avg。'
+        config:
+          meta: {}
+          tags: []
+      - name: p2_ten3f_vs_avg
+        description: 'feat_race_entry_past_lag 由来。直近2走前レースの ten3f_vs_avg。'
+        config:
+          meta: {}
+          tags: []
+      - name: p3_ten3f_vs_avg
+        description: 'feat_race_entry_past_lag 由来。直近3走前レースの ten3f_vs_avg。'
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_vs_avg_avg3
+        description: 'p1_ten3f_vs_avg, p2_ten3f_vs_avg, p3_ten3f_vs_avg の NULL 除外平均。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_pace_front_disadvantage
+        description: 'feat_race_entry_past_lag 由来。直近1走前レースの pace_front_disadvantage。'
+        config:
+          meta: {}
+          tags: []
+      - name: p2_pace_front_disadvantage
+        description: 'feat_race_entry_past_lag 由来。直近2走前レースの pace_front_disadvantage。'
+        config:
+          meta: {}
+          tags: []
+      - name: p3_pace_front_disadvantage
+        description: 'feat_race_entry_past_lag 由来。直近3走前レースの pace_front_disadvantage。'
+        config:
+          meta: {}
+          tags: []
+      - name: pace_front_disadvantage_avg3
+        description: 'p1_pace_front_disadvantage, p2_pace_front_disadvantage, p3_pace_front_disadvantage の NULL 除外平均。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_time_vs_pace_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_time_vs_pace_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_time_vs_pace_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_pace_avg_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_sd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_corner4
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: p2_corner4
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: p3_corner4
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: horse_corner4_sd3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_kinryo_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_slope3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_trend3_voladj
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_short_long_gap
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_pos4_agari_synergy_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_weight
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_weight_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: weight_change_ratio
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: condition_change_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_change_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_change_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_diff_ratio
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_diff_ratio_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: running_style_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_pos4_agari_synergy_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_wood_lap_time_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_wood_lap_time_1_z_tozai_day
+        description: '直近1走前レース時点の代表ウッド調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_trainer_wood_lap_time_1_fast_excess_z_3y
+        description: '直近1走前レース時点の代表ウッド調教1Fが、当時の trainer_cd 過去3年平均よりどれだけ速かったかを trainer 内標準偏差で正規化した excess z。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_hanro_lap_time_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_hanro_lap_time_1_z_tozai_day
+        description: '直近1走前レース時点の代表坂路調教1Fを `tozai_cd × chokyo_date` 単位で標準化した z-score。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+        description: '直近1走前レース時点の代表坂路調教1Fが、当時の trainer_cd 過去3年平均よりどれだけ速かったかを trainer 内標準偏差で正規化した excess z。'
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_avg3_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: num_past3_races
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster_change_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: blinker_added
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: num_front_runners
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pace_front_runners_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pace_front_runners_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: rel_agari_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_rate_z
+        config:
+          meta: {}
+          tags: []
+        description: ''
+      - name: race_avg_corner4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_stddev_corner4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_styele_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_styele_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: style_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_pace_avg_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_diff_top_in_race
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_adjusted_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_adjusted_diff_top_in_race
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_z
+        description: "Within-race z-score of time_diff_avg3."
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_robust
+        description: "Within-race robust scale of time_diff_avg3: (x - median) / IQR."
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_rank
+        description: "Within-race ascending rank of time_diff_avg3."
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_wavg5_recent_robust
+        description: "Within-race robust scale of time_diff_wavg5_recent: (x - median) / IQR."
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_pos4_agari_synergy_wavg5_recent_median
+        description: "Within-race median of pos4_agari_synergy_wavg5_recent."
+        config:
+          meta: {}
+          tags: []
+      - name: race_pos4_agari_synergy_wavg5_recent_iqr
+        description: "Within-race interquartile range of pos4_agari_synergy_wavg5_recent: q3 - q1."
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_wavg5_recent_robust
+        description: "Within-race robust scale of pos4_agari_synergy_wavg5_recent: (x - median) / IQR."
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_diff_top_in_race
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_max_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari_good_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: rel_agari_min_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_pos4_agari_synergy_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_pos4_agari_synergy_rank
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_min_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_adjusted_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_z_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_logit_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_logit_z_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_place_rate_corrected_logit_z
+        description: "Within-race z-score of the empirical logit transform of jockey_cluster_avg_place_rate_corrected."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_place_rate_corrected_rank
+        description: "Within-race descending rank of jockey_cluster_avg_place_rate_corrected. Smaller values mean stronger same-jockey/course-cluster place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: race_avg_jockey_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_avg_jockey_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: past_same_cluster_avg_pos4_as_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kinryo_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kinryo_adj_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age_days_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_first_start_flag
+        description: "Flag showing the horse has no prior same-course-cluster starts within the 3-year lookback window as of held_date."
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_time_diffs
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_avg_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_avg_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_avg_pos4_agari_synergy
+        description: "Horse 3-year average pos4_agari_synergy under the same turn_direction."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_surface_past_starts
+        description: "Horse 3-year history starts under the same (turn_direction, surface), excluding same day."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_surface_avg_pos4_agari_synergy
+        description: "Horse 3-year average pos4_agari_synergy under the same (turn_direction, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_surface_avg_pos4_agari_synergy_z
+        description: "Within-race z-score of same_turn_direction_surface_avg_pos4_agari_synergy."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_past_starts
+        description: "Horse 3-year history starts under the same (has_homestretch_slope, surface), excluding same day."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_avg_pos4_agari_synergy
+        description: "Horse 3-year average pos4_agari_synergy under the same (has_homestretch_slope, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_avg_pos4_agari_synergy_z
+        description: "Within-race z-score of same_homestretch_slope_surface_avg_pos4_agari_synergy."
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_weighted_avg_pos4_agari_synergy_z
+        description: "Within-race z-score of same_distance_weighted_avg_pos4_agari_synergy."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_wavg_pos4_agari_synergy
+        description: "Horse exponentially weighted 3-year average pos4_agari_synergy under the same (has_homestretch_slope, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_starts
+        description: "Horse 3-year history starts under the same (straight_distance_bucket, surface), excluding same day."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+        description: "Horse 3-year average pos4_agari_synergy under the same (straight_distance_bucket, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy
+        description: "Horse exponentially weighted 3-year average pos4_agari_synergy under the same (straight_distance_bucket, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_wavg_pos4_agari_synergy_z
+        description: "Within-race z-score of same_straight_distance_bucket_surface_wavg_pos4_agari_synergy."
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_starts
+        description: "From f_horse_jyo_distance. 3-year history starts on same (jyo_cd, distance_m), excluding same day."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_places
+        description: "From f_horse_jyo_distance. 3-year history places on same (jyo_cd, distance_m), excluding same day."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_pos4_agari_synergy
+        description: "From f_horse_jyo_distance. 3-year sum of pos4_agari_synergy on same (jyo_cd, distance_m)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_avg_pos4_agari_synergy
+        description: "same_jyo_distance_past_pos4_agari_synergy / same_jyo_distance_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_place_rate
+        description: "same_jyo_distance_past_places / same_jyo_distance_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_starts
+        description: "From f_horse_pace_ntile. 3-year history starts where ten3f_ntile=1 (fast pace bucket)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_places
+        description: "From f_horse_pace_ntile. 3-year history places where ten3f_ntile=1."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_pos4_agari_synergy
+        description: "From f_horse_pace_ntile. 3-year sum of pos4_agari_synergy where ten3f_ntile=1."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_avg_pos4_agari_synergy
+        description: "pace_ntile1_past_pos4_agari_synergy / pace_ntile1_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_place_rate
+        description: "pace_ntile1_past_places / pace_ntile1_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_starts
+        description: "From f_horse_pace_ntile. 3-year history starts where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_places
+        description: "From f_horse_pace_ntile. 3-year history places where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_pos4_agari_synergy
+        description: "From f_horse_pace_ntile. 3-year sum of pos4_agari_synergy where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_avg_pos4_agari_synergy
+        description: "pace_ntile2_past_pos4_agari_synergy / pace_ntile2_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_place_rate
+        description: "pace_ntile2_past_places / pace_ntile2_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_starts
+        description: "From f_horse_pace_ntile. 3-year history starts where ten3f_ntile=3 (slow pace bucket)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_places
+        description: "From f_horse_pace_ntile. 3-year history places where ten3f_ntile=3."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_pos4_agari_synergy
+        description: "From f_horse_pace_ntile. 3-year sum of pos4_agari_synergy where ten3f_ntile=3."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_avg_pos4_agari_synergy
+        description: "pace_ntile3_past_pos4_agari_synergy / pace_ntile3_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_place_rate
+        description: "pace_ntile3_past_places / pace_ntile3_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_fast_minus_slow_place_rate
+        description: "pace_ntile1_place_rate - pace_ntile3_place_rate (both starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: past_starts
+        description: "From f_horse_overall. Historical start count before held_date (daily level window)."
+        config:
+          meta: {}
+          tags: []
+      - name: past_places
+        description: "From f_horse_overall. Historical place count before held_date (daily level window)."
+        config:
+          meta: {}
+          tags: []
+      - name: sire_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_career_months
+        description: "種牡馬ごとの最古 held_year_month から対象レース月までの経過月数（0始まり）。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_is_early_phase_3y
+        description: "種牡馬使用初期フラグ。sire_career_months < 36 で 1、それ以外は 0。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_pos4_agari_synergy
+        description: "種牡馬×コースクラスタの pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_pos4_agari_synergy_diff
+        description: "種牡馬×コースクラスタ pos4_agari_synergy と種牡馬 overall pos4_agari_synergy の差。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_sire_avg_diff_logit
+        description: "種牡馬×コースクラスタの平滑化複勝率と overall 平滑化複勝率の logit 差。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_pos4_agari_synergy
+        description: "種牡馬×年齢の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_past_starts
+        description: "種牡馬×old_cd の過去5年出走数。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_place_rate_smooth
+        description: "種牡馬×old_cd の複勝率を平滑化した5年 rolling。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_pos4_agari_synergy
+        description: "種牡馬×old_cd の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_place_rate
+        description: "種牡馬×old_cd の生の過去5年複勝率。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        description: "種牡馬×sex_cd の複勝率を sex_cd 全体 prior で平滑化した5年 rolling。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_sex_cd_sire_avg_pos4_agari_synergy
+        description: "種牡馬×sex_cd の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_weight_sire_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_pos4_agari_synergy
+        description: "種牡馬×馬場×距離±200m の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_pos4_agari_synergy
+        description: "種牡馬全体の pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_time_diff
+        description: "種牡馬全体の time_diff 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: dam_starts_5y
+        description: "母馬ごとの過去5年相当月次窓の出走数。"
+        config:
+          meta: {}
+          tags: []
+      - name: dam_avg_place_rate
+        description: "母馬ごとの過去5年相当月次窓の複勝率。"
+        config:
+          meta: {}
+          tags: []
+      - name: dam_avg_place_rate_smooth
+        description: "母馬ごとの過去5年相当月次窓の複勝率を全体複勝率へ shrink した値。"
+        config:
+          meta: {}
+          tags: []
+      - name: dam_avg_pos4_agari_synergy
+        description: "母馬ごとの過去5年相当月次窓の pos4_agari_synergy 平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: dam_avg_time_diff
+        description: "母馬ごとの過去5年相当月次窓の time_diff 平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_past_starts
+        description: "母馬×コースクラスタの過去5年相当月次窓の出走数。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_place_rate
+        description: "母馬×コースクラスタの過去5年相当月次窓の複勝率。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_place_rate_smooth
+        description: "母馬×コースクラスタの過去5年相当月次窓の複勝率を全体複勝率へ shrink した値。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_pos4_agari_synergy
+        description: "母馬×コースクラスタの pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_starts_5y
+        description: "母父馬ごとの過去5年相当月次窓の出走数。"
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_avg_place_rate
+        description: "母父馬ごとの過去5年相当月次窓の複勝率。"
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_avg_place_rate_smooth
+        description: "母父馬ごとの過去5年相当月次窓の複勝率を全体複勝率へ shrink した値。"
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_avg_pos4_agari_synergy
+        description: "母父馬ごとの過去5年相当月次窓の pos4_agari_synergy 平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_avg_time_diff
+        description: "母父馬ごとの過去5年相当月次窓の time_diff 平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_damsire_past_starts
+        description: "母父馬×コースクラスタの過去5年相当月次窓の出走数。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_damsire_avg_place_rate
+        description: "母父馬×コースクラスタの過去5年相当月次窓の複勝率。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_damsire_avg_place_rate_smooth
+        description: "母父馬×コースクラスタの過去5年相当月次窓の複勝率を全体複勝率へ shrink した値。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_damsire_avg_pos4_agari_synergy
+        description: "母父馬×コースクラスタの pos4_agari_synergy 5年移動平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_age_sire_avg_place_rate_smooth_prev_age
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_old_cd_sire_avg_place_rate_smooth_prev_old_cd
+        description: "種牡馬×old_cd の複勝率を old_cd 全体 prior で平滑化した5年 rolling。"
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_sire_avg_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_style_relative_place_rate_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_style_relative_place_rate_3y_smooth
+        description: "Relative same-jockey/running-style place rate after normalizing the smoothed rate by the overall running-style smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_style_base_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/running-style place rate and the overall running-style smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_style_place_rate_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_style_place_rate_3y_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_style_place_rate_3y_style_prior_smooth
+        description: "Smoothed same-jockey/running-style place rate using the overall running-style smoothed place rate as the prior."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_style_avg_diff_logit_smooth
+        description: "Logit difference between the smoothed same-jockey/running-style place rate and the jockey's overall smoothed place rate."
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_old_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_place_rate_5y_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_style_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_sashi_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pred_pos4_for_jockey_te
+        description: "Clamped predicted corner4 position ratio used to look up jockey pos4-bin target encodings, preferring horse_corner4_wavg5_recent then avg5 then avg3."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_pos4_bin5_hard
+        description: "Hard 5-bin bucket derived from pred_pos4_for_jockey_te using equal-width bins over [0,1]."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_starts_3y_hard
+        description: "Historical starts for the same jockey and hard predicted pos4 bin over the previous 36 months."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_place_rate_3y_smooth_hard
+        description: "Smoothed place rate for the same jockey and hard predicted pos4 bin over the previous 36 months."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_relative_place_rate_3y_smooth_hard
+        description: "Relative smoothed place rate for the same jockey and hard predicted pos4 bin against the overall bin baseline."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_starts_3y_soft
+        description: "Soft-weighted historical starts aggregated across the five jockey pos4 bins using pred_pos4_for_jockey_te."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_place_rate_3y_smooth_soft
+        description: "Soft-weighted smoothed place rate aggregated across the five jockey pos4 bins using triangular weights from pred_pos4_for_jockey_te."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_pos4_bin5_relative_place_rate_3y_smooth_soft
+        description: "Soft-weighted relative smoothed place rate aggregated across the five jockey pos4 bins using triangular weights from pred_pos4_for_jockey_te."
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_style_place_rate_3y_smooth_soft
+        description: "Soft-weighted smoothed place rate aggregated across the four jockey running_style buckets using running_style_avg3 as a continuous interpolation source."
+        config:
+          meta: {}
+          tags: []

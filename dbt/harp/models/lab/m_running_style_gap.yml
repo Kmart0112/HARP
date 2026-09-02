@@ -1,0 +1,150 @@
+version: 2
+models:
+  - name: m_running_style_gap
+    description: "Exploratory table for comparing actual race-day running style with the past-3 average running_style feature."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: "Horse pedigree identifier used as the runner key."
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: "Race date."
+        config:
+          meta: {}
+          tags: []
+      - name: held_year
+        description: "Held year derived from held_date."
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: "Racecourse code."
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: "Race distance in meters."
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: "Surface code."
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: "Track course code."
+        config:
+          meta: {}
+          tags: []
+      - name: race_level
+        description: "Race class level."
+        config:
+          meta: {}
+          tags: []
+      - name: result_order
+        description: "Official finish order."
+        config:
+          meta: {}
+          tags: []
+      - name: is_place
+        description: "Whether the runner finished in the place positions."
+        config:
+          meta: {}
+          tags: []
+      - name: actual_running_style_cd
+        description: "Actual race-day running style code from int_race_entry_enriched.running_style_cd."
+        config:
+          meta: {}
+          tags: []
+      - name: actual_rank_4c
+        description: "Actual 4th-corner rank from int_race_entry_enriched.rank_4c."
+        config:
+          meta: {}
+          tags: []
+      - name: actual_corner4_pos
+        description: "Actual 4th-corner position ratio within the field; smaller means more forward."
+        config:
+          meta: {}
+          tags: []
+      - name: running_style_avg3
+        description: "Mean running style over the previous three races."
+        config:
+          meta: {}
+          tags: []
+      - name: avg3_running_style_rounded
+        description: "Rounded running_style_avg3 carried from feat_race_relative_z.running_style."
+        config:
+          meta: {}
+          tags: []
+      - name: horse_corner4_avg3
+        description: "Past-3 mean of the normalized 4th-corner position."
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_rate_z
+        description: "Race-relative z-score of horse_corner4_avg3."
+        config:
+          meta: {}
+          tags: []
+      - name: race_avg_corner4
+        description: "Race-level average of horse_corner4_avg3 used for corner4_rate_z."
+        config:
+          meta: {}
+          tags: []
+      - name: race_stddev_corner4
+        description: "Race-level standard deviation of horse_corner4_avg3 used for corner4_rate_z."
+        config:
+          meta: {}
+          tags: []
+      - name: num_past3_races
+        description: "Number of past races contributing to the past-3 aggregates."
+        config:
+          meta: {}
+          tags: []
+      - name: running_style_delta
+        description: "Signed gap between actual_running_style_cd and running_style_avg3."
+        config:
+          meta: {}
+          tags: []
+      - name: running_style_abs_delta
+        description: "Absolute gap between actual_running_style_cd and running_style_avg3."
+        config:
+          meta: {}
+          tags: []
+      - name: avg3_rounded_match_flag
+        description: "1 when the rounded past-3 style matches the actual race-day running style."
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_avg_delta
+        description: "Signed gap between actual_corner4_pos and horse_corner4_avg3."
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_avg_abs_delta
+        description: "Absolute gap between actual_corner4_pos and horse_corner4_avg3."
+        config:
+          meta: {}
+          tags: []
+      - name: actual_corner4_z
+        description: "Race-relative z-score of the actual 4th-corner position ratio."
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_z_delta
+        description: "Signed gap between actual_corner4_z and corner4_rate_z."
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_z_abs_delta
+        description: "Absolute gap between actual_corner4_z and corner4_rate_z."
+        config:
+          meta: {}
+          tags: []

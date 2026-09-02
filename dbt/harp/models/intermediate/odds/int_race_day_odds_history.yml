@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: int_race_day_odds_history
+    description: "Race-day normalized odds history from append-only s_jodds_tanpuku for the target held date. One row per race, horse, and publication time; latest odds are derived downstream in int_race_day_odds_latest."
+    columns:
+      - name: race_id
+        description: "Race identifier for the target held date."
+        tests:
+          - not_null
+      - name: horse_number
+        description: "Horse number within the race."
+        tests:
+          - not_null
+      - name: snapshot_time_key
+        description: "Numeric JRA publication time key used to order append-only s_jodds rows."
+        tests:
+          - not_null
+      - name: snapshot_at
+        description: "JRA odds publication time from s_jodds_tanpuku, stored as the source HHMM-style value."
+        tests:
+          - not_null
+      - name: odds_tansho
+        description: "Win odds at this publication time."
+      - name: odds_fukusho_low
+        description: "Place odds lower bound at this publication time."
+      - name: odds_fukusho_high
+        description: "Place odds upper bound at this publication time."
+      - name: odds_fukusho_avg
+        description: "Mean of place odds lower and upper bounds at this publication time."
+      - name: odds_fukusho_weighted_avg
+        description: "Weighted place odds average: 0.7 * low + 0.3 * high."
+      - name: popularity
+        description: "Popularity rank at this publication time when available."
+      - name: odds_source
+        description: "Raw速報 odds source used for the normalized history row."
+      - name: updated_at
+        description: "dbt model build timestamp."

@@ -1,0 +1,54 @@
+version: 2
+models:
+  - name: feat_sire_yearly_overall
+    columns:
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_career_months
+        description: "種牡馬ごとの最古 held_year_month から当月までの経過月数（0始まり）。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_is_early_phase_3y
+        description: "種牡馬使用初期フラグ。sire_career_months < 36 で 1、それ以外は 0。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_pos4_agari_synergy
+        description: "5年移動窓での種牡馬全体 pos4_agari_synergy 平均。"
+        config:
+          meta: {}
+          tags: []
+      - name: sire_avg_time_diff
+        description: "5年移動窓での種牡馬全体 time_diff 平均。"
+        config:
+          meta: {}
+          tags: []

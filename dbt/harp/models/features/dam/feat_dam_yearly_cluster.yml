@@ -1,0 +1,54 @@
+version: 2
+models:
+  - name: feat_dam_yearly_cluster
+    columns:
+      - name: dam_id
+        description: '母馬コード。feat_race_entry_base.dam_id をコースクラスタ別に月次集計した主体キー。'
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: '対象月。集計対象はこの月より前の過去月のみ。'
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster
+        description: 'コースクラスタ。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_starts_5y
+        description: '母馬×コースクラスタごとの過去5年相当月次窓の出走数。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_places_5y
+        description: '母馬×コースクラスタごとの過去5年相当月次窓の複勝数。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_wins_5y
+        description: '母馬×コースクラスタごとの過去5年相当月次窓の勝利数。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_time_diffs_5y
+        description: '母馬×コースクラスタごとの過去5年相当月次窓の time_diff 合計。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_place_rate
+        description: '母馬×コースクラスタごとの過去5年相当月次窓の複勝率。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_place_rate_smooth
+        description: '母馬×コースクラスタごとの過去5年相当月次窓の複勝率を全体複勝率へ shrink した値。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_pos4_agari_synergy
+        description: '母馬×コースクラスタごとの過去5年相当月次窓の pos4_agari_synergy 平均。'
+        config:
+          meta: {}
+          tags: []

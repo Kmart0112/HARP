@@ -1,0 +1,104 @@
+version: 2
+models:
+  - name: fct_training_work_hanro
+    columns:
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tozai_cd
+        description: "Representative hanro work row's tozai code carried from staging after choosing one work per horse and day."
+        config:
+          meta: {}
+          tags: []
+      - name: chokyo_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: peer_n_tozai_day
+        description: "Number of representative hanro works sharing the same tozai_cd and chokyo_date used to compute day-level normalization."
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_1_mean_tozai_day
+        description: "Mean hanro final 1F among representative works in the same tozai_cd and chokyo_date peer group. The peer group is filtered to lap_time_1 <= 14."
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_1_std_tozai_day
+        description: "Sample standard deviation of hanro final 1F in the same tozai_cd and chokyo_date peer group. The peer group is filtered to lap_time_1 <= 14."
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_1_z_tozai_day
+        description: "z-score of hanro final 1F within the representative-work peer group defined by tozai_cd and chokyo_date. The peer group is filtered to lap_time_1 <= 14."
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_4_mean_tozai_day
+        description: "Mean hanro 4F time among representative works in the same tozai_cd and chokyo_date peer group. The peer group is filtered to lap_time_1 <= 14."
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_4_std_tozai_day
+        description: "Sample standard deviation of hanro 4F time in the same tozai_cd and chokyo_date peer group. The peer group is filtered to lap_time_1 <= 14."
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_4_z_tozai_day
+        description: "z-score of hanro 4F time within the representative-work peer group defined by tozai_cd and chokyo_date. The peer group is filtered to lap_time_1 <= 14."
+        config:
+          meta: {}
+          tags: []
+      - name: accel_flag
+        description: "Acceleration flag on the representative daily hanro work selected by fastest final 1F, with ties treated as acceleration."
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_1_diff_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_1_diff_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_4_diff_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_4_diff_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_4_min
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_1_min
+        description: ''
+        config:
+          meta: {}
+          tags: []

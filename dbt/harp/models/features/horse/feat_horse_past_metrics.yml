@@ -1,0 +1,305 @@
+version: 2
+models:
+  - name: feat_horse_past_metrics
+    description: "Integrated horse history feature table joining cluster, distance, surface, turn-direction, racecourse-distance, pace-bucket, and overall history features. Most windows use 3-year lookback with current day excluded. Raw definitions: https://everydb.iwinz.net/edb2_manual/."
+    columns:
+      - name: kettonum
+        description: "Horse identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: "Race date used as feature reference date."
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_starts
+        description: "Past 3-year starts in same course_cluster (unweighted count)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_first_start_flag
+        description: "Flag = 1 when the horse has zero past 3-year starts in the same course_cluster as of held_date, else 0."
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_places
+        description: "Past 3-year places in same course_cluster (unweighted sum)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_time_diffs
+        description: "Past 3-year sum of time_diff in same course_cluster."
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy in same course_cluster."
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_pos4_agari_synergy
+        description: "Exponentially weighted average from int_horse_same_cluster_daily_cum: same_cluster_past_weighted_pos4_agari_synergy / same_cluster_past_weighted_starts (half-life 180 days)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_starts
+        description: "Past 3-year starts at same distance_m."
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_places
+        description: "Past 3-year places at same distance_m."
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at same distance_m."
+        config:
+          meta: {}
+          tags: []
+      - name: same_distance_avg_pos4_agari_synergy
+        description: "same_distance_past_pos4_agari_synergy / same_distance_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_starts
+        description: "Past 3-year starts at same (surface, surface_condition_cd)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_places
+        description: "Past 3-year places at same (surface, surface_condition_cd)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at same (surface, surface_condition_cd)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_avg_pos4_agari_synergy
+        description: "same_surface_condition_past_pos4_agari_synergy / same_surface_condition_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_condition_place_rate
+        description: "same_surface_condition_past_places / same_surface_condition_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_starts
+        description: "Past 3-year starts at same turn_direction."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_places
+        description: "Past 3-year places at same turn_direction."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at same turn_direction."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_avg_pos4_agari_synergy
+        description: "same_turn_direction_past_pos4_agari_synergy / same_turn_direction_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_place_rate
+        description: "same_turn_direction_past_places / same_turn_direction_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_surface_past_starts
+        description: "Past 3-year starts at same (turn_direction, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_surface_past_places
+        description: "Past 3-year places at same (turn_direction, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_surface_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at same (turn_direction, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_surface_avg_pos4_agari_synergy
+        description: "same_turn_direction_surface_past_pos4_agari_synergy / same_turn_direction_surface_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_turn_direction_surface_place_rate
+        description: "same_turn_direction_surface_past_places / same_turn_direction_surface_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_past_starts
+        description: "Past 3-year starts at same (has_homestretch_slope, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_past_places
+        description: "Past 3-year places at same (has_homestretch_slope, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at same (has_homestretch_slope, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_avg_pos4_agari_synergy
+        description: "same_homestretch_slope_surface_past_pos4_agari_synergy / same_homestretch_slope_surface_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_homestretch_slope_surface_place_rate
+        description: "same_homestretch_slope_surface_past_places / same_homestretch_slope_surface_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_starts
+        description: "Past 3-year starts at same (straight_distance_bucket, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_places
+        description: "Past 3-year places at same (straight_distance_bucket, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at same (straight_distance_bucket, surface)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_avg_pos4_agari_synergy
+        description: "same_straight_distance_bucket_surface_past_pos4_agari_synergy / same_straight_distance_bucket_surface_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_straight_distance_bucket_surface_place_rate
+        description: "same_straight_distance_bucket_surface_past_places / same_straight_distance_bucket_surface_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_starts
+        description: "Past 3-year starts at same (jyo_cd, distance_m)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_places
+        description: "Past 3-year places at same (jyo_cd, distance_m)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy at same (jyo_cd, distance_m)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_avg_pos4_agari_synergy
+        description: "same_jyo_distance_past_pos4_agari_synergy / same_jyo_distance_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: same_jyo_distance_place_rate
+        description: "same_jyo_distance_past_places / same_jyo_distance_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_starts
+        description: "Past 3-year starts where ten3f_ntile=1."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_places
+        description: "Past 3-year places where ten3f_ntile=1."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy where ten3f_ntile=1."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_avg_pos4_agari_synergy
+        description: "pace_ntile1_past_pos4_agari_synergy / pace_ntile1_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile1_place_rate
+        description: "pace_ntile1_past_places / pace_ntile1_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_starts
+        description: "Past 3-year starts where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_places
+        description: "Past 3-year places where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy where ten3f_ntile=2."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_avg_pos4_agari_synergy
+        description: "pace_ntile2_past_pos4_agari_synergy / pace_ntile2_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile2_place_rate
+        description: "pace_ntile2_past_places / pace_ntile2_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_starts
+        description: "Past 3-year starts where ten3f_ntile=3."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_places
+        description: "Past 3-year places where ten3f_ntile=3."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_past_pos4_agari_synergy
+        description: "Past 3-year sum of pos4_agari_synergy where ten3f_ntile=3."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_avg_pos4_agari_synergy
+        description: "pace_ntile3_past_pos4_agari_synergy / pace_ntile3_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_ntile3_place_rate
+        description: "pace_ntile3_past_places / pace_ntile3_past_starts (starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: pace_fast_minus_slow_place_rate
+        description: "pace_ntile1_place_rate - pace_ntile3_place_rate (both starts > 0)."
+        config:
+          meta: {}
+          tags: []
+      - name: past_starts
+        description: "Historical starts from f_horse_overall before held_date using daily-level window count."
+        config:
+          meta: {}
+          tags: []
+      - name: past_places
+        description: "Historical places from f_horse_overall before held_date using daily-level window sum."
+        config:
+          meta: {}
+          tags: []

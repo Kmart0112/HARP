@@ -1,0 +1,86 @@
+version: 1
+
+validation:
+  name: current_4f1f_profile_te3y_addon
+  category: feature_engineering
+  change_summary: validate_current_4f1f_profile_te3y_addon
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_current_4f1f_profile_te3y_addon_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_current_4f1f_profile_te3y_addon_runs.csv"
+  run_log_dir: "current_4f1f_profile_te3y_addon_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（current 4Fx1F profile TE 3y add-on）"
+  background: "当週調教の `wood_4f1f_profile_cat3` / `hanro_4f1f_profile_cat3` を、そのままカテゴリで使う代わりに過去3年の複勝率TEへ変換し、`place_v1` への add-on 候補として検証する。"
+  hypothesis_lines:
+    - "`wood_4f1f_profile_place_rate_3y_smooth` は current wood の 4F×1F 面の情報を、ノイズを抑えた履歴複勝率として圧縮できる。"
+    - "`hanro_4f1f_profile_place_rate_3y_smooth` は current hanro の 4F×1F 面の情報を、カテゴリ直入れより滑らかな数値特徴として利用できる。"
+    - "今回は過去36か月 rolling、当月除外、global prior 0.213 と疑似件数20の smoothing を採用する。"
+  leakage_notes:
+    - "as-of: いずれも対象レース月より前の過去36か月のみを参照し、対象月の結果は含めない。"
+    - "対象レースの結果情報不使用: 着順・払戻・確定後指標は使わない。"
+    - "将来情報不使用: `held_year_month` 以後の履歴は参照しない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "candidate は `wood_4f1f_profile_place_rate_3y_smooth` と `hanro_4f1f_profile_place_rate_3y_smooth` の2本のみ。"
+    - "TE の元カテゴリは current workout の `*_4f1f_profile_cat3`。"
+    - "source registry は書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: wood_4f1f_profile_place_rate_3y_smooth
+    feature_type: num
+    change_type: add
+    summary: current wood 4F×1F 3x3 category に対応する過去3年 smoothed 複勝率TE。
+    sections: [feature_names]
+    comparison_features: [wood_lap_time_1_z_tozai_day, wood_haron_time_4_z_tozai_day]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.wood_4f1f_profile_place_rate_3y_smooth
+
+  - feature_name: hanro_4f1f_profile_place_rate_3y_smooth
+    feature_type: num
+    change_type: add
+    summary: current hanro 4F×1F 3x3 category に対応する過去3年 smoothed 複勝率TE。
+    sections: [feature_names]
+    comparison_features: [hanro_lap_time_1_z_tozai_day, hanro_haron_time_4_z_tozai_day]
+    dbt_model_path: dbt/harp/models/mart/training/m_train_race_horse_past5.sql
+    dbt_yaml_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+    final_column: mart.m_train_race_horse_past5.hanro_4f1f_profile_place_rate_3y_smooth
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_wood_4f1f_profile_te3y
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [wood_4f1f_profile_place_rate_3y_smooth]
+    shap:
+      candidate_feature: wood_4f1f_profile_place_rate_3y_smooth
+      comparison_features: [wood_lap_time_1_z_tozai_day, wood_haron_time_4_z_tozai_day]
+      report_run_label: wood_4f1f_profile_place_rate_3y_smooth
+
+  - scenario_name: add_hanro_4f1f_profile_te3y
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [hanro_4f1f_profile_place_rate_3y_smooth]
+    shap:
+      candidate_feature: hanro_4f1f_profile_place_rate_3y_smooth
+      comparison_features: [hanro_lap_time_1_z_tozai_day, hanro_haron_time_4_z_tozai_day]
+      report_run_label: hanro_4f1f_profile_place_rate_3y_smooth
+
+  - scenario_name: add_both_4f1f_profile_te3y
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features:
+        - wood_4f1f_profile_place_rate_3y_smooth
+        - hanro_4f1f_profile_place_rate_3y_smooth

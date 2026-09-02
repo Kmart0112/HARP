@@ -1,0 +1,50 @@
+version: 2
+models:
+  - name: m_corner4_prediction_ols3
+    description: "Exploratory table for lightweight corner4_pos predictors restricted to recent-3 and OLS3 rules."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: "Horse pedigree identifier used as the runner key."
+        config:
+          meta: {}
+          tags: []
+      - name: actual_corner4_pos
+        description: "Actual 4th-corner position ratio within the field."
+        config:
+          meta: {}
+          tags: []
+      - name: num_past3_races
+        description: "Number of available past-3 races."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_last1
+        description: "Uses only the most recent past race corner4 position."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_avg3
+        description: "Simple average of the most recent three corner4 positions."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_wavg3_recent
+        description: "Recency-weighted average over the most recent three corner4 positions."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_endpoint_trend3
+        description: "Endpoint trend extrapolation from p3 to p1 for the next race."
+        config:
+          meta: {}
+          tags: []
+      - name: pred_ols3_next
+        description: "Linear regression forecast for the next race using the most recent three corner4 positions."
+        config:
+          meta: {}
+          tags: []

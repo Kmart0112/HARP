@@ -1,0 +1,71 @@
+"""Modeling helpers for statistical validation in core layer."""
+
+from harp.core.modeling.group_condition_glmm import (
+    GroupConditionGlmmData,
+    build_group_condition_glmm_model,
+    prepare_group_condition_glmm_data,
+    sample_group_condition_glmm,
+)
+from harp.core.modeling.group_condition_categorical_glmm import (
+    GroupConditionCategoricalGlmmData,
+    SparseFilterStats,
+    build_group_condition_categorical_glmm_model,
+    prepare_group_condition_categorical_glmm_data,
+    sample_group_condition_categorical_glmm,
+)
+from harp.core.modeling.glmm_condition_aptitude_runner import (
+    ABILITY_TRANSFORMS,
+    STAGE_MODES,
+    AptitudeCaseConfig,
+    AptitudeCaseResult,
+    AptitudeRunConfig,
+    GroupConditionSpec,
+    SamplingStageConfig,
+    build_aggregate_tables,
+    default_case_presets,
+    default_group_condition_specs,
+    default_stage1_target_accept_by_case,
+    prepare_ability_feature,
+    render_report_markdown,
+    run_stage_for_specs,
+    select_stage2_targets,
+    to_distance_bucket_4,
+)
+from harp.core.modeling.jockey_distance_glmm import (
+    JockeyDistanceGlmmData,
+    build_jockey_distance_glmm_model,
+    prepare_jockey_distance_glmm_data,
+    sample_jockey_distance_glmm,
+)
+
+__all__ = [
+    "GroupConditionGlmmData",
+    "build_group_condition_glmm_model",
+    "prepare_group_condition_glmm_data",
+    "sample_group_condition_glmm",
+    "GroupConditionCategoricalGlmmData",
+    "SparseFilterStats",
+    "build_group_condition_categorical_glmm_model",
+    "prepare_group_condition_categorical_glmm_data",
+    "sample_group_condition_categorical_glmm",
+    "ABILITY_TRANSFORMS",
+    "STAGE_MODES",
+    "GroupConditionSpec",
+    "SamplingStageConfig",
+    "AptitudeRunConfig",
+    "AptitudeCaseConfig",
+    "AptitudeCaseResult",
+    "default_group_condition_specs",
+    "default_case_presets",
+    "default_stage1_target_accept_by_case",
+    "to_distance_bucket_4",
+    "prepare_ability_feature",
+    "run_stage_for_specs",
+    "select_stage2_targets",
+    "build_aggregate_tables",
+    "render_report_markdown",
+    "JockeyDistanceGlmmData",
+    "build_jockey_distance_glmm_model",
+    "prepare_jockey_distance_glmm_data",
+    "sample_jockey_distance_glmm",
+]

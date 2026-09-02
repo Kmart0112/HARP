@@ -1,0 +1,72 @@
+version: 1
+
+validation:
+  name: turn_direction_surface_z
+  category: feature_engineering
+  change_summary: compare_same_turn_direction_surface_avg_pos4_agari_synergy_z_against_raw
+  experiment_name: feature_validation
+
+outputs:
+  report_file: "{date}_turn_direction_surface_z_feature_definition_validation_report.md"
+  runs_csv_file: "{date}_turn_direction_surface_z_runs.csv"
+  run_log_dir: "turn_direction_surface_z_logs_{date}"
+
+report:
+  title: "特徴量定義・検証統合レポート（turn_direction_surface z）"
+  background: "採用済みの `same_turn_direction_surface_avg_pos4_agari_synergy` を race 内 `z` へ再表現すると、同レース内での相対優位を追加できるかを `place_v1` で formal validation する。"
+  hypothesis_lines:
+    - "`same_turn_direction_surface_avg_pos4_agari_synergy_z` は raw 値よりもレース内の比較優位を直接表現できるため、冗長性を抑えつつ追加情報を持てる可能性がある。"
+    - "まずは add-only で純増分を見て、その後 raw を外した純置換で winner になれるかを確認する。"
+    - "winner 判定は `DeltaAUC > 0` かつ `DeltaLogLoss < 0` を基本とし、baseline / add / replace を MLflow に残す。"
+  leakage_notes:
+    - "as-of: `same_turn_direction_surface_avg_pos4_agari_synergy` は過去3年の事前確定情報のみから算出され、race 内 z も当該レースの事前特徴量だけで計算する。"
+    - "対象レース結果や払戻は不使用。"
+    - "将来情報不使用: 対象レース以降の結果や派生集計は使わない。"
+  implementation_notes:
+    - "base feature_set: `place_v1`"
+    - "`same_turn_direction_surface_avg_pos4_agari_synergy` は baseline では維持し、candidate は add scenario で明示的に include する。"
+    - "`replace_raw_with_z` scenario では raw を外し、candidate へ純置換する。"
+    - "`add_all_turn_direction_surface_z` は単一 candidate のため add-only と同じ実効集合になるが、preset 上の feature_set_add パターンとして残す。"
+    - "source registry は実行中に書き換えず、scenario ごとの一時 config を使う。"
+  metrics_notebook_path: notebook/prd/lgbm_fuku_platt_metrics.py
+  shap_notebook_path: notebook/lab/lgbm_fuku_platt_shap.py
+
+target_features:
+  - feature_name: same_turn_direction_surface_avg_pos4_agari_synergy_z
+    feature_type: num
+    change_type: add
+    summary: "`same_turn_direction_surface_avg_pos4_agari_synergy` を race 内平均と標準偏差で z 化した相対 turn_direction_surface 適性。"
+    sections: [feature_names]
+    comparison_features: [same_turn_direction_surface_avg_pos4_agari_synergy]
+    dbt_model_path: dbt/harp/models/features/base/feat_race_relative_z.sql
+    dbt_yaml_path: dbt/harp/models/features/base/feat_race_relative_z.yml
+    final_column: mart.m_train_race_horse_past5.same_turn_direction_surface_avg_pos4_agari_synergy_z
+
+scenarios:
+  - scenario_name: baseline_existing
+    validation_mode: baseline
+    feature_set:
+      base_feature_set_name: place_v1
+
+  - scenario_name: add_turn_direction_surface_z
+    validation_mode: single_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_turn_direction_surface_avg_pos4_agari_synergy_z]
+    shap:
+      candidate_feature: same_turn_direction_surface_avg_pos4_agari_synergy_z
+      comparison_features: [same_turn_direction_surface_avg_pos4_agari_synergy]
+      report_run_label: same_turn_direction_surface_z
+
+  - scenario_name: add_all_turn_direction_surface_z
+    validation_mode: feature_set_add
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_turn_direction_surface_avg_pos4_agari_synergy_z]
+
+  - scenario_name: replace_raw_with_z
+    validation_mode: replace_existing
+    feature_set:
+      base_feature_set_name: place_v1
+      include_features: [same_turn_direction_surface_avg_pos4_agari_synergy_z]
+      exclude_features: [same_turn_direction_surface_avg_pos4_agari_synergy]

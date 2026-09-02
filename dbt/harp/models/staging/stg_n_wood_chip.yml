@@ -1,0 +1,130 @@
+version: 2
+models:
+  - name: stg_n_wood_chip
+    columns:
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tozai_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chokyo_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: chokyo_time
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_10
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: haron_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_10
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_9
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_8
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_7
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_6
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_5
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: lap_time_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+

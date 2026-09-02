@@ -1,0 +1,609 @@
+version: 2
+models:
+  - name: feat_race_entry_base
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: gate_number
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sire_name
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: dam_id
+        description: 'Dam horse identifier propagated from int_race_entry_enriched.dam_id.'
+        config:
+          meta: {}
+          tags: []
+      - name: damsire_id
+        description: 'Damsire identifier propagated from int_race_entry_enriched.damsire_id.'
+        config:
+          meta: {}
+          tags: []
+      - name: sire_cat
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: breeder_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: h_weight
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: h_weight_bin
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: weight_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: dm_rank
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sex_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kinryo
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: tozai_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: popularity
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: odds_tansho
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: result_order
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: running_style_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f_rank_in_race
+        description: 'int_race_entry_enriched 由来。同一レース内の agari3f 昇順順位。'
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f_rank_percentile_in_race
+        description: 'int_race_entry_enriched 由来。agari3f race 内順位を頭数で 0-1 に正規化した相対順位。0 が最良。'
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_win
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: track_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_condition_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_level
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: num_starters
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten4f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f_race
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari4f_race
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_ntile
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: turn_direction
+        description: "Course turning direction label from int_race_entry_enriched/fct_race."
+        config:
+          meta: {}
+          tags: []
+      - name: turn_direction_cd
+        description: "Course turning direction code from int_race_entry_enriched/fct_race."
+        config:
+          meta: {}
+          tags: []
+      - name: straight_distance_m
+        description: "Course straight distance in meters propagated from int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: has_homestretch_slope
+        description: "Whether the course has a homestretch slope propagated from int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: straight_distance_bucket
+        description: "Bucket derived from straight_distance_m: 1=<300, 2=300-349, 3=350-399, 4=400-499, 5=>=500."
+        config:
+          meta: {}
+          tags: []
+      - name: race_pace
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wood_lap_time_1
+        description: "Representative wood work final 1F from 3-4 days before the race."
+        config:
+          meta: {}
+          tags: []
+      - name: wood_lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wood_haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: wood_lap_time_1_z_tozai_day
+        description: "int_race_entry_enriched 由来。代表 current wood 最終1F の tozai_cd × chokyo_date 内 z-score。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_haron_time_4_z_tozai_day
+        description: "int_race_entry_enriched 由来。代表 current wood 4F の tozai_cd × chokyo_date 内 z-score。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_4f1f_profile_cat3
+        description: "int_race_entry_enriched 由来。代表 current wood の 4F z-score と最終1F z-score を 3x3 にビン化した joint category。`0` は欠損、`1..9` は fastest/fastest から slowest/slowest。"
+        config:
+          meta: {}
+          tags: []
+      - name: wood_tozai_cd
+        description: "Representative current wood workout row's tozai code propagated from int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: wood_late_sharpness
+        description: "int_race_entry_enriched 由来。代表 current wood 4F/1F から計算した終いの鋭さ。値が大きいほど、前半3F平均に対して最終1Fが速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_lap_time_1
+        description: "Representative wood work final 1F from 10-11 days before the race."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_lap_time_1_z_tozai_day
+        description: "int_race_entry_enriched 由来。代表 week1 wood 最終1F の tozai_cd × chokyo_date 内 z-score。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_haron_time_4_z_tozai_day
+        description: "int_race_entry_enriched 由来。代表 week1 wood 4F の tozai_cd × chokyo_date 内 z-score。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_tozai_cd
+        description: "Representative week1 wood workout row's tozai code propagated from int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_wood_late_sharpness
+        description: "int_race_entry_enriched 由来。代表 week1 wood 4F/1F から計算した終いの鋭さ。値が大きいほど、前半3F平均に対して最終1Fが速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_lap_time_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_lap_time_1_z_tozai_day
+        description: "int_race_entry_enriched 由来。代表 current hanro 最終1F の tozai_cd × chokyo_date 内 z-score。peer group は lap_time_1 <= 14。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_haron_time_4_z_tozai_day
+        description: "int_race_entry_enriched 由来。代表 current hanro 4F の tozai_cd × chokyo_date 内 z-score。peer group は lap_time_1 <= 14。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_4f1f_profile_cat3
+        description: "int_race_entry_enriched 由来。代表 current hanro の 4F z-score と最終1F z-score を 3x3 にビン化した joint category。`0` は欠損、`1..9` は fastest/fastest から slowest/slowest。"
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_tozai_cd
+        description: "Representative current hanro workout row's tozai code propagated from int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: hanro_late_sharpness
+        description: "int_race_entry_enriched 由来。代表 current hanro 4F/1F から計算した終いの鋭さ。値が大きいほど、前半3F平均に対して最終1Fが速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_lap_time_1
+        description: "Representative hanro work final 1F from 10-11 days before the race."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_lap_time_2
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_haron_time_4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_lap_time_1_z_tozai_day
+        description: "int_race_entry_enriched 由来。代表 week1 hanro 最終1F の tozai_cd × chokyo_date 内 z-score。peer group は lap_time_1 <= 14。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_haron_time_4_z_tozai_day
+        description: "int_race_entry_enriched 由来。代表 week1 hanro 4F の tozai_cd × chokyo_date 内 z-score。peer group は lap_time_1 <= 14。"
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_tozai_cd
+        description: "Representative week1 hanro workout row's tozai code propagated from int_race_entry_enriched."
+        config:
+          meta: {}
+          tags: []
+      - name: week1_hanro_late_sharpness
+        description: "int_race_entry_enriched 由来。代表 week1 hanro 4F/1F から計算した終いの鋭さ。値が大きいほど、前半3F平均に対して最終1Fが速い。"
+        config:
+          meta: {}
+          tags: []
+      - name: popularity_ratio
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_number_ratio
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: sprint_decay
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: corner4_pos
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age_month
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: age_days
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pace_type
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari_good
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ensei_type
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kinryo_adj
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_place
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: blinker_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_pace_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: relative_agari3f
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_vs_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_vs_avg_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten3f_avg_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten4f_vs_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten4f_vs_avg_front_runners
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_adjusted
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_z
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pace_front_disadvantage
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_hensachi
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_starts_3y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_logit
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_logit_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_3y_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_corrected
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_corrected_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_place_rate_corrected
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_cluster_avg_place_rate_corrected_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []

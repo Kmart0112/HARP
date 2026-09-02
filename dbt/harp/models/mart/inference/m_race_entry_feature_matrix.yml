@@ -1,0 +1,116 @@
+version: 2
+
+models:
+  - name: m_race_entry_feature_matrix
+    description: "Common result-free, odds-free feature matrix for training and inference. Grain is race_id and kettonum; odds are joined only in the train/predict mart exits."
+    columns:
+      - name: race_id
+        description: "Race identifier."
+        tests:
+          - not_null
+      - name: kettonum
+        description: "Horse identifier."
+        tests:
+          - not_null
+      - name: held_date
+        description: "Race date."
+      - name: h_weight_bin
+        description: "Resolved body-weight bucket."
+      - name: surface_condition_cd
+        description: "Resolved surface condition bucket."
+      - name: jockey_place_rate_3y_smooth
+        description: "Smoothed jockey place rate over the prior 3 years at month grain."
+      - name: jockey_cluster_place_rate_3y_smooth
+        description: "Smoothed jockey place rate for the same course cluster over the prior 3 years at month grain."
+      - name: jockey_surface_dist_pm200_place_rate_3y_smooth
+        description: "Smoothed jockey place rate for the same surface and +/-200m distance band over the prior 3 years at month grain."
+      - name: jockey_surface_jyo_place_rate_3y_smooth
+        description: "Smoothed jockey place rate for the same surface and racecourse over the prior 3 years at month grain."
+      - name: jockey_surface_straight_distance_bucket_place_rate_3y_smooth
+        description: "Smoothed jockey place rate for the same surface and homestretch-distance bucket over the prior 3 years at month grain."
+      - name: jockey_surface_turn_direction_place_rate_3y_smooth
+        description: "Smoothed jockey place rate for the same surface and turn direction over the prior 3 years at month grain."
+      - name: jockey_turn_direction_place_rate_3y_smooth
+        description: "Smoothed jockey place rate for the same turn direction over the prior 3 years at month grain."
+      - name: trainer_place_rate_5y
+        description: "Trainer place rate over the prior 5 yearly rows, smoothed toward the project prior."
+      - name: trainer_old_place_rate_5y
+        description: "Trainer place rate over the prior 5 yearly rows for the same old_cd bucket."
+      - name: breeder_place_rate_5y_smooth
+        description: "Breeder place rate over the prior 5 yearly rows, smoothed toward the project prior."
+      - name: dm_rank
+        description: "Pre-race data-mining rank carried from the enriched race-entry base."
+      - name: wood_lap_time_1
+        description: "Latest wood workout lap time 1 from the pre-race enriched entry source."
+      - name: hanro_lap_time_1
+        description: "Latest hanro workout lap time 1 from the pre-race enriched entry source."
+      - name: week1_wood_lap_time_1
+        description: "Previous-week wood workout lap time 1 from the pre-race enriched entry source."
+      - name: week1_hanro_lap_time_1
+        description: "Previous-week hanro workout lap time 1 from the pre-race enriched entry source."
+      - name: past_starts
+        description: "Horse starts before the target race from the horse past metrics lookup."
+      - name: same_cluster_past_starts
+        description: "Horse prior starts in the same course cluster."
+      - name: same_distance_past_starts
+        description: "Horse prior starts at the same distance condition."
+      - name: same_cluster_avg_pos4_agari_synergy
+        description: "Horse historical position/agari synergy average in the same course cluster."
+      - name: pace_ntile1_place_rate
+        description: "Horse historical place rate for pace ntile 1 from the horse past metrics lookup."
+      - name: jockey_horse_pair_weighted_avg_pos4_agari_synergy
+        description: "Historical weighted position/agari synergy for the same horse and jockey pair."
+      - name: jockey_horse_pair_same_cluster_weighted_avg_pos4_agari_synergy
+        description: "Historical weighted position/agari synergy for the same horse and jockey pair in the same course cluster."
+      - name: wood_4f1f_profile_place_rate_3y_smooth
+        description: "Smoothed place-rate prior for the horse's wood 4F/1F workout profile."
+      - name: trainer_wood_lap_time_1_fast_excess_z_3y
+        description: "Trainer-normalized fast-excess z-score for the latest wood lap time 1 workout metric."
+      - name: trainer_wood_haron_time_4_fast_excess_z_3y
+        description: "Trainer-normalized fast-excess z-score for the latest wood haron time 4 workout metric."
+      - name: top3_corner3_pos_avg_5y
+        description: "Course prior: average corner-3 position among top-3 finishers over the prior 5 years."
+      - name: course_sashi_place_rate_5y
+        description: "Course prior: place rate for sashi-style runners over the prior 5 years."
+      - name: race_level_diff
+        description: "Race-level change from the previous race, sourced from the past-lag feature model."
+      - name: is_jockey_change
+        description: "Flag indicating whether the jockey changed from the previous race."
+      - name: kinryo_z
+        description: "Within-race z-score of carried weight."
+      - name: jockey_place_rate_z_smooth
+        description: "Within-race z-score of smoothed jockey place-rate prior."
+      - name: running_style
+        description: "Predicted running-style bucket derived from historical race-relative features."
+      - name: pred_pos4_for_jockey_te
+        description: "Predicted normalized corner-4 position used to resolve jockey position-bucket target encodings."
+      - name: jockey_style_place_rate_3y_smooth
+        description: "Smoothed jockey place-rate prior for the predicted running-style bucket."
+      - name: jockey_pos4_bin5_place_rate_3y_smooth_soft
+        description: "Soft-weighted jockey place-rate prior across predicted corner-4 position buckets."
+      - name: sire_avg_place_rate_smooth
+        description: "Smoothed sire place rate from the monthly sire overall lookup."
+      - name: same_cluster_sire_avg_place_rate_smooth
+        description: "Smoothed sire place rate for the same course cluster from the monthly sire cluster lookup."
+      - name: same_age_sire_avg_place_rate_smooth
+        description: "Smoothed sire place rate for the same age bucket from the monthly sire age lookup."
+      - name: same_old_cd_sire_avg_place_rate_smooth
+        description: "Smoothed sire place rate for the same race age-class bucket from the monthly sire old_cd lookup."
+      - name: same_sex_cd_sire_avg_place_rate_smooth_prev_sex_cd
+        description: "Smoothed sire place rate for the same sex_cd bucket from the monthly sire sex lookup."
+      - name: same_weight_sire_place_rate_smooth
+        description: "Smoothed sire place rate for the same body-weight bucket from the monthly sire weight lookup; null until body weight is available."
+      - name: same_surface_dist_pm200_sire_avg_place_rate_smooth
+        description: "Smoothed sire place rate for the same surface and +/-200m distance band from the monthly sire distance lookup."
+      - name: dam_avg_place_rate_smooth
+        description: "Smoothed dam place rate from the monthly dam overall lookup."
+      - name: same_cluster_dam_avg_place_rate_smooth
+        description: "Smoothed dam place rate for the same course cluster from the monthly dam cluster lookup."
+      - name: damsire_avg_place_rate_smooth
+        description: "Smoothed damsire place rate from the monthly damsire overall lookup."
+      - name: same_cluster_damsire_avg_place_rate_smooth
+        description: "Smoothed damsire place rate for the same course cluster from the monthly damsire cluster lookup."
+      - name: is_prediction_target
+        description: "True for active entries without finalized result."
+      - name: entry_status
+        description: "Entry lifecycle status."

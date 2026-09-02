@@ -1,0 +1,34 @@
+version: 2
+models:
+  - name: feat_trainer_age
+    columns:
+      - name: trainer_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: old_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_year
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_old_starts_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_old_places_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: trainer_old_place_rate_5y
+        description: ''
+        config:
+          meta: {}
+          tags: []

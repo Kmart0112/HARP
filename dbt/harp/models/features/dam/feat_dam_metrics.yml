@@ -1,0 +1,59 @@
+version: 2
+models:
+  - name: feat_dam_metrics
+    columns:
+      - name: race_id
+        description: 'レースID。'
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: '競走馬コード。'
+        config:
+          meta: {}
+          tags: []
+      - name: dam_starts_5y
+        description: '対象レース月直前までの母馬出走数。'
+        config:
+          meta: {}
+          tags: []
+      - name: dam_avg_place_rate
+        description: '対象レース月直前までの母馬複勝率。'
+        config:
+          meta: {}
+          tags: []
+      - name: dam_avg_place_rate_smooth
+        description: '対象レース月直前までの母馬複勝率を全体複勝率へ shrink した値。'
+        config:
+          meta: {}
+          tags: []
+      - name: dam_avg_pos4_agari_synergy
+        description: '対象レース月直前までの母馬 pos4_agari_synergy 平均。'
+        config:
+          meta: {}
+          tags: []
+      - name: dam_avg_time_diff
+        description: '対象レース月直前までの母馬 time_diff 平均。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_past_starts
+        description: '対象レース月直前までの母馬×コースクラスタ出走数。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_place_rate
+        description: '対象レース月直前までの母馬×コースクラスタ複勝率。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_place_rate_smooth
+        description: '対象レース月直前までの母馬×コースクラスタ複勝率を全体複勝率へ shrink した値。'
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_dam_avg_pos4_agari_synergy
+        description: '対象レース月直前までの母馬×コースクラスタ pos4_agari_synergy 平均。'
+        config:
+          meta: {}
+          tags: []

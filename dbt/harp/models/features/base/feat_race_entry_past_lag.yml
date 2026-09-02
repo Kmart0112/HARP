@@ -1,0 +1,389 @@
+version: 2
+models:
+  - name: feat_race_entry_past_lag
+    columns:
+      - name: race_id
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_shokyu
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_level_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_jockey_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: is_surface_changed
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_corner4_sd3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_kinryo
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_weight
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_weight_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: weight_change_ratio
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster_change
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_wood_lap_time_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_wood_lap_time_1_z_tozai_day
+        description: '直近1走前レース時点の代表ウッド調教1Fを、当時の `tozai_cd × chokyo_date` 基準で標準化した z-score。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_trainer_wood_lap_time_1_fast_excess_z_3y
+        description: '直近1走前レース時点の代表ウッド調教1Fが、当時の trainer_cd 過去3年平均よりどれだけ速かったかを trainer 内標準偏差で正規化した excess z。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_hanro_lap_time_1
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_hanro_lap_time_1_z_tozai_day
+        description: '直近1走前レース時点の代表坂路調教1Fを、当時の `tozai_cd × chokyo_date` 基準で標準化した z-score。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_trainer_hanro_lap_time_1_fast_excess_z_3y
+        description: '直近1走前レース時点の代表坂路調教1Fが、当時の trainer_cd 過去3年平均よりどれだけ速かったかを trainer 内標準偏差で正規化した excess z。'
+        config:
+          meta: {}
+          tags: []
+      - name: p1_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_time_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_time_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_time_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_pace_front_disadvantage
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_pace_front_disadvantage
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_pace_front_disadvantage
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_time_vs_pace_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_time_vs_pace_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_time_vs_pace_avg
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_jyo_cd
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_race_level
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: blinker_added
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: num_past3_races
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: condition_change_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_change_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface_change_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: course_cluster_change_score
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_course_cluster
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_kinryo_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_rel_agari3f_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f_rank_avg3
+        description: 'p1-p3 の agari3f race 内順位平均を切り捨てで離散化した値。小さいほど良い。'
+        config:
+          meta: {}
+          tags: []
+      - name: agari3f_rank_percentile_avg3
+        description: 'p1-p3 の agari3f race 内相対順位 percent 値の NULL 除外平均。0 が最良、1 に近いほど後位。'
+        config:
+          meta: {}
+          tags: []
+      - name: horse_corner4_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p1_corner4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_corner4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p3_corner4
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_pace_avg_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pace_front_disadvantage_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_adjusted_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_slope3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_trend3_voladj
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_short_long_gap
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_avg_pos4_agari_synergy_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_cluster_pos4_agari_synergy_diff
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: agari_good_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: ten4f_vs_avg_front_runners_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: running_style_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: horse_rel_agari3f_min3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_vs_avg_min3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: pos4_agari_synergy_max3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: time_diff_adjusted_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_avg3
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_avg_place_rate_avg3_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: race_interval_days
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: p2_race_interval_days
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_diff_ratio
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: jockey_place_rate_diff_ratio_smooth
+        description: ''
+        config:
+          meta: {}
+          tags: []

@@ -1,0 +1,49 @@
+version: 2
+models:
+  - name: feat_horse_surface_distance_pm200
+    columns:
+      - name: kettonum
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: held_date
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: surface
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: distance_m
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_past_starts
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_past_places
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_past_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_avg_pos4_agari_synergy
+        description: ''
+        config:
+          meta: {}
+          tags: []
+      - name: same_surface_dist_pm200_place_rate
+        description: ''
+        config:
+          meta: {}
+          tags: []
