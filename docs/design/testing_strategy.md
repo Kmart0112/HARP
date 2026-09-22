@@ -87,3 +87,9 @@ uv run pytest -q tests/flows
 uv run pytest -q tests/calculations
 uv run pytest -q tests/integrations
 ```
+
+## 6. オッズのスキーマ変更契約
+
+学習・推論Portは `RaceInputQuery -> RaceInputs` を公開する。`tests/integrations/test_race_input_port_contract.py` は実SQLの改名・分割・列追加・型差を同じPortの契約として検証する。`HARP_CONTRACT_TEST_DB_URL` を指定するとSQLiteに加えてPostgreSQLも実行し、CIでは常に指定する。
+
+純粋な時点・欠損・計算、実Adapterの変換、UseCaseの結果・再実行を分ける。詳細な保証範囲は [odds_input_contract.md](odds_input_contract.md) に記載する。warehouseのdbt unit/data testは別途実行し、Pythonの成功だけで実データの正しさを断定しない。

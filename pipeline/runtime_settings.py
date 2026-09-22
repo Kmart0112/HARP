@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dotenv import dotenv_values, load_dotenv
+from sqlalchemy.engine import URL
 
 from harp.config import (
     DatabaseConfig,
@@ -13,7 +14,6 @@ from harp.config import (
     PathConfig,
     TrackingConfig,
 )
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ENV_FILE = PROJECT_ROOT / ".env"
@@ -56,10 +56,12 @@ def load_pipeline_runtime_config(env_file: str | Path | None = None) -> HarpRunt
     load_pipeline_env_files(env_file=env_file)
 
     return HarpRuntimeConfig(
-        database=DatabaseConfig(db_url=_required_env("HARP_DB_URL")),
+        database=DatabaseConfig(db_url=resolve_database_url()),
         mart=MartConfig(
             training_mart_table=_required_env("HARP_TRAINING_MART_TABLE"),
             prediction_mart_table=_required_env("HARP_PREDICTION_MART_TABLE"),
+            training_quotes_table=os.environ.get("HARP_TRAINING_QUOTES_TABLE", "intermediate.int_odds_pre10m_v1"),
+            prediction_quotes_table=os.environ.get("HARP_PREDICTION_QUOTES_TABLE", "staging.stg_s_odds_quotes_v1"),
         ),
         tracking=TrackingConfig(
             mlflow_tracking_uri=_required_env("HARP_MLFLOW_TRACKING_URI"),
@@ -67,15 +69,27 @@ def load_pipeline_runtime_config(env_file: str | Path | None = None) -> HarpRunt
             feature_validation_experiment=_required_env("HARP_MLFLOW_FEATURE_VALIDATION_EXPERIMENT"),
             feature_selection_experiment=_required_env("HARP_MLFLOW_FEATURE_SELECTION_EXPERIMENT"),
         ),
-        paths=PathConfig(feature_sets_path=_required_env("HARP_FEATURE_SETS_PATH")),
+        paths=PathConfig(feature_sets_path=_required_env("HARP_FEATURE_SETS_PATH"),
+                         prediction_snapshots_path=os.environ.get("HARP_PREDICTION_SNAPSHOTS_PATH", "pipeline/artifacts/prediction_inputs")),
         log_level=_required_env("HARP_LOG_LEVEL").upper(),
     )
+
+
+def resolve_database_url() -> str:
+    """Share dbt credentials; URL.create safely encodes special characters."""
+    explicit = os.environ.get("HARP_DB_URL", "").strip()
+    if explicit:
+        return explicit
+    return URL.create("postgresql+psycopg", host=_required_env("HARP_DB_HOST"),
+                      port=int(os.environ.get("HARP_DB_PORT", "5432")),
+                      username=_required_env("HARP_DB_USER"), password=os.environ.get("HARP_DB_PASSWORD", ""),
+                      database=_required_env("HARP_DB_NAME")).render_as_string(hide_password=False)
 
 
 def load_table_export_runtime_config(env_file: str | Path | None = None) -> TableExportRuntimeConfig:
     load_pipeline_env_files(env_file=env_file)
     return TableExportRuntimeConfig(
-        db_url=_required_env("HARP_DB_URL"),
+        db_url=resolve_database_url(),
         source_table=_required_env("HARP_TRAINING_MART_TABLE"),
     )
 

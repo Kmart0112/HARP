@@ -49,7 +49,7 @@ UseCase の差し替え可能性は `tests/flows/` で、外部依存を Port Mo
 `src/harp/config.py` は値型だけを提供する。
 
 - `DatabaseConfig`: 完成した`db_url`
-- `MartConfig`: training / prediction mart table
+- `MartConfig`: training / prediction entry relationとquote relation
 - `TrackingConfig`: MLflow URIとexperiment名
 - `PathConfig`: feature registry path
 - `HarpRuntimeConfig`: 上記とlog levelの集約
@@ -75,7 +75,7 @@ domain-local composition rootは以下に置く。
 
 | UseCase | Requestの状態 | 主責務 | 非責務 |
 |---|---|---|---|
-| `run_predict_place_usecase` | 日付、threshold、bankroll等が解決済み | feature / odds / race info取得、推論・EV Core呼び出し、結果集約 | 日付default、manifest JSON解釈、SQL |
+| `run_predict_place_usecase` | 日付、threshold、bankroll等が解決済み | 単一RaceInputs取得、契約照合、推論・EV Core呼び出し、入力保存・結果集約 | 日付default、manifest JSON解釈、SQL |
 | `run_train_pipeline_usecase` | task spec、feature set名、出力先が解決済み | 学習データ取得、Core学習、artifact / manifest / tracking保存指示 | recipe default解釈、YAML解釈、DB接続 |
 | `run_feature_validation_usecase` | presetと出力パスが解決済み | scenario実行、判定Core呼び出し、成果物公開順序 | preset読込、feature YAML解釈、MLflow SDK |
 | `run_feature_selection_usecase` | presetとbase feature set名が解決済み | scenario実行、選定Core呼び出し、materialization順序 | YAML schema解釈、具象runner、MLflow SDK |
@@ -88,8 +88,9 @@ domain-local composition rootは以下に置く。
 
 | Port | 責務 | 主な実装 |
 |---|---|---|
-| `InferenceRepositoryPort` | 推論特徴量、オッズ、レース情報の取得 | `PostgresPolarsInferenceRepositoryAdapter` |
-| `TrainingRepositoryPort` | 学習フレーム取得 | `PostgresTrainingRepositoryAdapter` |
+| `InferenceRepositoryPort` | 論理Queryから同一時点の特徴量・オッズ・レース情報を取得 | `SqlRaceInputRepository` |
+| `TrainingRepositoryPort` | pre-startの学習入力を欠損行を含めて取得 | `SqlRaceInputRepository` |
+| `PredictionSnapshotStorePort` | 使用入力の保存と整合性検証付き再読込 | `ParquetPredictionSnapshotStore` |
 | `FeatureDefinitionPort` | registry / contract / feature configの読込・render・検索 | `YamlFeatureDefinitionAdapter` |
 | `ModelLoaderPort` | model artifact payload読込 | `PickleModelLoaderAdapter` |
 | `ManifestReaderPort` | manifest JSONからmodel typeを取得 | `JsonManifestReaderAdapter` |
@@ -154,3 +155,5 @@ notebookもpackage側のambient settingsを使わない。repo内の標準notebo
 - `docs/design/testing_strategy.md`
 - `docs/operations/notebook_usage.md`
 - `AGENTS.md`
+
+オッズの入力・時点・欠損・再実行の契約は [odds_input_contract.md](odds_input_contract.md) を正本とする。

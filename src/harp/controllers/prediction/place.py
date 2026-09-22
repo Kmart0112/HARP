@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from harp.config import HarpRuntimeConfig
 from harp.core.inference import resolve_date_range
+from harp.core.inference.ev_calculator import PlaceOddsMethod
 from harp.interface.ports import FileGatewayPort
 from harp.usecase.prediction.place import (
     PredictPlaceRequest,
@@ -42,6 +44,9 @@ class PredictPlaceCommand:
     bankroll: float = 100000.0
     kelly_fraction: float = 0.1
     kelly_cap: float = 0.05
+    as_of: datetime | None = None
+    max_quote_age_seconds: float = 300.0
+    replay_snapshot_id: str | None = None
 
 
 def infer_predict_manifest_path(artifact_path: str) -> str | None:
@@ -99,7 +104,7 @@ class PredictController:
         from_date, to_date = resolve_date_range(
             cmd.from_date,
             cmd.to_date,
-            now=datetime.now(),
+            now=datetime.now(ZoneInfo("Asia/Tokyo")),
         )
         req = PredictPlaceRequest(
             artifact_path=cmd.artifact_path,
@@ -111,10 +116,14 @@ class PredictController:
             from_date=from_date,
             to_date=to_date,
             limit=cmd.limit,
-            fukusho_type=cmd.fukusho_type,
+            odds_method={"odds_fukusho_low": PlaceOddsMethod.LOW, "odds_fukusho_high": PlaceOddsMethod.HIGH,
+                         "odds_fukusho_avg": PlaceOddsMethod.MIDPOINT, "odds_fukusho_weighted_avg": PlaceOddsMethod.WEIGHTED}[cmd.fukusho_type],
             edge_threshold=cmd.edge_threshold,
             bankroll=cmd.bankroll,
             kelly_fraction=cmd.kelly_fraction,
             kelly_cap=cmd.kelly_cap,
+            as_of=cmd.as_of or datetime.now(UTC),
+            max_quote_age_seconds=cmd.max_quote_age_seconds,
+            replay_snapshot_id=cmd.replay_snapshot_id,
         )
         return run_predict_place_usecase(req=req, deps=deps)

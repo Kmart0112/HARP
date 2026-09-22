@@ -92,6 +92,17 @@ components:
         edge_threshold:
           type: number
           default: 0.1
+        as_of:
+          type: string
+          format: date-time
+          description: Decision cutoff with timezone; replay uses the original cutoff.
+        max_quote_age_seconds:
+          type: number
+          minimum: 0
+          default: 300
+        replay_snapshot_id:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
         artifact_id:
           type: string
           enum:
@@ -134,13 +145,13 @@ components:
         horse_name:
           type: string
         edge:
-          type: number
+          type: [number, "null"]
         p_place:
-          type: number
+          type: [number, "null"]
         kelly_fraction:
-          type: number
+          type: [number, "null"]
         kelly_bet_amount:
-          type: number
+          type: [number, "null"]
         surface:
           oneOf:
             - type: integer
@@ -152,13 +163,34 @@ components:
             - type: integer
             - type: string
         odds_fukusho_low:
-          type: number
+          type: [number, "null"]
         odds_fukusho_high:
-          type: number
+          type: [number, "null"]
         odds:
-          type: number
+          type: [number, "null"]
         ev_return:
-          type: number
+          type: [number, "null"]
+
+        race_id:
+          type: string
+        p_raw:
+          type: [number, "null"]
+        prediction_status:
+          type: string
+        odds_status:
+          type: string
+        ev_status:
+          type: string
+        skip_reason:
+          type: string
+        quote_id:
+          type: [string, "null"]
+        odds_published_at:
+          type: [string, "null"]
+          format: date-time
+        odds_cutoff_at:
+          type: [string, "null"]
+          format: date-time
 
     PredictPlaceResponse:
       type: object
@@ -171,6 +203,9 @@ components:
         - summary
         - predictions
       properties:
+        input_snapshot_id:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
         request_id:
           type: string
         artifact_id:

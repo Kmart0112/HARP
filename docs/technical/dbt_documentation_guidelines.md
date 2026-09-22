@@ -44,7 +44,7 @@ models:
       meta:
         harp:
           layer: mart
-          grain: ["race_id", "kettonum", "feature_snapshot_type"]
+          grain: ["race_id", "kettonum"]
           role: common_feature_matrix
           availability: pre_race
           leakage_boundary: result_free
@@ -71,8 +71,8 @@ columns:
     tests:
       - not_null
 
-  - name: feature_snapshot_type
-    description: "{{ doc('col_feature_snapshot_type') }}"
+  - name: odds_snapshot_type
+    description: "{{ doc('col_odds_snapshot_type') }}"
     tests:
       - not_null
 
@@ -90,7 +90,7 @@ columns:
 - `kettonum`
 - `held_date`
 - `horse_number`
-- `feature_snapshot_type`
+- `odds_snapshot_type`
 - `is_win`
 - `is_place`
 - `result_order`
@@ -102,10 +102,10 @@ columns:
 docs block 名は、列なら `col_<column_name>`、モデルなら `model_<model_name>` を基本にする。
 
 ```markdown
-{% docs col_feature_snapshot_type %}
+{% docs col_odds_snapshot_type %}
 
-Feature snapshot timing.
-Training rows use `pre10m` or `final`.
+Odds snapshot timing at the train/predict mart exits.
+Training rows use `pre10m`.
 Race-day inference rows use `latest`.
 
 {% enddocs %}
@@ -127,7 +127,7 @@ SQL 識別子、dbt 用語、タグ、指標名、feature 名は英語のまま�
 
 推奨キー:
 
-- `layer`: `staging`、`intermediate`、`core`、`features`、`mart`、`sokuho`、`lab`
+- `layer`: `staging`、`intermediate`、`core`、`features`、`mart`
 - `grain`: 一意性を期待する列の配列
 - `role`: `source_shape`、`canonical_fact`、`feature_lookup`、`common_feature_matrix`、`training_output`、`inference_output` など
 - `availability`: `pre_race`、`race_day`、`post_race`、`mixed`

@@ -15,6 +15,113 @@
     "metrics"
   ],
   "properties": {
+    "input_contract": {
+      "type": "object",
+      "required": [
+        "odds_contract_version",
+        "odds_feature_version",
+        "feature_names",
+        "training_odds_policy",
+        "allowed_prediction_policies",
+        "availability_basis",
+        "source_revision"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "odds_contract_version": {
+          "const": "1.0"
+        },
+        "odds_feature_version": {
+          "const": "1.0"
+        },
+        "feature_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "training_odds_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "max_age_seconds",
+            "as_of",
+            "minutes_before_start",
+            "require_availability"
+          ],
+          "properties": {
+            "mode": {
+              "const": "pre_start"
+            },
+            "max_age_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "as_of": {
+              "type": "null"
+            },
+            "minutes_before_start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "require_availability": {
+              "type": "boolean"
+            }
+          }
+        },
+        "allowed_prediction_policies": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "latest_before",
+              "pre_start"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "availability_basis": {
+          "enum": [
+            "publication_time",
+            "availability_time",
+            "mixed"
+          ]
+        },
+        "source_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "training_filters": {
+          "type": "object"
+        }
+      }
+    },
+    "training_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "year",
+          "reason",
+          "rows"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "year": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rows": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
     "model_type": {
       "type": "string",
       "enum": [

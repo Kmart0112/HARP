@@ -42,7 +42,6 @@ class CandidateFeatureShapReviewRequest:
 @dataclass(frozen=True)
 class CandidateFeatureShapReviewDeps:
     training_repository: TrainingRepositoryPort
-    mart_table: str
 
 
 @dataclass(frozen=True)
@@ -67,7 +66,6 @@ def run_candidate_feature_shap_review_usecase(
         ),
         deps=ArtifactExplanationDatasetDeps(
             training_repository=deps.training_repository,
-            mart_table=deps.mart_table,
         ),
     )
     df_train = _ensure_held_year(rebuild_result.df_train)

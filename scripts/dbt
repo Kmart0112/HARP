@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 set -eu
 
+ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+
 if [ -n "${UV_BIN:-}" ]; then
   :
 elif command -v uv >/dev/null 2>&1; then
@@ -14,7 +16,20 @@ else
   exit 127
 fi
 
+# uv parses dotenv values without executing them as shell commands.
+# Later env files override earlier ones; exported OS variables win over both.
+set -- dbt "$@"
+if [ -n "${HARP_ENV:-${APP_ENV:-}}" ]; then
+  ENV_FILE="$ROOT_DIR/.env.${HARP_ENV:-$APP_ENV}"
+  if [ -f "$ENV_FILE" ]; then
+    set -- --env-file "$ENV_FILE" "$@"
+  fi
+fi
+if [ -f "$ROOT_DIR/.env" ]; then
+  set -- --env-file "$ROOT_DIR/.env" "$@"
+fi
+
 exec "$UV_BIN" tool run --isolated \
   --from dbt-core==1.10.0 \
   --with dbt-postgres==1.9.1 \
-  dbt "$@"
+  "$@"

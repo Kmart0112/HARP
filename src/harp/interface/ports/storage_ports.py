@@ -31,6 +31,8 @@ class ManifestStorePort(Protocol):
         metrics: dict[str, float | None],
         source_table: str,
         note: str | None,
+        input_contract: dict | None = None,
+        training_coverage: list[dict] | None = None,
     ) -> dict[str, Any]:
         ...
 

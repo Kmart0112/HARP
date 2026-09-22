@@ -2,41 +2,23 @@ from __future__ import annotations
 
 from typing import Protocol
 
-import pandas as pd
+from harp.core.race_inputs import RaceInputQuery, RaceInputs
 
 
 class InferenceRepositoryPort(Protocol):
-    def load_recent_features(
-        self,
-        from_date: str | None,
-        to_date: str | None,
-        limit: int | None,
-        mart_table: str,
-    ) -> pd.DataFrame:
-        ...
+    def load_prediction_input(self, query: RaceInputQuery) -> RaceInputs:
+        """Return one coherent batch with logical fields and no post-race targets.
 
-    def load_odds(
-        self,
-        from_date: str | None = None,
-        to_date: str | None = None,
-    ) -> pd.DataFrame:
-        ...
-
-    def load_race_info(
-        self,
-        from_date: str | None,
-        to_date: str | None,
-    ) -> pd.DataFrame:
+        Preserve every requested active entrant even when odds are unavailable.
+        Raise OddsContractError for unsupported schemas, keys, types or policies.
+        """
         ...
 
 
 class TrainingRepositoryPort(Protocol):
-    def load_training_frame(
-        self,
-        max_year: int,
-        limit: int | None,
-        mart_table: str,
-        where: dict[str, object] | None = None,
-    ) -> pd.DataFrame:
-        ...
+    def load_training_input(self, query: RaceInputQuery) -> RaceInputs:
+        """Return pre-start inputs, retaining missing odds for coverage auditing.
 
+        The result must satisfy the query and have one row per active entrant.
+        """
+        ...

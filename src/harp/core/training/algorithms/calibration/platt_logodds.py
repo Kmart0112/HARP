@@ -39,11 +39,12 @@ def fit_platt_logodds_oof(
     model: Any,
     ds: BinaryDataset,
     df_meta: pd.DataFrame,
-    odds_col: str,
+    odds_col: str | None,
     train_year_start: int,
     train_year_end: int,
     valid_years_back: int = 5,
     eps: float = 1e-12,
+    win_odds: pd.Series | None = None,
 ) -> dict[str, Any]:
     if not ds.X_tr.index.isin(df_meta.index).all():
         raise KeyError("対象列欠損: df_meta must include rows for training index")
@@ -51,7 +52,7 @@ def fit_platt_logodds_oof(
     meta = df_meta.loc[ds.X_tr.index].copy()
     if "race_id" not in meta.columns:
         raise KeyError("対象列欠損: race_id")
-    if odds_col not in meta.columns:
+    if win_odds is None and odds_col not in meta.columns:
         raise KeyError(f"対象列欠損: {odds_col}")
 
     if "held_year" in meta.columns:
@@ -65,8 +66,10 @@ def fit_platt_logodds_oof(
 
     race_id = meta["race_id"].astype(str).reset_index(drop=True)
     held_year_np = held_year.astype(int).to_numpy()
-    odds = pd.to_numeric(meta[odds_col], errors="coerce").astype(float)
-    odds = odds.fillna(odds.median()).clip(lower=eps).to_numpy()
+    odds_input = win_odds.loc[ds.X_tr.index] if win_odds is not None else meta[odds_col]
+    odds = pd.to_numeric(odds_input, errors="raise").astype(float).to_numpy()
+    if not np.isfinite(odds).all() or (odds < 1).any():
+        raise ValueError("calibration requires available win odds; no batch median imputation")
 
     folds = build_time_series_folds(
         held_year=held_year_np,
@@ -148,7 +151,7 @@ def fit_platt_logodds_oof(
     lr.fit(x_platt, y_platt)
 
     return {
-        "odds_col": odds_col,
+        "odds_field": "win_odds",
         "eps": float(eps),
         "oof_n": int(mask.sum()),
         "oof_missing": int((~mask).sum()),
@@ -180,6 +183,17 @@ def apply_platt_logodds(
     odds_col: str | None = None,
 ) -> np.ndarray:
     platt_info = resolve_platt_info(payload)
+    resolved_odds_col = odds_col or str(platt_info.get("odds_col") or "")
+    if not resolved_odds_col or resolved_odds_col not in df_feat.columns:
+        raise KeyError(f"Missing required odds column for place_platt: {resolved_odds_col}")
+    return apply_platt_odds(base_proba, win_odds=df_feat[resolved_odds_col].to_numpy(), payload=payload)
+
+
+def apply_platt_odds(
+    base_proba: np.ndarray, *, win_odds: np.ndarray, payload: dict[str, Any],
+) -> np.ndarray:
+    """Apply calibration to aligned semantic odds; never impute from a live batch."""
+    platt_info = resolve_platt_info(payload)
 
     platt = platt_info.get("platt")
     if not isinstance(platt, dict):
@@ -193,21 +207,18 @@ def apply_platt_logodds(
     intercept = float(intercept_vec[0]) if intercept_vec.size > 0 else 0.0
     eps = float(platt_info.get("eps", 1e-12))
 
-    resolved_odds_col = odds_col or str(platt_info.get("odds_col") or "")
-    if not resolved_odds_col:
-        raise KeyError("odds_col is required for place_platt predict.")
-    if resolved_odds_col not in df_feat.columns:
-        raise KeyError(f"Missing required odds column for place_platt: {resolved_odds_col}")
-
-    odds = pd.to_numeric(df_feat[resolved_odds_col], errors="coerce").astype(float)
-    if odds.isna().all():
-        raise ValueError(f"odds column is all NaN: {resolved_odds_col}")
-    if odds.isna().any():
-        odds = odds.fillna(float(odds.median()))
+    odds = np.asarray(win_odds, dtype=float)
+    base = np.asarray(base_proba, dtype=float)
+    if odds.ndim != 1 or base.ndim != 1 or odds.shape != base.shape:
+        raise ValueError("probabilities and win odds must be aligned one-dimensional arrays")
+    if not np.isfinite(odds).all() or (odds < 1).any():
+        raise ValueError("win odds must be available, finite, and at least 1")
+    if not np.isfinite(base).all() or ((base < 0) | (base > 1)).any():
+        raise ValueError("base probabilities must be finite and in [0, 1]")
 
     p = np.clip(np.asarray(base_proba, dtype=float), eps, 1.0 - eps)
     x_logit = np.log(p / (1.0 - p))
-    x_log_odds = np.log(np.clip(odds.to_numpy(dtype=float), eps, None))
+    x_log_odds = np.log(np.clip(odds, eps, None))
     logits = coef[0] * x_logit + coef[1] * x_log_odds + intercept
     logits = np.clip(logits, -50.0, 50.0)
     return (1.0 / (1.0 + np.exp(-logits))).astype(float)
