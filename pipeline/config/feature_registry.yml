@@ -1,8 +1,8 @@
 schema_version: 0.3.0
 registry_name: mart_feature_registry
 managed_at: '2026-03-27'
-source_table: mart.m_train_race_horse_past5
-source_schema_path: dbt/harp/models/mart/training/m_train_race_horse_past5.yml
+source_table: mart.m_training_inputs_v1
+source_schema_path: dbt/harp/models/mart/odds_input_contract_v1.yml
 inventory_snapshot:
   mart_column_count: 319
   registered_feature_count: 169

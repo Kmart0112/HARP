@@ -5,6 +5,8 @@ from unittest.mock import create_autospec
 import pandas as pd
 
 from harp.core.feature_definitions import FeatureSetDefinition
+from harp.core.odds import OddsPolicy, select_odds
+from harp.core.race_inputs import RaceInputs
 from harp.interface.ports import (
     ArtifactStorePort,
     FeatureDefinitionPort,
@@ -31,14 +33,26 @@ from harp.usecase.notebook_artifact.model_artifact import (
 
 def test_artifact_explanation_flow_rebuilds_the_original_year_splits_from_mocked_data() -> None:
     repository = create_autospec(TrainingRepositoryPort, instance=True, spec_set=True)
-    repository.load_training_frame.return_value = pd.DataFrame(
+    frame = pd.DataFrame(
         {
             "held_year": [2018, 2018, 2019, 2020],
             "speed": [1.0, 2.0, 3.0, 4.0],
             "is_place": [0, 1, 0, 1],
         }
     )
+    frame["race_id"] = ["A", "B", "C", "D"]
+    frame["horse_number"] = 1
+    frame["held_date"] = frame.held_year.astype(str) + "-06-01"
+    frame["scheduled_start_at"] = frame.held_date + "T06:10:00+00:00"
+    quotes = frame[["race_id", "horse_number"]].copy()
+    for column in ["win_odds", "place_low", "place_high", "win_popularity", "published_at", "available_at"]:
+        quotes[column] = None
+    policy = OddsPolicy.pre_start(max_age_seconds=300)
+    repository.load_training_input.return_value = RaceInputs(frame, select_odds(frame, quotes, policy), "fixture")
     payload = {
+        "input_contract": {"odds_contract_version": "1.0", "odds_feature_version": "1.0",
+                           "feature_names": ["speed"], "training_odds_policy": policy.to_dict(),
+                           "allowed_prediction_policies": []},
         "feature_names": ["speed"],
         "cat_features": [],
         "split_info": {
@@ -52,7 +66,6 @@ def test_artifact_explanation_flow_rebuilds_the_original_year_splits_from_mocked
         ArtifactExplanationDatasetRequest(payload=payload, target_col="is_place"),
         ArtifactExplanationDatasetDeps(
             training_repository=repository,
-            mart_table="mart.train_features",
         ),
     )
 

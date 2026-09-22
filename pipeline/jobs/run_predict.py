@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 from pathlib import Path
 
 from harp.controllers import PredictController, PredictPlaceCommand
@@ -86,7 +87,7 @@ def parse_args() -> argparse.Namespace:
         "--limit",
         type=int,
         default=None,
-        help="Optional max rows for feature loading.",
+        help="Optional maximum number of complete races.",
     )
     parser.add_argument(
         "--fukusho-type",
@@ -135,6 +136,9 @@ def parse_args() -> argparse.Namespace:
             "Default from HARP_PREDICT_FUKUSHO_KELLY_CAP or 0.05."
         ),
     )
+    parser.add_argument("--as-of", type=datetime.fromisoformat, help="Decision time including timezone, e.g. 2026-06-13T15:00:00+09:00")
+    parser.add_argument("--max-quote-age-seconds", type=float, default=300.0)
+    parser.add_argument("--replay-snapshot-id", help="Replay saved input; requires the original decision parameters and model")
     return parser.parse_args()
 
 
@@ -178,9 +182,12 @@ def main() -> None:
             bankroll=args.bankroll,
             kelly_fraction=args.kelly_fraction,
             kelly_cap=args.kelly_cap,
+            as_of=args.as_of, max_quote_age_seconds=args.max_quote_age_seconds,
+            replay_snapshot_id=args.replay_snapshot_id,
         )
         result = PredictController(config).run_place(command)
 
+        logger.info("Prediction input snapshot: %s", result.input_snapshot_id)
         out_path = Path(args.out)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         result.race_entries.to_csv(out_path, index=False)

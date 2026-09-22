@@ -37,6 +37,8 @@ class TrainRequest:
     calibration_odds_col: str | None = None
     tracking_experiment_name: str | None = None
     tracking_run_name: str | None = None
+    max_quote_age_seconds: float = 300.0
+    allowed_prediction_policies: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         pipeline_kind = (
@@ -51,6 +53,8 @@ class TrainRequest:
         )
         object.__setattr__(self, "pipeline_kind", pipeline_kind)
         object.__setattr__(self, "calibration_method", CalibrationMethod(calibration_method))
+        if self.calibration_odds_col not in {None, "win_odds"}:
+            raise ValueError("training calibration accepts the logical win_odds field only")
         validate_training_calibration(
             task_kind=self.task_spec.task_kind,
             calibration_method=calibration_method,
@@ -65,7 +69,5 @@ class TrainDeps:
     feature_definition_port: FeatureDefinitionPort
     artifact_store_port: ArtifactStorePort
     manifest_store_port: ManifestStorePort
-    mart_table: str
     contract_path: str
-    source_table: str
     tracking_port: TrackingPort | None = None

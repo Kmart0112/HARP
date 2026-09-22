@@ -57,14 +57,6 @@ models:
       +dbt-osmosis: "{model}.yml"
       +materialized: table
 
-    sokuho:
-      +schema: sokuho
-      +dbt-osmosis: "{model}.yml"
-    
-    lab:
-      +schema: lab
-      +dbt-osmosis: "{model}.yml"
-
 seeds:
   +dbt-osmosis: "{model}.yml"
 

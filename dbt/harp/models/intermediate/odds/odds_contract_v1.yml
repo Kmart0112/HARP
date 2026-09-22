@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: int_odds_pre10m_v1
+    description: "Version 1 publication-time pre-start quotes. Latest publication is selected before market validity checks. available_at is unknown for legacy raw inputs. Explicit date bounds control backfill."
+    columns:
+      - name: race_id
+        tests: [not_null]
+      - name: horse_number
+        tests: [not_null]
+      - name: odds_published_at
+        description: "Null when no intermediate publication exists before the cutoff."
+      - name: cutoff_at
+        description: "Null when source scheduled time is unknown; preserved for coverage auditing."

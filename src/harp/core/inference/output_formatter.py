@@ -21,6 +21,15 @@ OUTPUT_COLUMNS = [
     "odds_fukusho_high",
     "odds",
     "ev_return",
+    "race_id",
+    "p_raw",
+    "prediction_status",
+    "odds_status",
+    "ev_status",
+    "skip_reason",
+    "quote_id",
+    "odds_published_at",
+    "odds_cutoff_at",
 ]
 
 

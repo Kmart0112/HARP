@@ -8,13 +8,12 @@ HARP の分析用データは PostgreSQL を前提にしている。ローカル
 
 ## dbt
 
-dbt プロジェクトは `dbt/harp` に置く。モデルは staging、intermediate、core、features、mart、sokuho、lab に分ける。
+dbt プロジェクトは `dbt/harp` に置く。モデルは staging、intermediate、core、features、mart に分ける。
 
 通常の学習・mart 更新は、重いモデルを避ける selector を使う。
 
 ```bash
-uv tool run --isolated --from dbt-core==1.10.0 --with dbt-postgres==1.9.1 \
-  dbt build --project-dir dbt/harp --profiles-dir dbt/harp --no-version-check \
+scripts/dbt build --project-dir dbt/harp --profiles-dir dbt/harp --no-version-check \
   --selector training_default
 ```
 

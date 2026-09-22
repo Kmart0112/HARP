@@ -7,14 +7,8 @@ from .driven import (
     PostgresDataReadAdapter,
     PolarsToPandasDataReadAdapter,
     PostgresPolarsDataReadAdapter,
-    PostgresInferenceRepositoryAdapter,
-    PostgresPolarsInferenceRepositoryAdapter,
-    PostgresPolarsTrainingRepositoryAdapter,
-    PostgresTrainingRepositoryAdapter,
     PickleArtifactStoreAdapter,
     PickleModelLoaderAdapter,
-    SqlInferenceRepositoryAdapter,
-    SqlTrainingRepositoryAdapter,
 )
 
 __all__ = [
@@ -26,12 +20,6 @@ __all__ = [
     "PostgresDataReadAdapter",
     "PolarsToPandasDataReadAdapter",
     "PostgresPolarsDataReadAdapter",
-    "PostgresInferenceRepositoryAdapter",
-    "PostgresPolarsInferenceRepositoryAdapter",
-    "PostgresPolarsTrainingRepositoryAdapter",
-    "PostgresTrainingRepositoryAdapter",
     "PickleArtifactStoreAdapter",
     "PickleModelLoaderAdapter",
-    "SqlInferenceRepositoryAdapter",
-    "SqlTrainingRepositoryAdapter",
 ]

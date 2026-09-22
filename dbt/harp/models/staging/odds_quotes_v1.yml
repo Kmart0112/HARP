@@ -1,0 +1,20 @@
+version: 2
+models:
+  - name: stg_n_odds_quotes_v1
+    description: "Historical intermediate quotes with full Japan publication date, decimal payout multiples, independent market nulls, and unknown received time. December/January publications are assigned the adjacent race year. All-zero publication times are not intermediate quotes."
+  - name: stg_s_odds_quotes_v1
+    description: "Live intermediate quotes using the same normalization as historical quotes. Source makedate is not a received timestamp."
+unit_tests:
+  - name: normalize_full_publication_date_and_market_sentinels
+    model: stg_s_odds_quotes_v1
+    given:
+      - input: source('raw', 's_jodds_tanpuku')
+        rows:
+          - {year: '2026', monthday: '0101', jyocd: '05', kaiji: '01', nichiji: '01', racenum: '01', umaban: '01', happyotime: '12312359', tanodds: '0040', fukuoddslow: '----', fukuoddshigh: '0020', tanninki: '01'}
+          - {year: '2026', monthday: '0613', jyocd: '05', kaiji: '01', nichiji: '01', racenum: '01', umaban: '02', happyotime: '06121831', tanodds: '****', fukuoddslow: '0018', fukuoddshigh: '0020', tanninki: '**'}
+          - {year: '2026', monthday: '0613', jyocd: '05', kaiji: '01', nichiji: '01', racenum: '01', umaban: '03', happyotime: '00000000', tanodds: '0040', fukuoddslow: '0018', fukuoddshigh: '0020', tanninki: '01'}
+    expect:
+      rows:
+        - {horse_number: 1, odds_published_at: '2025-12-31 14:59:00+00', odds_tansho: 4.0, odds_fukusho_low: null, odds_fukusho_high: 2.0, popularity: 1}
+        - {horse_number: 2, odds_published_at: '2026-06-12 09:31:00+00', odds_tansho: null, odds_fukusho_low: 1.8, odds_fukusho_high: 2.0, popularity: null}
+

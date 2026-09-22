@@ -1,231 +1,104 @@
-# dbt レース当日推論モデル設計
+# dbtの学習・当日推論ルート
 
-## 目的
+## 現行の責務分離
 
-- レース情報は対象週だけを増分更新する。
-- レース当日の dbt 実行を軽くする。
-- 学習用と推論用で特徴量ロジックを二重管理しない。
-- レース前に使えない結果情報の混入を防ぐ。
-
-詳細なテーブル設計は `docs/design/dbt_race_day_inference_table_design.md` を参照する。
-
-## 基本方針
-
-特徴量生成ロジックは `m_race_entry_feature_matrix` に集約する。
-
-学習用モデルと推論用モデルは、特徴量を再計算せず、共通の feature matrix に対する薄い出口モデルにする。
-
-```text
-共通特徴量ロジック
-  m_race_entry_feature_matrix
-
-出口
-  m_train_race_entry_features         = feature_matrix(pre10m/final) + outcome
-  m_predict_race_entry_features       = feature_matrix(latest)
-```
-
-## 全体DAG
+特徴量計算は `m_race_entry_feature_matrix` と上流の `features/*` に集約する。
+共通matrixの粒度は `race_id, kettonum` で、現レースの結果・オッズは含めない。
+Pythonの学習／推論は `m_training_inputs_v1` / `m_race_inputs_v1` を出走馬の母集団とし、別のquote relationと同一SQLで読み取る。オッズ・人気の特徴量化はCoreの `assemble_odds_features` に集約する。詳細は [odds_input_contract.md](odds_input_contract.md)。以下の旧mart出口は互換モデルとして残る。
 
 ```mermaid
 flowchart TD
-    raw_n["raw n_* / s_*"] --> stg["staging"]
-
-    stg --> spine["int_race_entry_spine"]
-    stg --> race_basic["fct_race_basic"]
-    stg --> entry_declared["fct_race_entry_declared"]
-    stg --> outcome["int_race_entry_outcome"]
-    stg --> live_odds["int_race_entry_live_odds"]
-    stg --> odds_snapshot["int_race_entry_odds_snapshot"]
-
-    live_odds --> live_overlay["int_race_day_overlay"]
-    spine --> live_overlay
-    race_basic --> live_overlay
-    entry_declared --> live_overlay
-    live_overlay --> live_context["int_race_day_feature_context"]
-
-    odds_snapshot --> train_overlay["int_race_entry_training_overlay"]
-    spine --> train_overlay
-    race_basic --> train_overlay
-    entry_declared --> train_overlay
-    train_overlay --> train_context["int_race_entry_feature_context"]
-
-    live_context --> feature_matrix["m_race_entry_feature_matrix"]
-    train_context --> feature_matrix
-    feature_matrix --> train["m_train_race_entry_features"]
-    feature_matrix --> predict
-    outcome --> train
+    basic[fct_race_basic] --> training_context[int_race_entry_feature_context]
+    declared[fct_race_entry_declared] --> spine[int_race_entry_spine]
+    spine --> training_context
+    declared --> training_context
+    basic --> live_context[int_race_day_feature_context]
+    declared --> live_context
+    spine --> live_context
+    live_entry[stg_s_uma_race] --> live_context
+    training_context --> matrix[m_race_entry_feature_matrix]
+    live_context --> matrix
+    lookups[履歴特徴量・調教情報] --> matrix
+    live_odds[stg_s_jodds_tanpuku] --> history[int_race_day_odds_history]
+    history --> latest[int_race_day_odds_latest]
+    matrix --> predict[m_predict_race_entry_features]
+    latest --> predict
+    matrix --> train[m_train_race_entry_features]
+    snapshot[int_race_entry_odds_snapshot: pre10m] --> train
+    outcome[int_race_entry_outcome] --> train
 ```
 
-## モデル責務
+詳細な入力・粒度は [dbt_race_day_inference_table_design.md](dbt_race_day_inference_table_design.md) を参照する。
 
-| モデル | 粒度 | 役割 | 更新タイミング |
-|---|---:|---|---|
-| `int_race_entry_spine` | `race_id, kettonum` | 学習/推論共通の出走馬spine | 週次/前日 |
-| `fct_race_basic` | `race_id` | レース前に分かる基本情報 | 週次/前日 |
-| `fct_race_entry_declared` | `race_id, kettonum` | レース前に分かる出走馬情報 | 週次/前日 |
-| `int_race_entry_odds_snapshot` | `race_id, horse_number, feature_snapshot_type` | 学習/検証用オッズ。`pre10m` / `final` のみ | レース後/定期 |
-| `int_race_entry_live_odds` | `race_id, horse_number, feature_snapshot_type` | 当日 `s_jodds` 由来の最新オッズ。`latest` のみ | 当日 |
-| `int_race_entry_training_overlay` | `race_id, kettonum, feature_snapshot_type` | 学習/検証用overlay。`pre10m` / `final` | レース後/定期 |
-| `int_race_day_overlay` | `race_id, kettonum, feature_snapshot_type` | 当日更新情報。`latest` のみ | 当日 |
-| `int_race_entry_feature_context` | `race_id, kettonum, feature_snapshot_type` | 学習/検証用 feature matrix 入力 | レース後/定期 |
-| `int_race_day_feature_context` | `race_id, kettonum, feature_snapshot_type` | 当日推論用 feature matrix 入力 | 当日 |
-| `int_race_entry_outcome` | `race_id, kettonum` | 着順・結果・教師ラベル | レース後 |
-| `m_race_entry_feature_matrix` | `race_id, kettonum, feature_snapshot_type` | 共通特徴量行列 | 週次/前日/当日 |
-| `m_predict_race_entry_features` | `race_id, kettonum` | 推論用出力 | 当日 |
-| `m_train_race_entry_features` | `race_id, kettonum, feature_snapshot_type` | 学習用出力。`pre10m` / `final` | レース後/定期 |
+## 学習と推論の境界
 
-## ロジック一元化ルール
-
-1. 特徴量計算は `m_race_entry_feature_matrix` またはその上流の `features/*` に置く。
-2. `m_train_*` と `m_predict_*` には特徴量計算を書かない。
-3. `m_train_*` は `pre10m` / `final` の feature matrix に `outcome` を join して教師ラベルを付けるだけにする。
-4. `m_predict_*` は `latest` の feature matrix を対象日に絞るだけにする。
-5. レース後にしか分からない列は feature matrix に入れない。
-
-## データ分離
-
-### レース前に使える情報
-
-- レース基本情報
-- 出走馬
-- 枠番・馬番
-- 騎手・調教師
-- 斤量
-- コース属性
-- 過去成績由来の履歴特徴量
-- 調教情報
-
-### 当日に更新される情報
-
-- オッズ
-- 人気
-- 馬体重
-- 馬体重増減
-- 天候
-- 馬場状態
-- 取消/除外
-- 発走時刻変更
-
-### レース後にしか使わない情報
-
-- 着順
-- タイム
-- 着差
-- 通過順
-- 上がり
-- レースラップ
-- 払戻
-- `is_win`
-- `is_place`
-
-## タグ設計
-
-| タグ | 対象 |
-|---|---|
-| `race_week_static` | 週次/前日に作る静的・準静的モデル |
-| `race_day_live` | 当日に軽く更新するモデル |
-| `post_race` | レース後に更新する結果モデル |
-| `feature_matrix` | 学習/推論共通の特徴量行列 |
-| `inference` | 推論用出口モデル |
-| `training` | 学習用・学習入力モデル |
-| `expensive` | 当日実行から除外したい重いモデル |
+- 学習contextは蓄積系の出馬・レース情報から作り、速報出馬情報やオッズを読まない。
+- 当日contextは速報出馬情報で馬体重・馬体重増減・取消状態を解決する。
+- 現行の天候・馬場・頭数は `fct_race_basic` 側の値を使う。
+- 履歴特徴量は事前作成済みのlookupを使い、当日ルートで履歴集計全体を再構築しない。
+- 学習出口は `pre10m` オッズと結果を内部結合する。最終オッズ `final` は学習入力にしない。
+- 推論出口は対象日の取消馬を除外し、最新オッズを左結合する。オッズ欠損の馬も残し、`odds_source = missing_live_odds` とする。
 
 ## 実行単位
 
-### 週次/前日
+実値は Git 管理外の `.env` に置き、`scripts/dbt` から自動で読む。
+各selectorは更新対象を選ぶだけで、rawの取り込みやPython推論は実行しない。
 
-対象週のレース・出走馬・履歴特徴量を作る。
+| selector | 更新対象・前提 |
+|---|---|
+| `training_default` | `m_training_inputs_v1` と `int_odds_pre10m_v1` の上流。手動の旧snapshotは更新しない。期間指定なしのオッズ更新は直近7日 |
+| `odds_contract_v1` | 新しい入力view・オッズ正規化view・10分前snapshotとその契約テスト。履歴特徴量は作成済みであること |
+| `race_week_prepare` | `race_week_static` / `feature_matrix` タグのモデル。履歴lookup・結果テーブル・stagingは事前に利用可能であること |
+| `race_day_update` | 当日オッズ履歴・最新値、当日context、共通matrix、推論出口と、それに依存する `m_training_inputs_v1` view。`feature_input_mode: latest` が必要 |
+| `race_day_odds_update` | 当日オッズ履歴と最新値のみ。推論出口は別途更新する |
+| `post_race_finalize` | `post_race` / `training` タグの結果・context・matrix・学習出口 |
+
+`training_default` 以外の上記selectorはタグ・明示モデルの選択であり、親モデルを自動で全件追加しない。
+`race_day_update` は `m_race_inputs_v1` の置換時に削除される依存view `m_training_inputs_v1` も、依存順に再作成する。学習結果などの別の親モデルは更新対象に追加しない。
+当日までに対象日の `n_race` / `n_uma_race` とspineを用意しておく。
+
+### 当日の一括更新
 
 ```bash
-dbt build --selector race_week_prepare \
-  --vars '{race_from_date: "2026-05-25", race_to_date: "2026-05-31"}'
+scripts/dbt build --project-dir dbt/harp --profiles-dir dbt/harp --no-version-check \
+  --selector race_day_update --vars '{feature_input_mode: latest}'
 ```
 
-### レース当日
+`target_held_date` を省略した場合はDBの `current_date` を使う。
+日付を固定する場合は同じvarsに `target_held_date: "YYYY-MM-DD"` を追加する。
 
-当日更新情報と推論用出口だけを更新する。
+### オッズだけ更新して推論入力へ反映
+
+馬体重・取消・履歴特徴量を含むmatrixが対象日について作成済みの場合に使う。
 
 ```bash
-dbt build --selector race_day_update \
-  --vars '{feature_snapshot_mode: "latest"}'
+scripts/dbt build --project-dir dbt/harp --profiles-dir dbt/harp --no-version-check \
+  --selector race_day_odds_update
+scripts/dbt build --project-dir dbt/harp --profiles-dir dbt/harp --no-version-check \
+  --select m_predict_race_entry_features
 ```
 
-未指定時は `target_held_date = current_date` として実行する。
-`feature_snapshot_mode = latest` は当日推論用の `latest` snapshot だけを feature matrix に反映する指定。
-過去日や検証対象日を明示したい場合だけ `--vars` で上書きする。
+対象日を固定するときは両方のコマンドに同じ `target_held_date` を渡す。
+速報出馬情報が変わった場合は当日の一括更新を使う。
 
 ### レース後
 
-結果情報と学習用出口を更新する。
-
 ```bash
-dbt build --selector post_race_finalize \
-  --vars '{target_held_date: "2026-05-30"}'
+scripts/dbt build --project-dir dbt/harp --profiles-dir dbt/harp --no-version-check \
+  --selector post_race_finalize
 ```
 
-`feature_snapshot_mode` は未指定のままにする。
-未指定時は `training` mode になり、feature matrix は `pre10m` / `final` snapshot を作る。
+`feature_input_mode` の既定値は `training`。
+旧変数名 `feature_snapshot_mode` は互換入力として残っているが、新しい指定では `feature_input_mode` を使う。
+`all` は対象日の当日contextと、それ以外の学習contextを合わせる検証用モード。
 
-## Materialization 方針
+## 保持している互換経路
 
-| 種別 | materialization | 理由 |
-|---|---|---|
-| staging | `view` | 1:1整形に限定 |
-| race/entry basic | `incremental` | 対象週だけ更新 |
-| live overlay | `incremental` | 当日だけ頻繁に更新 |
-| live odds | `incremental` | `s_jodds` latest だけを対象日で更新 |
-| training odds snapshot | `incremental` | `pre10m` / `final` だけを履歴保持 |
-| history features | `incremental` | 重いので再計算範囲を限定 |
-| feature matrix | `incremental` | 学習/推論共通の中核 |
-| training output | `incremental` or `table` | 用途に応じて選択 |
-| inference output | `table` or `view` | 当日対象だけなら軽量 |
+`m_train_race_horse_past5`、`race_info_wide`、`fct_race_odds_result` は通常の学習・推論Portから参照しない。旧分析キャッシュ・探索用パッケージには参照が残るため、物理リレーションは削除していない。`training_default` も新Portの参照先を更新する。
 
-## セレクタ案
+新matrixも調教・DM情報を `int_race_entry_enriched` から取得しており、履歴特徴量も
+`fct_race` / `fct_race_entry` を使っている。これらは現行DAGの一部である。
+通常の学習・推論・artifact説明のPortは移行済み。旧基礎モデルの責務分割と探索用ヘルパーの整理は別の範囲となる。
 
-```yaml
-selectors:
-  - name: race_week_prepare
-    description: Build static weekly race inputs and common feature matrix.
-    definition:
-      union:
-        - method: tag
-          value: race_week_static
-        - method: tag
-          value: feature_matrix
-
-  - name: race_day_update
-    description: Refresh race-day live overlay, feature context/matrix, and inference output.
-    definition:
-      union:
-        - method: tag
-          value: race_day_live
-        - method: tag
-          value: inference
-
-  - name: post_race_finalize
-    description: Refresh post-race outcomes and training output.
-    definition:
-      union:
-        - method: tag
-          value: post_race
-        - method: tag
-          value: training
-```
-
-## 移行ステップ
-
-1. `fct_race_entry` を「レース前情報」と「結果情報」に分ける。
-2. `fct_race` を「レース基本情報」と「レース後情報」に分ける。
-3. `m_race_entry_feature_matrix` を共通特徴量の正本にする。
-4. 当日 `latest` は `s_jodds` から `int_race_entry_live_odds` へ分離する。
-5. 学習/検証は `int_race_entry_odds_snapshot` を `pre10m` / `final` のみにする。
-6. `m_train_race_entry_features` を feature matrix + outcome の薄い wrapper として追加し、既存の学習mart利用側を段階移行する。
-7. 推論martを latest feature matrix の薄い wrapper として追加する。
-8. 当日実行 selector から重い履歴特徴量と `expensive` モデルを除外する。
-
-## 注意点
-
-- 実行時に対象日や期間が分かっている場合は、incremental の直近日付 fallback より `race_from_date` / `race_to_date` / `target_held_date` を優先する。
-- 学習用オッズは `pre10m` / `final` に限定し、当日推論の `latest` とはテーブル境界で分ける。
-- feature matrix に教師ラベルや結果由来特徴量を入れない。
-- 推論martの追加は新しい特徴量ロジック追加ではなく、出口追加として扱う。
+旧overlay、未使用の派生mart、lab・sokuhoモデルは現行DAGから除外済み。
+SQL/YAMLの削除は既存DBリレーションの削除を伴わない。

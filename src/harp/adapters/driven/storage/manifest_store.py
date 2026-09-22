@@ -49,6 +49,8 @@ class JsonManifestStoreAdapter:
         metrics: dict[str, float | None],
         source_table: str,
         note: str | None,
+        input_contract: dict | None = None,
+        training_coverage: list[dict] | None = None,
     ) -> dict[str, Any]:
         manifest: dict[str, Any] = {
             "model_type": model_type,
@@ -71,6 +73,10 @@ class JsonManifestStoreAdapter:
         }
         if note:
             manifest["note"] = note
+        if input_contract is not None:
+            manifest["input_contract"] = input_contract
+        if training_coverage is not None:
+            manifest["training_coverage"] = training_coverage
         return manifest
 
     def validate_manifest(self, manifest: dict[str, Any]) -> None:

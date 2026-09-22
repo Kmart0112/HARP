@@ -1,0 +1,20 @@
+[
+  {
+    "mutation": "invalid_latest_fallback",
+    "test": "tests/calculations/test_odds_contract.py::test_latest_unavailable_quote_does_not_resurrect_older_price",
+    "detected": true,
+    "summary": "1 failed in 0.18s"
+  },
+  {
+    "mutation": "exclusive_cutoff",
+    "test": "tests/calculations/test_odds_contract.py::test_latest_before_cutoff_is_inclusive",
+    "detected": true,
+    "summary": "1 failed, 2 passed in 0.19s"
+  },
+  {
+    "mutation": "ignored_schema_alias",
+    "test": "tests/integrations/test_race_input_port_contract.py::test_each_port_returns_the_same_semantics_across_schema_layouts",
+    "detected": true,
+    "summary": "4 failed, 6 passed in 0.48s"
+  }
+]

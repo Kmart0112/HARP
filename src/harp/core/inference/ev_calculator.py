@@ -1,11 +1,52 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import Literal
 
 import numpy as np
 import pandas as pd
 
 from .edge_simulation import prepare_edge_frame
+
+
+class PlaceOddsMethod(str, Enum):
+    LOW = "low"
+    HIGH = "high"
+    MIDPOINT = "midpoint"
+    WEIGHTED = "weighted"
+
+
+def select_place_odds(low, high, method: PlaceOddsMethod) -> np.ndarray:
+    lower, upper = np.asarray(low, dtype=float), np.asarray(high, dtype=float)
+    if lower.shape != upper.shape:
+        raise ValueError("place odds bounds must be aligned")
+    method = PlaceOddsMethod(method)
+    if method is PlaceOddsMethod.LOW:
+        return lower.copy()
+    if method is PlaceOddsMethod.HIGH:
+        return upper.copy()
+    if method is PlaceOddsMethod.WEIGHTED:
+        return 0.7 * lower + 0.3 * upper
+    return (lower + upper) / 2
+
+
+def compute_place_ev(probability, odds, *, bankroll: float, kelly_fraction: float, kelly_cap: float) -> pd.DataFrame:
+    """Calculate decisions from aligned values without physical column names."""
+    p, prices = np.asarray(probability, dtype=float), np.asarray(odds, dtype=float)
+    if p.ndim != 1 or p.shape != prices.shape:
+        raise ValueError("probability and odds must be aligned one-dimensional arrays")
+    if not np.isfinite(p).all() or ((p < 0) | (p > 1)).any():
+        raise ValueError("probability must be finite and in [0, 1]")
+    if not np.isfinite(prices).all() or (prices < 1).any():
+        raise ValueError("odds must be finite and at least 1")
+    if not np.isfinite([bankroll, kelly_fraction, kelly_cap]).all() or bankroll < 0 or kelly_fraction < 0 or not 0 <= kelly_cap <= 1:
+        raise ValueError("invalid stake parameters")
+    stake = np.zeros_like(prices)
+    np.divide(p * prices - 1, prices - 1, out=stake, where=prices > 1)
+    stake = np.clip(kelly_fraction * stake, 0, kelly_cap)
+    return pd.DataFrame({"odds": prices, "edge": p - 0.8 / prices, "ev_return": p * prices,
+                         "ev_profit": p * prices - 1, "kelly_fraction": stake,
+                         "kelly_bet_amount": stake * bankroll})
 
 
 SUPPORTED_FUKUSHO_TYPES = (

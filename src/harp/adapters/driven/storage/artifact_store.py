@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import pickle
+from hashlib import sha256
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
@@ -89,4 +90,4 @@ class PickleModelLoaderAdapter:
             raise KeyError("Artifact payload does not include 'model'.")
         if "feature_names" not in payload:
             raise KeyError("Artifact payload does not include 'feature_names'.")
-        return payload
+        return {**payload, "artifact_sha256": sha256(raw).hexdigest()}

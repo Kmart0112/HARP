@@ -1,0 +1,18 @@
+version: 2
+models:
+  - name: m_race_inputs_v1
+    description: "Odds-free active-entry universe with full scheduled Japan timestamp and active race size, consumed by the prediction Port. The repository excludes scratches."
+    columns:
+      - name: race_id
+        tests: [not_null]
+      - name: horse_number
+        tests: [not_null]
+      - name: scheduled_start_at
+        description: "Nullable when the source has no scheduled time. Application retains the entrant with unknown_cutoff/unknown_start and excludes timing-dependent calculations."
+  - name: m_training_inputs_v1
+    description: "Training entry universe plus optional outcomes. Odds are separately bound by the training Port, and missing inputs remain visible in coverage."
+    columns:
+      - name: race_id
+        tests: [not_null]
+      - name: horse_number
+        tests: [not_null]

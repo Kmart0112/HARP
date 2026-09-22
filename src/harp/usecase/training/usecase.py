@@ -34,7 +34,8 @@ def _fit_platt_calibration(
         model=model,
         ds=ds,
         df_meta=df_train,
-        odds_col=str(req.calibration_odds_col).strip(),
+        odds_col=None,
+        win_odds=df_train["calibration_win_odds"],
         train_year_start=req.train_year_start,
         train_year_end=req.train_year_end,
     )
@@ -80,8 +81,6 @@ def _start_tracking_run(
             "legacy_artifact_out": req.legacy_artifact_out,
             "calibration_method": req.calibration_method.value,
             "calibration_odds_col": req.calibration_odds_col,
-            "mart_table": deps.mart_table,
-            "source_table": deps.source_table,
         },
     )
     return run_id
@@ -131,7 +130,6 @@ def run_train_pipeline_usecase(req: TrainRequest, deps: TrainDeps) -> TrainFlowR
         df_train, ds = materialize_dataset(
             training_repository=deps.training_repository,
             feature_definition_port=deps.feature_definition_port,
-            mart_table=deps.mart_table,
             contract_path=deps.contract_path,
             feature_set_name=req.feature_set_name,
             target_col=task_spec.target_col,
@@ -140,6 +138,9 @@ def run_train_pipeline_usecase(req: TrainRequest, deps: TrainDeps) -> TrainFlowR
             test_year=req.test_year,
             limit=req.limit,
             where=req.where,
+            calibration_requires_odds=req.calibration_method is CalibrationMethod.PLATT_LOGODDS,
+            max_quote_age_seconds=req.max_quote_age_seconds,
+            allowed_prediction_policies=req.allowed_prediction_policies,
         )
         training_recipe = build_training_recipe(task_kind=task_spec.task_kind, ds=ds)
 
@@ -168,6 +169,8 @@ def run_train_pipeline_usecase(req: TrainRequest, deps: TrainDeps) -> TrainFlowR
             calibration_method=req.calibration_method.value,
             calibration_info=calibration_info,
         )
+        payload["input_contract"] = df_train.attrs["input_contract"]
+        payload["training_coverage"] = df_train.attrs["coverage"]
         legacy_path = persist_training_outputs(
             artifact_store_port=deps.artifact_store_port,
             manifest_store_port=deps.manifest_store_port,
@@ -183,7 +186,9 @@ def run_train_pipeline_usecase(req: TrainRequest, deps: TrainDeps) -> TrainFlowR
             train_year_end=req.train_year_end,
             test_year=req.test_year,
             metrics=result.metrics,
-            source_table=deps.source_table,
+            source_table="training_input",
+            input_contract=df_train.attrs["input_contract"],
+            training_coverage=df_train.attrs["coverage"],
             note=task_spec.note,
             calibration_method=req.calibration_method.value,
         )

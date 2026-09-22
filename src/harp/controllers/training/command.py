@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from harp.core.training.task_policy import resolve_training_task_spec
 from harp.usecase.training.dto import CalibrationMethod, TrainPipelineKind, TrainRequest
 
-
 DEFAULT_TRAINING_WHERE: dict[str, object] = {
+    "horse_number__gt": 0,
     "race_level__neq": 0,
     "race_level__lte": 3,
 }
@@ -50,6 +50,8 @@ class TrainCommand:
     feature_set_name: str | None = None
     limit: int | None = None
     where: dict[str, object] | None = None
+    max_quote_age_seconds: float = 300.0
+    allowed_prediction_policies: tuple[str, ...] = ()
 
 
 def resolve_training_where(where: dict[str, object] | None) -> dict[str, object]:
@@ -130,6 +132,8 @@ def build_train_request(cmd: TrainCommand) -> TrainRequest:
         calibration_method=resolved_calibration_method.value,
     )
 
+    if cmd.calibration_odds_col not in {None, "win_odds", "odds_tansho", "j_odds_tansho"}:
+        raise ValueError("calibration must use the logical win_odds field")
     return TrainRequest(
         pipeline_kind=resolved_pipeline_kind,
         train_year_start=cmd.train_year_start,
@@ -140,9 +144,11 @@ def build_train_request(cmd: TrainCommand) -> TrainRequest:
         legacy_copy=cmd.legacy_copy,
         legacy_artifact_out=cmd.legacy_artifact_out,
         calibration_method=resolved_calibration_method,
-        calibration_odds_col=cmd.calibration_odds_col,
+        calibration_odds_col="win_odds" if cmd.calibration_odds_col else None,
         feature_set_name=feature_set_name,
         task_spec=task_spec,
         limit=cmd.limit,
         where=resolve_training_where(cmd.where),
+        max_quote_age_seconds=cmd.max_quote_age_seconds,
+        allowed_prediction_policies=cmd.allowed_prediction_policies,
     )

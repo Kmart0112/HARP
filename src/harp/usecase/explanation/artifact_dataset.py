@@ -5,11 +5,14 @@ from typing import Any
 
 import pandas as pd
 
+from harp.core.input_contract import require_model_input_contract
+from harp.core.odds import OddsPolicy, assemble_odds_features, odds_features_available
+from harp.core.race_inputs import RaceInputQuery
 from harp.core.training import BinaryDataset, build_binary_dataset
 from harp.interface.ports import TrainingRepositoryPort
 
-
 DEFAULT_EXPLANATION_WHERE: dict[str, object] = {
+    "horse_number__gt": 0,
     "race_level__gte": 1,
     "race_level__lte": 3,
 }
@@ -27,7 +30,6 @@ class ArtifactExplanationDatasetRequest:
 @dataclass(frozen=True)
 class ArtifactExplanationDatasetDeps:
     training_repository: TrainingRepositoryPort
-    mart_table: str
 
 
 @dataclass(frozen=True)
@@ -71,12 +73,21 @@ def run_rebuild_artifact_explanation_dataset_usecase(
         merged_where = dict(DEFAULT_EXPLANATION_WHERE)
         if req.where:
             merged_where.update(req.where)
-        df_train = deps.training_repository.load_training_frame(
-            max_year=max(int(train_year_end), int(test_year)),
-            limit=req.limit,
-            mart_table=deps.mart_table,
-            where=merged_where,
+        contract = require_model_input_contract(req.payload)
+        query = RaceInputQuery(
+            from_date=f"{train_year_start}-01-01", to_date=f"{max(train_year_end, test_year)}-12-31",
+            feature_names=tuple(feature_names), target_names=(req.target_col,),
+            odds_policy=OddsPolicy(**contract["training_odds_policy"]),
+            max_races=req.limit, filters=merged_where,
+            categorical_features=tuple(cat_features),
         )
+        inputs = deps.training_repository.load_training_input(query)
+        inputs.validate_query(query)
+        df_train = assemble_odds_features(inputs.frame, inputs.odds)
+        included = df_train[req.target_col].notna() & odds_features_available(df_train, feature_names)
+        if req.payload.get("calibration", {}).get("method") == "platt_logodds":
+            included &= inputs.odds.align(df_train).win_status.eq("available")
+        df_train = df_train.loc[included].copy().reset_index(drop=True)
 
     ds = build_binary_dataset(
         df=df_train,

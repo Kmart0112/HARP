@@ -4,7 +4,12 @@ import argparse
 from dataclasses import dataclass
 from typing import Any
 
-from harp.controllers import CalibrationMethod, TrainController, TrainCommand, TrainPipelineKind
+from harp.controllers import (
+    CalibrationMethod,
+    TrainCommand,
+    TrainController,
+    TrainPipelineKind,
+)
 from harp.shared.logging import configure_logging, get_logger
 from harp.shared.paths import ensure_runtime_dirs
 from pipeline.jobs._where_parser import parse_where_args
@@ -65,6 +70,9 @@ def _build_train_parser(spec: TrainJobSpec) -> argparse.ArgumentParser:
         default=None,
         help="Optional filter in key=value form. Repeatable. Defaults include race_level__neq=0 and race_level__lte=3.",
     )
+    parser.add_argument("--max-quote-age-seconds", type=float, default=300.0)
+    parser.add_argument("--allow-prediction-policy", action="append", choices=["latest_before", "pre_start"], default=[],
+                        help="Explicitly record accepted inference policies; evaluate policy differences before deployment.")
     return parser
 
 
@@ -107,12 +115,14 @@ def _build_command(
         feature_set_name=args.feature_set,
         limit=args.limit,
         where=where_filters,
+        max_quote_age_seconds=args.max_quote_age_seconds,
+        allowed_prediction_policies=tuple(args.allow_prediction_policy),
     )
 
 
 def _build_calibration_summary(calibration_info: dict[str, Any]) -> dict[str, Any]:
     summary: dict[str, Any] = {
-        "odds_col": calibration_info.get("odds_col"),
+        "odds_field": calibration_info.get("odds_field"),
         "oof_n": calibration_info.get("oof_n"),
         "oof_missing": calibration_info.get("oof_missing"),
         "oof_fallback_in_sample": calibration_info.get("oof_fallback_in_sample"),

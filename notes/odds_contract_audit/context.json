@@ -1,0 +1,21 @@
+{
+  "period": [
+    "2013-01-01",
+    "2026-12-31"
+  ],
+  "filters": {
+    "race_level__neq": 0,
+    "race_level__lte": 3,
+    "horse_number__gt": 0
+  },
+  "policy": {
+    "mode": "pre_start",
+    "max_age_seconds": 300,
+    "as_of": null,
+    "minutes_before_start": 10,
+    "require_availability": false
+  },
+  "availability_basis": "publication_time",
+  "source_binding_revision": "1c3cba4471dc90b6c61fd96f4060aa92fc7044b7fd7ebffe530481fe376cd4a5",
+  "comparison": "odds only; feature/prediction/performance equivalence not asserted"
+}

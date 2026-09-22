@@ -11,10 +11,10 @@
 - `core`: canonical な fact/dimension 相当のモデル
 - `features`: 再利用可能な特徴量モデル
 - `mart`: 学習・推論・レポートで直接使う最終テーブル
-- `sokuho`: レース当日や速報系のデータ
-- `lab`: 試験的な分析モデル
 
-標準的な学習用 mart は `dbt/harp/models/mart/training/` に置く。既存では `m_train_race_horse_past5` とその派生 feature matrix が主な入口になっている。
+学習出口は `m_train_race_entry_features`、当日推論出口は `m_predict_race_entry_features`。
+両者はオッズを含まない `m_race_entry_feature_matrix` を共有し、出口でオッズを結合する。
+Python runtimeが使用中の `m_train_race_horse_past5` は互換入口として残している。
 
 ## 標準フロー
 
