@@ -49,11 +49,12 @@ flowchart TD
 | `training_default` | `m_training_inputs_v1` と `int_odds_pre10m_v1` の上流。手動の旧snapshotは更新しない。期間指定なしのオッズ更新は直近7日 |
 | `odds_contract_v1` | 新しい入力view・オッズ正規化view・10分前snapshotとその契約テスト。履歴特徴量は作成済みであること |
 | `race_week_prepare` | `race_week_static` / `feature_matrix` タグのモデル。履歴lookup・結果テーブル・stagingは事前に利用可能であること |
-| `race_day_update` | 当日オッズ履歴・最新値、当日context、共通matrix、推論出口。`feature_input_mode: latest` が必要 |
+| `race_day_update` | 当日オッズ履歴・最新値、当日context、共通matrix、推論出口と、それに依存する `m_training_inputs_v1` view。`feature_input_mode: latest` が必要 |
 | `race_day_odds_update` | 当日オッズ履歴と最新値のみ。推論出口は別途更新する |
 | `post_race_finalize` | `post_race` / `training` タグの結果・context・matrix・学習出口 |
 
-`training_default` 以外の上記selectorはタグ選択であり、親モデルを自動で全件追加しない。
+`training_default` 以外の上記selectorはタグ・明示モデルの選択であり、親モデルを自動で全件追加しない。
+`race_day_update` は `m_race_inputs_v1` の置換時に削除される依存view `m_training_inputs_v1` も、依存順に再作成する。学習結果などの別の親モデルは更新対象に追加しない。
 当日までに対象日の `n_race` / `n_uma_race` とspineを用意しておく。
 
 ### 当日の一括更新
