@@ -1,4 +1,38 @@
 selectors:
+  - name: nn_inputs
+    description: Refresh shared pre-race values, full stored run history, and NN target entries; reuse existing contexts and statistical lookups.
+    definition:
+      method: tag
+      value: nn_inputs
+      # The independent LightGBM matrix may still contain an older refresh.
+      exclude:
+        - method: fqn
+          value: shared_pre_race_feature_parity
+
+  - name: nn_training
+    description: Build NN inputs and their upstream contexts/statistics; no legacy manual odds snapshots.
+    definition:
+      method: fqn
+      value: m_nn_race_entry
+      parents: true
+      exclude:
+        - method: fqn
+          value: shared_pre_race_feature_parity
+
+  - name: nn_current
+    description: Refresh current NN entries and shared live pre-race values, retaining an already built full run-history table. Use feature_input_mode=latest.
+    definition:
+      union:
+        - method: fqn
+          value: int_race_day_feature_context
+        - method: fqn
+          value: feat_race_entry_pre_race
+        - method: fqn
+          value: m_nn_race_entry
+        - exclude:
+            - method: fqn
+              value: shared_pre_race_feature_parity
+
   - name: training_default
     description: Build logical training entries and versioned pre10m quotes; manual legacy snapshots are not refreshed.
     definition:
@@ -9,6 +43,10 @@ selectors:
         - method: fqn
           value: int_odds_pre10m_v1
           parents: true
+        # LightGBM builds must also work before NN marts have been created.
+        - exclude:
+            - method: fqn
+              value: nn_entry_complete_field
 
   - name: odds_contract_v1
     description: Validate the current odds contract without rebuilding feature lookups.
@@ -38,6 +76,9 @@ selectors:
           value: race_week_static
         - method: tag
           value: feature_matrix
+        - exclude:
+            - method: fqn
+              value: nn_entry_complete_field
 
   - name: race_day_update
     description: Refresh race-day odds, feature context/matrix, inference output, and its dependent training input view. Requires feature_input_mode=latest.
@@ -51,6 +92,9 @@ selectors:
         # Rebuild this view after m_race_inputs_v1 without refreshing its other parents.
         - method: fqn
           value: m_training_inputs_v1
+        - exclude:
+            - method: fqn
+              value: nn_entry_complete_field
 
   - name: race_day_odds_update
     description: Refresh only the race-day odds tables from append-only s_jodds before feature-matrix joins.
@@ -66,3 +110,6 @@ selectors:
           value: post_race
         - method: tag
           value: training
+        - exclude:
+            - method: fqn
+              value: nn_entry_complete_field

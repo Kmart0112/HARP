@@ -22,6 +22,11 @@ scripts/dbt build --project-dir dbt/harp --profiles-dir dbt/harp --no-version-ch
   --selector training_default
 ```
 
+NN用の共通事前特徴・出走履歴・参照終端は `nn_inputs` selectorで更新する。
+初回全履歴構築、当日更新、履歴の版と入力列の契約は
+[NN入力設計](../../docs/design/nn_race_history_inputs.md) を参照する。
+既存LightGBMのmatrixも同じ事前特徴を利用する。
+
 ## `fct_jodds_snapshot` 手動更新
 
 `fct_jodds_snapshot` は重いため、必要な時だけ専用 selector で更新する。

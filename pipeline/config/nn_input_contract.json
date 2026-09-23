@@ -1,0 +1,283 @@
+{
+  "version": 1,
+  "pre_race": [
+    {
+      "name": "horse_number",
+      "kind": "numeric"
+    },
+    {
+      "name": "gate_number",
+      "kind": "numeric"
+    },
+    {
+      "name": "age",
+      "kind": "numeric"
+    },
+    {
+      "name": "age_month",
+      "kind": "numeric"
+    },
+    {
+      "name": "sex_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "kinryo",
+      "kind": "numeric"
+    },
+    {
+      "name": "kinryo_adj",
+      "kind": "numeric"
+    },
+    {
+      "name": "h_weight",
+      "kind": "numeric"
+    },
+    {
+      "name": "weight_change",
+      "kind": "numeric"
+    },
+    {
+      "name": "blinker_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "jyo_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "distance_m",
+      "kind": "numeric"
+    },
+    {
+      "name": "surface",
+      "kind": "categorical"
+    },
+    {
+      "name": "surface_condition_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "weather_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "old_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "race_level",
+      "kind": "categorical"
+    },
+    {
+      "name": "grade_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "track_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "num_starters",
+      "kind": "numeric"
+    },
+    {
+      "name": "turn_direction_cd",
+      "kind": "categorical"
+    },
+    {
+      "name": "straight_distance_m",
+      "kind": "numeric"
+    },
+    {
+      "name": "elevation_diff_m",
+      "kind": "numeric"
+    },
+    {
+      "name": "has_homestretch_slope",
+      "kind": "categorical"
+    },
+    {
+      "name": "held_month",
+      "kind": "numeric"
+    },
+    {
+      "name": "ensei_type",
+      "kind": "categorical"
+    },
+    {
+      "name": "wood_lap_time_1",
+      "kind": "numeric"
+    },
+    {
+      "name": "wood_haron_time_4",
+      "kind": "numeric"
+    },
+    {
+      "name": "wood_lap_time_1_z_tozai_day",
+      "kind": "numeric"
+    },
+    {
+      "name": "wood_haron_time_4_z_tozai_day",
+      "kind": "numeric"
+    },
+    {
+      "name": "hanro_lap_time_1",
+      "kind": "numeric"
+    },
+    {
+      "name": "hanro_haron_time_4",
+      "kind": "numeric"
+    },
+    {
+      "name": "hanro_lap_time_1_z_tozai_day",
+      "kind": "numeric"
+    },
+    {
+      "name": "hanro_haron_time_4_z_tozai_day",
+      "kind": "numeric"
+    },
+    {
+      "name": "week1_wood_lap_time_1",
+      "kind": "numeric"
+    },
+    {
+      "name": "week1_wood_haron_time_4",
+      "kind": "numeric"
+    },
+    {
+      "name": "week1_hanro_lap_time_1",
+      "kind": "numeric"
+    },
+    {
+      "name": "week1_hanro_haron_time_4",
+      "kind": "numeric"
+    },
+    {
+      "name": "jockey_starts_3y",
+      "kind": "numeric"
+    },
+    {
+      "name": "jockey_place_rate_3y_smooth",
+      "kind": "numeric"
+    },
+    {
+      "name": "jockey_cluster_starts_3y",
+      "kind": "numeric"
+    },
+    {
+      "name": "jockey_cluster_place_rate_3y_smooth",
+      "kind": "numeric"
+    },
+    {
+      "name": "jockey_surface_dist_pm200_starts_3y",
+      "kind": "numeric"
+    },
+    {
+      "name": "jockey_surface_dist_pm200_place_rate_3y_smooth",
+      "kind": "numeric"
+    },
+    {
+      "name": "trainer_starts_5y",
+      "kind": "numeric"
+    },
+    {
+      "name": "trainer_place_rate_5y",
+      "kind": "numeric"
+    },
+    {
+      "name": "breeder_starts_5y",
+      "kind": "numeric"
+    },
+    {
+      "name": "breeder_place_rate_5y_smooth",
+      "kind": "numeric"
+    },
+    {
+      "name": "sire_starts_5y",
+      "kind": "numeric"
+    },
+    {
+      "name": "sire_avg_place_rate_smooth",
+      "kind": "numeric"
+    },
+    {
+      "name": "sire_avg_pos4_agari_synergy",
+      "kind": "numeric"
+    },
+    {
+      "name": "same_cluster_sire_past_starts",
+      "kind": "numeric"
+    },
+    {
+      "name": "same_cluster_sire_avg_place_rate_smooth",
+      "kind": "numeric"
+    },
+    {
+      "name": "dam_starts_5y",
+      "kind": "numeric"
+    },
+    {
+      "name": "dam_avg_place_rate_smooth",
+      "kind": "numeric"
+    },
+    {
+      "name": "dam_avg_pos4_agari_synergy",
+      "kind": "numeric"
+    },
+    {
+      "name": "damsire_starts_5y",
+      "kind": "numeric"
+    },
+    {
+      "name": "damsire_avg_place_rate_smooth",
+      "kind": "numeric"
+    },
+    {
+      "name": "damsire_avg_pos4_agari_synergy",
+      "kind": "numeric"
+    }
+  ],
+  "history_results": [
+    {
+      "name": "result_status_code",
+      "kind": "categorical"
+    },
+    {
+      "name": "result_order",
+      "kind": "numeric"
+    },
+    {
+      "name": "time_sec",
+      "kind": "numeric"
+    },
+    {
+      "name": "time_diff",
+      "kind": "numeric"
+    },
+    {
+      "name": "agari3f",
+      "kind": "numeric"
+    },
+    {
+      "name": "rank_1c",
+      "kind": "numeric"
+    },
+    {
+      "name": "rank_2c",
+      "kind": "numeric"
+    },
+    {
+      "name": "rank_3c",
+      "kind": "numeric"
+    },
+    {
+      "name": "rank_4c",
+      "kind": "numeric"
+    },
+    {
+      "name": "running_style_cd",
+      "kind": "categorical"
+    }
+  ]
+}

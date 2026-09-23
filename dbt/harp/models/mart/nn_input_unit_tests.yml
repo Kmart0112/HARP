@@ -1,0 +1,74 @@
+version: 2
+unit_tests:
+  - name: nn_history_numbers_actual_starts_in_event_order
+    model: int_race_entry_run_record
+    given:
+      - input: ref('feat_race_entry_pre_race')
+        rows:
+          - {race_id: 30, kettonum: 1, held_date: '2026-07-01', held_year: 2026, held_year_month: '2026-07-01', jockey_place_rate_3y_smooth: 0.30}
+          - {race_id: 10, kettonum: 1, held_date: '2026-05-01', held_year: 2026, held_year_month: '2026-05-01', jockey_place_rate_3y_smooth: 0.10}
+          - {race_id: 20, kettonum: 1, held_date: '2026-06-01', held_year: 2026, held_year_month: '2026-06-01', ijyo_cd: '4', jockey_place_rate_3y_smooth: 0.20}
+          - {race_id: 5, kettonum: 1, held_date: '2026-04-01', held_year: 2026, held_year_month: '2026-04-01', ijyo_cd: '1'}
+          - {race_id: 40, kettonum: 1, held_date: '2026-08-01', held_year: 2026, held_year_month: '2026-08-01'}
+          - {race_id: 20, kettonum: 2, held_date: '2026-06-01', held_year: 2026, held_year_month: '2026-06-01', ijyo_cd: '5'}
+      - input: ref('fct_race_entry_result')
+        rows:
+          - {race_id: 10, kettonum: 1, result_order: 3, time_diff: 0.5}
+          - {race_id: 30, kettonum: 1, result_order: 1, time_diff: 0.0}
+      - input: ref('stg_n_uma_race_all')
+        rows:
+          - {race_id: 20, kettonum: 1, ijyo_cd: '4'}
+          - {race_id: 20, kettonum: 2, ijyo_cd: '5'}
+    expect:
+      rows:
+        - {race_id: 10, kettonum: 1, run_no: 1, result_order: 3, time_diff: 0.5, jockey_place_rate_3y_smooth: 0.10, monthly_stats_cutoff: '2026-05-01'}
+        - {race_id: 20, kettonum: 1, run_no: 2, result_order: null, time_diff: null, jockey_place_rate_3y_smooth: 0.20, monthly_stats_cutoff: '2026-06-01'}
+        - {race_id: 30, kettonum: 1, run_no: 3, result_order: 1, time_diff: 0.0, jockey_place_rate_3y_smooth: 0.30, monthly_stats_cutoff: '2026-07-01'}
+        - {race_id: 20, kettonum: 2, run_no: 1, result_order: null, time_diff: null, jockey_place_rate_3y_smooth: null, monthly_stats_cutoff: '2026-06-01'}
+
+  - name: nn_current_new_horses_and_history_cutoff
+    model: m_nn_race_entry
+    overrides:
+      vars:
+        feature_input_mode: training
+        target_held_date: null
+        race_from_date: '2026-06-13'
+        race_to_date: '2026-06-13'
+    given:
+      - input: ref('feat_race_entry_pre_race')
+        rows:
+          - {race_id: 30, kettonum: 1, held_date: '2026-06-13', held_year: 2026, held_year_month: '2026-06-01', horse_number: 1, jockey_place_rate_3y_smooth: 0.25, ijyo_cd: '4'}
+          - {race_id: 30, kettonum: 2, held_date: '2026-06-13', held_year: 2026, held_year_month: '2026-06-01', horse_number: 2}
+          - {race_id: 30, kettonum: 3, held_date: '2026-06-13', held_year: 2026, held_year_month: '2026-06-01', horse_number: 3, ijyo_cd: '2'}
+          - {race_id: 40, kettonum: 1, held_date: '2026-06-20', held_year: 2026, held_year_month: '2026-06-01', horse_number: 1}
+      - input: ref('int_race_entry_run_record')
+        rows:
+          - {race_id: 10, kettonum: 1, held_date: '2026-05-01', run_no: 1}
+          - {race_id: 20, kettonum: 1, held_date: '2026-06-12', run_no: 2}
+          - {race_id: 29, kettonum: 1, held_date: '2026-06-13', run_no: 3}
+          - {race_id: 30, kettonum: 1, held_date: '2026-06-13', run_no: 4}
+          - {race_id: 40, kettonum: 1, held_date: '2026-06-20', run_no: 5}
+    expect:
+      rows:
+        - {race_id: 30, kettonum: 1, history_end_no: 2, last_history_race_id: 20, last_history_held_date: '2026-06-12', days_since_last_run: 1, active_entrant_count: 2, jockey_place_rate_3y_smooth: 0.25, jockey_stats_missing: false}
+        - {race_id: 30, kettonum: 2, history_end_no: 0, last_history_race_id: null, last_history_held_date: null, days_since_last_run: null, active_entrant_count: 2, jockey_place_rate_3y_smooth: null, jockey_stats_missing: true}
+
+  - name: nn_latest_selects_target_day_with_older_history
+    model: m_nn_race_entry
+    overrides:
+      vars:
+        feature_input_mode: latest
+        target_held_date: '2026-06-20'
+        race_from_date: '2026-06-01'
+        race_to_date: '2026-06-13'
+    given:
+      - input: ref('feat_race_entry_pre_race')
+        rows:
+          - {race_id: 30, kettonum: 1, held_date: '2026-06-13', held_year: 2026, held_year_month: '2026-06-01', horse_number: 1}
+          - {race_id: 40, kettonum: 1, held_date: '2026-06-20', held_year: 2026, held_year_month: '2026-06-01', horse_number: 1}
+      - input: ref('int_race_entry_run_record')
+        rows:
+          - {race_id: 10, kettonum: 1, held_date: '2026-05-01', run_no: 1}
+    expect:
+      rows:
+        - {race_id: 40, kettonum: 1, history_end_no: 1, last_history_race_id: 10, days_since_last_run: 50, active_entrant_count: 1}

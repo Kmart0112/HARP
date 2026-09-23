@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: m_race_entry_feature_matrix
-    description: "Common result-free, odds-free feature matrix for training and inference. Grain is race_id and kettonum; odds are joined only in the train/predict mart exits."
+    description: "LightGBM向けの結果・オッズを含まない特徴量matrix。粒度はrace_id, kettonum。基本情報・調教・主体統計はfeat_race_entry_pre_raceをNNと共用し、ここで過去走集計と相対特徴を追加する。既存の列名・型・列順・値を維持し、オッズは公開Portで別取得する。"
     columns:
       - name: race_id
         description: "Race identifier."
