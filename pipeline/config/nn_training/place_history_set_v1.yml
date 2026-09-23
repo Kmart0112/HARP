@@ -1,0 +1,37 @@
+version: 1
+model:
+  name: history_set_transformer_v1
+  d_model: 128
+  categorical_embedding_dim: 8
+  history_layers: 2
+  race_layers: 2
+  attention_heads: 4
+  feedforward_dim: 256
+  dropout: 0.1
+optimizer:
+  name: adamw
+  lr: 0.0003
+  weight_decay: 0.0001
+scheduler:
+  name: reduce_on_plateau
+  factor: 0.5
+  patience: 3
+  min_lr: 0.000001
+training:
+  batch_size_races: 32
+  max_epochs: 50
+  seed: 42
+  gradient_clip_norm: 1.0
+loss:
+  name: bce_with_logits
+  reduction: entrant_mean
+early_stopping:
+  metric: validation.logloss
+  mode: min
+  patience: 8
+  min_delta: 0.0001
+runtime:
+  device: auto
+  precision: float32
+  num_workers: 0
+  num_threads: 4

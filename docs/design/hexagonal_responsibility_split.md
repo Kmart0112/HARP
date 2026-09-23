@@ -83,6 +83,7 @@ domain-local composition rootは以下に置く。
 | `run_export_feature_contract_usecase` | registry / target pathが解決済み | feature定義Port呼び出し、差分と書込順序 | YAML parse / dump |
 | `run_log_condition_split_compare_usecase` | report / tracking設定が解決済み | report reader、pure payload builder、publisherの順序制御 | CSV parse、JSON生成、MLflow呼び出し |
 | `run_prepare_nn_dataset_usecase` / `load_prepared_nn_dataset` | 入力IDまたはQuery、期間分割、履歴長が解決済み | 入力取得、Dataset Core、入力と前処理recipeの保存・復元 | SQL、Parquet/JSON、NN学習 |
+| `run_nn_train_usecase` / `run_nn_evaluate_usecase` | Dataset ID、型付きrecipe、device、provenanceが解決済み | Dataset復元、epoch進行、checkpointとtracking、独立した評価 | YAML、torch保存、DB接続、勾配計算 |
 
 `*Request` は業務上必須またはControllerで解決済みの値、`*Deps` はPort実装と実行設定、`*Result` は外側へ返す境界形式を保持する。
 
@@ -96,6 +97,7 @@ domain-local composition rootは以下に置く。
 | `NnInputRepositoryPort` | 全頭の事前特徴と馬別履歴、学習時だけ別教師を取得 | `SqlNnInputRepository` |
 | `NnDatasetStorePort` / `NnPredictionSnapshotPort` | NN入力の保存・整合性検証付き復元 | `ParquetNnDatasetStore` / `ParquetNnPredictionSnapshotStore` |
 | `NnFeatureContractPort` | dbtから出力した順序付きNN入力許可列を読込 | `JsonNnFeatureContractReader` |
+| `NnTrainingRecipePort` / `NnModelStorePort` | NN設定読込、学習run/checkpointの保存・復元 | `YamlNnTrainingRecipeReader` / `TorchNnModelStore` |
 | `NnPreparedDatasetStorePort` | 入力ID・学習済み前処理・レース分割の保存と検証付き復元 | `JsonNnPreparedDatasetStore` |
 | `FeatureDefinitionPort` | registry / contract / feature configの読込・render・検索 | `YamlFeatureDefinitionAdapter` |
 | `ModelLoaderPort` | model artifact payload読込 | `PickleModelLoaderAdapter` |
@@ -112,8 +114,9 @@ domain-local composition rootは以下に置く。
 外部形式の構文解釈はAdapter、形式に依存しないstatus解決やpayload意味モデルはCore、呼び出し順はUseCaseに置く。
 
 NN入力Portの値・保存形式は [nn_input_repository_contract.md](nn_input_repository_contract.md) を参照する。
-NNはDataset作成・復元のController/UseCase/Jobまで実装済み。
-前処理と配列の契約は [nn_dataset_preparation.md](nn_dataset_preparation.md) を参照する。NN本体・学習処理は未実装。
+NNはDataset作成・復元とTransformer学習・評価のController/UseCase/Jobを実装済み。
+前処理と配列は [nn_dataset_preparation.md](nn_dataset_preparation.md)、
+モデル・設定・学習・checkpointは [nn_transformer_training.md](nn_transformer_training.md) を参照する。
 
 ## 6. 代表フロー
 

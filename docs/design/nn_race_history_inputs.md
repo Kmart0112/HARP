@@ -5,7 +5,8 @@ NNは馬ごとの過去走系列と今回の出走馬集合を受け取る。DB�
 dbt入力に加え、Pythonの入力契約・Repository・入力保存は実装済み。
 [Python入力Portの契約](nn_input_repository_contract.md)を参照する。
 レース単位Dataset、前処理、NumPy配列・padding・mask、作成Jobは実装済み。
-[Dataset作成の契約・実行手順](nn_dataset_preparation.md)を参照する。NN本体と学習は未実装。
+[Dataset作成の契約・実行手順](nn_dataset_preparation.md)を参照する。
+ネットワーク・学習・保存モデルの復元は [NN Transformer学習](nn_transformer_training.md) に実装済み。
 
 ## モデルと既存経路
 

@@ -26,6 +26,10 @@ def _decode_table(document: dict) -> NnTablePreprocessor:
     )
 
 
+def decode_nn_preprocessing_state(document: dict) -> NnPreprocessingState:
+    return NnPreprocessingState(**{name: _decode_table(document[name]) for name in ("current", "history")})
+
+
 class JsonNnPreparedDatasetStore:
     def __init__(self, root: str | Path):
         self.root = Path(root)
@@ -72,7 +76,7 @@ class JsonNnPreparedDatasetStore:
             _check_identity(recipe["input_dataset_id"])
             return NnPreparedDatasetRecipe(
                 recipe["input_dataset_id"], NnDatasetConfig(**recipe["config"]),
-                NnPreprocessingState(**{name: _decode_table(recipe["preprocessing"][name]) for name in ("current", "history")}),
+                decode_nn_preprocessing_state(recipe["preprocessing"]),
                 tuple(NnRacePartition(**part) for part in recipe["partitions"]),
             )
         except NnInputContractError:

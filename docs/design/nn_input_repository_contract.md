@@ -2,7 +2,8 @@
 
 本書の対象は契約型、Port、DB入力Repository、特徴契約の読込、入力の保存・復元。
 この入力を使うDatasetの配列化、前処理、作成・復元の実行経路は
-[NN Dataset作成](nn_dataset_preparation.md)に実装済みの契約を記載する。NN本体・学習は未実装。
+[NN Dataset作成](nn_dataset_preparation.md)に実装済みの契約を記載する。
+後続の学習経路は [NN Transformer学習](nn_transformer_training.md) を参照する。
 dbt側の粒度・時点は [nn_race_history_inputs.md](nn_race_history_inputs.md) を正本とする。
 
 ## 公開境界
@@ -63,6 +64,12 @@ SQLiteの契約テストでも複数SELECTを一つの明示トランザクシ�
 RepositoryはDB上の「対象日より前の最大run_no」と参照終端を照合する。
 Coreでも、履歴の連番・開催日順、参照終端のレースID・開催日・間隔、全頭数を照合する。
 履歴バックフィル後に対象出走表を再構築していないなどの不一致は`NnInputContractError`とする。
+
+統計参照日がNULLの行は、対象の主体群がすべて`stats_missing=True`で、
+対応する統計特徴がNULL（出走母数だけは0も可）の場合に限り受け入れる。
+月次は騎手・種牡馬・母・母父、年次は厩舎・生産者が対象。
+参照日を開催日から推測して補完せず、NULLのまま保存・復元する。
+参照日不明で複勝率や正の出走母数などが入っている行は拒否する。
 
 トランザクションだけで、別々に公開されるdbtモデルが同じ更新世代に属することまでは証明できない。
 NNのdbt構築完了後に取得する運用が前提。保存後はDB更新から独立して再実行できる。

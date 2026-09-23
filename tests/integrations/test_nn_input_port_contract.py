@@ -112,6 +112,29 @@ def test_empty_period_is_a_valid_empty_training_input(nn_provider):
     assert result.inputs.entries.empty and result.inputs.history.empty and result.targets.empty
 
 
+def test_absent_statistics_keep_unknown_cutoffs_across_sql_and_snapshot_restore(nn_provider, tmp_path):
+    from harp.adapters.driven.storage.nn_dataset_store import ParquetNnDatasetStore
+
+    port, engine, mapping = nn_provider
+    with engine.begin() as conn:
+        for table, columns in ((mapping.entries_table, mapping.entry_columns),
+                               (mapping.history_table, mapping.history_columns)):
+            conn.execute(text(f'''UPDATE "{table}" SET
+                "{columns['monthly_stats_cutoff']}" = NULL,
+                "{columns['yearly_stats_cutoff']}" = NULL,
+                "{columns['jockey_place_rate_3y_smooth']}" = NULL,
+                "{columns['jockey_stats_missing']}" = true'''))
+    source = port.load_training_inputs(input_query())
+    store = ParquetNnDatasetStore(tmp_path)
+    restored = store.load(store.save(source, {})).inputs
+    assert len(restored.inputs.entries) == 3 and len(restored.inputs.history) == 3
+    for frame in (restored.inputs.entries, restored.inputs.history):
+        assert frame.monthly_stats_cutoff.isna().all()
+        assert frame.yearly_stats_cutoff.isna().all()
+        assert frame.jockey_place_rate_3y_smooth.isna().all()
+        assert frame.jockey_stats_missing.all()
+
+
 @pytest.mark.parametrize("field", ["result_order", "jockey_id", "race_id"])
 def test_current_feature_allowlist_rejects_labels_and_identities(nn_provider, field):
     port, _, _ = nn_provider

@@ -23,6 +23,11 @@ HISTORY_METADATA = (*ENTRY_KEY, "held_date", "run_no")
 STATS_FLAGS = tuple(f"{entity}_stats_missing" for entity in
                     ("jockey", "trainer", "breeder", "sire", "dam", "damsire"))
 STATS_METADATA = ("monthly_stats_cutoff", "yearly_stats_cutoff", *STATS_FLAGS)
+_STATS_CUTOFF_GROUPS = {
+    "monthly_stats_cutoff": (("jockey", "sire", "dam", "damsire"),
+                             ("jockey_", "sire_", "dam_", "damsire_", "same_cluster_sire_")),
+    "yearly_stats_cutoff": (("trainer", "breeder"), ("trainer_", "breeder_")),
+}
 TARGET_COLUMNS = ("result_order", "is_win", "is_place")
 _RESULT_FIELDS = frozenset((*TARGET_COLUMNS, "time_sec", "time_diff", "agari3f",
                             "rank_1c", "rank_2c", "rank_3c", "rank_4c",
@@ -182,7 +187,7 @@ def _normalize(frame, columns, fields):
             out[field.name] = (_numbers(out[field.name]) if field.kind == "numeric"
                                else out[field.name].map(_category).astype("string"))
     for name in STATS_METADATA[:2]:
-        out[name] = _dates(out[name])
+        out[name] = _dates(out[name], nullable=True)
         if out[name].gt(out.held_date).any():
             raise NnInputContractError("statistics cutoff is after the event date")
     for name in STATS_FLAGS:
@@ -190,6 +195,22 @@ def _normalize(frame, columns, fields):
         if not values.isin([0, 1]).all():
             raise NnInputContractError("invalid statistics missing flag")
         out[name] = values.astype("boolean")
+    for cutoff, (entities, prefixes) in _STATS_CUTOFF_GROUPS.items():
+        unknown = out[cutoff].isna()
+        if not unknown.any():
+            continue
+        # A missing lookup has no reference date. Preserve it as unknown rather
+        # than inventing a date; only absent statistics/zero sample counts qualify.
+        if not out.loc[unknown, [f"{entity}_stats_missing" for entity in entities]].all().all():
+            raise NnInputContractError("statistics values require a known cutoff")
+        for field in fields:
+            if field.name in out and field.name.startswith(prefixes):
+                values = out.loc[unknown, field.name]
+                absent = values.isna()
+                if "_starts" in field.name:
+                    absent = absent | values.eq(0).fillna(False)
+                if not absent.all():
+                    raise NnInputContractError("statistics values require a known cutoff")
     return out
 
 

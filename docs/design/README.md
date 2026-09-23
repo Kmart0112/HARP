@@ -7,5 +7,6 @@
 - `harp_strategy_factory_design.md`: 関数優先アーキテクチャの設計補足
 - `mlflow_feature_validation_usecase_design.md`: 特徴量検証 usecase の詳細設計
 - `mlflow_theme_append_design.md`: append/finalize の詳細設計
+- [nn_transformer_training.md](nn_transformer_training.md): Transformer構成・学習設定・checkpoint・評価
 
 実装前の比較案や移行計画は `notes/proposals` に置く。

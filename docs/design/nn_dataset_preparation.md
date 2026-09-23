@@ -2,7 +2,8 @@
 
 実装範囲は、dbt入力取得または保存入力の読込、開催日による分割、trainだけを使う前処理fit、
 レース単位Dataset、NumPyバッチのpadding/mask、再現に必要な入力とrecipeの保存・復元。
-NN本体・学習ループ・モデルによる予測は含まない。PyTorchへの依存は追加していない。
+このDataset経路はPyTorchなしで利用できる。
+後続のネットワーク・学習・保存モデルによる予測は [NN Transformer学習](nn_transformer_training.md) に記載する。
 入力表と時点の契約は [NN入力Repository](nn_input_repository_contract.md) を参照する。
 
 ## 責務と経路
