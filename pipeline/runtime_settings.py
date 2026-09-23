@@ -94,6 +94,38 @@ def load_table_export_runtime_config(env_file: str | Path | None = None) -> Tabl
     )
 
 
+def load_nn_tracking_settings() -> tuple[str, str]:
+    """NN tracking opt-in; no DB or LightGBM mart settings are required."""
+    load_pipeline_env_files()
+    return _required_env("HARP_MLFLOW_TRACKING_URI"), os.environ.get("HARP_NN_TRAIN_EXPERIMENT", "nn_place_training")
+
+
+def collect_nn_training_provenance() -> dict:
+    """Fingerprint source/configuration without reading credentials or artifacts."""
+    from hashlib import sha256
+    from importlib.metadata import version
+    import platform
+    import subprocess
+
+    digest = sha256()
+    files = [PROJECT_ROOT / name for name in ("pyproject.toml", "uv.lock", "pipeline/runtime_settings.py")]
+    for directory in ("src/harp", "pipeline/jobs", "pipeline/config"):
+        files.extend(path for path in (PROJECT_ROOT / directory).rglob("*")
+                     if path.is_file() and path.suffix in {".py", ".json", ".yaml", ".yml"})
+    for path in sorted(files):
+        digest.update(str(path.relative_to(PROJECT_ROOT)).encode())
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+    try:
+        revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=PROJECT_ROOT, check=True,
+                                  capture_output=True, text=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        revision = "unavailable"
+    return {"code_revision": revision, "source_sha256": digest.hexdigest(),
+            "python": platform.python_version(), "platform": platform.platform(),
+            "torch": version("torch"), "numpy": version("numpy"), "pandas": version("pandas")}
+
+
 def load_predict_runtime_defaults(env_file: str | Path | None = None) -> PredictRuntimeDefaults:
     load_pipeline_env_files(env_file=env_file)
     bankroll = _optional_float("HARP_PREDICT_FUKUSHO_BANKROLL", default=223000.0)

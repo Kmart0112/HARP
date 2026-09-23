@@ -36,6 +36,10 @@ dependencies = [
 knowledge = [
     "cognee==0.5.5",
 ]
+nn = [
+    "pyyaml>=6,<7",
+    "torch>=2.8,<3",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

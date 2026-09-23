@@ -69,6 +69,8 @@ FileGateway、Parquet、MLflow など、実 Adapter の Port 契約を最小限�
 - Condition tracking
 - Notebook artifact export
 - Artifact explanation dataset rebuild
+- NN Dataset preparation and replay
+- NN Transformer training, checkpoint resume, and held-out evaluation
 
 正式入口が存在しない機能にはテストを追加しない。新しい正式フローを追加した場合は、実装完了後に同じ Request / Port Mock / Result 形式で追加する。
 

@@ -24,7 +24,10 @@ Python runtimeの現在の公開境界は [odds_input_contract.md](odds_input_co
 |---|---|---|
 | `int_race_entry_feature_context` | `race_id, kettonum` | spine、declared、race_basic |
 | `int_race_day_feature_context` | `race_id, kettonum` | spine、declared、race_basic、`stg_s_uma_race` |
-| `m_race_entry_feature_matrix` | `race_id, kettonum` | modeに応じたcontext、履歴lookup、調教・DM情報 |
+| `feat_race_entry_pre_race` | `race_id, kettonum` | modeに応じたcontext、主体・コース統計、調教・DM情報。LightGBM/NN共通 |
+| `m_race_entry_feature_matrix` | `race_id, kettonum` | 共通事前特徴、馬の過去走lookup、レース内相対特徴 |
+
+NN用の出走履歴・参照終端の契約は [nn_race_history_inputs.md](nn_race_history_inputs.md) を参照する。
 
 学習contextは速報を読まず、当日contextは `target_held_date` に絞る。
 当日contextは `stg_s_uma_race` の同一馬を `datakubun` 降順で1行にし、

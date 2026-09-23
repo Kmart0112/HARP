@@ -1,0 +1,45 @@
+version: 2
+models:
+  - name: int_race_entry_run_record
+    description: >-
+      NN用の馬別出走履歴。1行はrace_id, kettonumの1走で、当該出走時点の共通事前特徴と確定結果を持つ。
+      run_noは収録された実出走を開催日・race_id順に数えた番号で、生涯出走数ではない。
+      取消・除外は除き、競走中止・失格等の実出走は残す。結果未取得の通常出馬は履歴に含めない。
+      更新対象日の指定にかかわらず保存済み共通層の全期間からtableを再構築する。
+      履歴バックフィル時は番号が変わり得るためm_nn_race_entryも更新し、学習時は同じデータ版を保存する。
+    config:
+      meta:
+        harp:
+          grain: [race_id, kettonum]
+          availability: post_race
+          role: nn_run_history
+          feature_columns_macro: nn_pre_race_feature_columns
+    columns:
+      - name: race_id
+        description: その過去走のレースID。管理キー。
+        tests: [not_null]
+      - name: kettonum
+        description: 履歴をまとめる馬ID。管理キーでありNN入力に含めない。
+        tests: [not_null]
+      - name: held_date
+        description: 履歴の日付。対象レースの開催日より厳密に前の行だけを利用する。
+        tests: [not_null]
+      - name: run_no
+        description: 馬ごとに1から始まる収録実出走の連番。バックフィルで変わるため永続IDとして使わない。
+        tests: [not_null]
+      - name: monthly_stats_cutoff
+        description: その走の月初。主体の月次統計に含めない期間の開始日。発表・受信時刻ではない。
+      - name: yearly_stats_cutoff
+        description: その走の年初。主体の年次統計に含めない期間の開始日。
+      - name: jockey_stats_missing
+        description: 騎手の平滑化複勝率が未取得。出走経験ゼロとは限らない。
+      - name: result_status_code
+        description: JV-Data 2101の結果状態。1/2/3の非出走は履歴から除外。結果側の情報なので今回の特徴には使わない。
+      - name: result_order
+        description: その走の確定着順。競走中止等ではNULL。過去走の入力にのみ利用可能。
+      - name: time_diff
+        description: 勝ち馬からの着差秒（非負）。既存の対数変換済みtime_diff列とは異なり、生の秒数。
+      - name: time_sec
+        description: その走の走破秒数。欠測・未完走を0で補完しない。
+      - name: agari3f
+        description: その走の上がり3F秒数。結果情報であり過去走としてのみ利用可能。

@@ -1,0 +1,38 @@
+version: 2
+models:
+  - name: feat_race_entry_pre_race
+    description: >-
+      LightGBM/NN共通の事前特徴。粒度はrace_id, kettonum。出馬context、調教、既存の主体・コース統計を
+      結合し、馬の過去走lag・平均・レース内相対特徴は含めない。統計の窓・平滑化・欠損処理は既存matrixと同一。
+      主体IDとライフサイクル列は管理用であり、NNはnn_pre_race_feature_columnsの許可列だけを使う。
+      incremental更新は対象範囲のみを更新して既存履歴を保持する。過去時点の受信情報を復元するsnapshotではない。
+    config:
+      meta:
+        harp:
+          grain: [race_id, kettonum]
+          availability: pre_race
+          role: shared_pre_race_features
+    columns:
+      - name: race_id
+        description: レースID。モデル入力ではなく結合キー。
+        tests: [not_null]
+      - name: kettonum
+        description: 馬ID。モデル入力ではなく履歴取得キー。
+        tests: [not_null]
+      - name: held_date
+        description: 当該出走の開催日。統計の参照月・年を決める。
+        tests: [not_null]
+      - name: held_year_month
+        description: 当該出走の月初。騎手・血統統計はこの月の結果を含めない既存lookupを参照。
+      - name: held_year
+        description: 当該出走の年。厩舎・生産者統計はこの年の結果を含めない既存lookupを参照。
+      - name: jockey_place_rate_3y_smooth
+        description: 対象月より前の既存騎手lookupの平滑化複勝率。窓は35個の観測月行であり暦の36か月とは限らない。
+      - name: jockey_starts_3y
+        description: 騎手複勝率と同じ既存窓の出走数。lookup不足時のNULLを保持。
+      - name: trainer_place_rate_5y
+        description: 対象年より前の5観測年行を使う既存厩舎lookupの平滑化複勝率。
+      - name: sire_avg_place_rate_smooth
+        description: 当該出走月に対応する既存種牡馬lookupの平滑化複勝率。現在時点の値で履歴を書き換えない。
+      - name: updated_at
+        description: 元contextの更新時刻。予測時点や情報の発表・受信時刻ではない。

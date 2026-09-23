@@ -1,0 +1,41 @@
+version: 2
+models:
+  - name: m_nn_race_entry
+    description: >-
+      NN用の予測対象出走馬。粒度はrace_id, kettonumで、共通事前特徴と履歴の参照終端を持つ。
+      feature_input_modeと対象日・期間で出力範囲を選ぶ。結果やオッズとの内部結合は行わず、新馬・欠損統計の馬も残す。
+      ID・参照終端・日付は管理用、nn_pre_race_feature_columnsで定義した列がモデル入力。
+      取消・除外を除き、完走しなかった実出走馬も集合に保持する。教師は既存outcomeから別途取得する。
+      当日以前の受信履歴は復元しない日単位の契約。同一レースを複数時点で使う場合は外部snapshotで区別する。
+    config:
+      meta:
+        harp:
+          grain: [race_id, kettonum]
+          availability: pre_race
+          role: nn_current_entries
+          feature_columns_macro: nn_pre_race_feature_columns
+    columns:
+      - name: race_id
+        description: 全頭をまとめる対象レースのID。管理キーでありNN入力に含めない。
+        tests: [not_null]
+      - name: kettonum
+        description: 履歴配列を取得する馬ID。管理キーでありNN入力に含めない。
+        tests: [not_null]
+      - name: held_date
+        description: 対象開催日。同日・未来の履歴を除く締切。
+        tests: [not_null]
+      - name: history_end_no
+        description: 当該開催日より前の最後のrun_no。履歴なしは0。直近K走はend-Kより大きくend以下の番号を取得。
+        tests: [not_null]
+      - name: last_history_race_id
+        description: 参照終端の履歴レースID。履歴なしはNULL。
+      - name: last_history_held_date
+        description: 参照終端の開催日。held_dateより厳密に前。
+      - name: days_since_last_run
+        description: 前回収録実出走から対象日までの日数。履歴なしはNULL。
+      - name: active_entrant_count
+        description: 当該入力集合の頭数。オッズ・履歴・統計の欠損で馬を除外しない。
+      - name: monthly_stats_cutoff
+        description: 対象月の初日。騎手・血統統計が含めない期間の開始日。
+      - name: yearly_stats_cutoff
+        description: 対象年の初日。厩舎・生産者統計が含めない期間の開始日。

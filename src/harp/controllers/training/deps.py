@@ -37,3 +37,32 @@ def build_train_deps(config: HarpRuntimeConfig) -> TrainDeps:
         tracking_port=MlflowTrackingAdapter(tracking_uri=config.tracking.mlflow_tracking_uri),
         contract_path=config.paths.feature_sets_path,
     )
+
+
+def build_nn_train_deps(input_root: str, prepared_root: str, model_root: str, *, tracking_uri: str | None = None):
+    # Optional torch dependency is imported only when entering an NN operation.
+    from harp.adapters.driven.storage.nn_dataset_store import ParquetNnDatasetStore
+    from harp.adapters.driven.storage.nn_prepared_dataset_store import JsonNnPreparedDatasetStore
+    from harp.adapters.driven.storage.nn_model_store import TorchNnModelStore
+    from harp.usecase.training.nn_dto import NnTrainDeps
+
+    return NnTrainDeps(ParquetNnDatasetStore(input_root), JsonNnPreparedDatasetStore(prepared_root),
+                       TorchNnModelStore(model_root),
+                       MlflowTrackingAdapter(tracking_uri=tracking_uri) if tracking_uri else None)
+
+
+def build_nn_recipe_reader():
+    from harp.adapters.driven.storage.nn_training_recipe import YamlNnTrainingRecipeReader
+    return YamlNnTrainingRecipeReader()
+
+
+def resolve_nn_device(requested: str) -> str:
+    import torch
+    from harp.core.nn.contracts import NnInputContractError
+
+    available = {"cpu": True, "cuda": torch.cuda.is_available(), "mps": torch.backends.mps.is_available()}
+    if requested == "auto":
+        return next(name for name in ("cuda", "mps", "cpu") if available[name])
+    if requested not in available or not available[requested]:
+        raise NnInputContractError(f"requested NN device is unavailable: {requested}")
+    return requested
