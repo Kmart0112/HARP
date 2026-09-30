@@ -7,7 +7,7 @@ from harp.core.nn.contracts import NnInputContractError
 from harp.core.nn.split import NnDatasetConfig
 from harp.usecase.training.nn import run_nn_evaluate_usecase, run_nn_train_usecase
 from harp.usecase.training.nn_dto import NnEvaluateRequest, NnTrainRequest
-from tests.nn_dataset_support import dataset_inputs, replace_inputs
+from tests.nn_dataset_support import dataset_inputs, replace_inputs, win_dataset_inputs
 from tests.nn_training_support import small_recipe, training_deps, torch_cpu_runtime
 
 
@@ -107,3 +107,38 @@ def test_failed_checkpoint_publication_leaves_last_completed_epoch_and_failed_tr
     assert tracking["status"] == "FAILED"
     run = next(iter(runs.values()))
     assert [state["epoch"] for state in run["checkpoints"].values()] == [1]
+
+
+def test_win_training_is_selected_only_on_validation_and_can_resume_and_evaluate():
+    config = NnDatasetConfig("2026-06-13", "2026-06-20", 3, task="win")
+    recipe = small_recipe(task="win", **{"loss.name": "cross_entropy", "loss.reduction": "race_mean",
+                                         "training.max_epochs": 1})
+    source = win_dataset_inputs()
+    changed = source.targets
+    test = changed.race_id.eq("R4")
+    changed.loc[test, "is_win"] = ~changed.loc[test, "is_win"]
+    changed.loc[test, "result_order"] = changed.loc[test, "is_win"].map({True: 1, False: 2})
+    initial = []
+    for inputs in (source, replace_inputs(source, targets=changed)):
+        deps, runs, _ = training_deps(inputs, config)
+        initial.append(run_nn_train_usecase(request(recipe), deps))
+    assert initial[0].best_validation_logloss == initial[1].best_validation_logloss
+    extended = replace(recipe, training=replace(recipe.training, max_epochs=3))
+    trained = run_nn_train_usecase(request(extended, resume_run_id=initial[-1].run_id), deps)
+    assert trained.completed_epochs == 3
+    assert runs[trained.run_id]["metadata"]["target"] == "is_win"
+    evaluation = run_nn_evaluate_usecase(NnEvaluateRequest(trained.run_id, "cpu"), deps)
+    assert evaluation.metrics["labelled_races"] == 1
+    assert evaluation.metrics["labelled_entries"] == 2
+    assert 0 <= evaluation.metrics["top1_accuracy"] <= 1
+
+
+@pytest.mark.parametrize("dataset_task", ["place", "win"])
+def test_mismatched_dataset_and_training_task_does_not_publish_a_model(dataset_task):
+    config = NnDatasetConfig("2026-06-13", "2026-06-20", 3, task=dataset_task)
+    deps, runs, _ = training_deps(win_dataset_inputs(), config)
+    recipe = small_recipe() if dataset_task == "win" else small_recipe(
+        task="win", **{"loss.name": "cross_entropy", "loss.reduction": "race_mean"})
+    with pytest.raises(NnInputContractError, match="task"):
+        run_nn_train_usecase(request(recipe), deps)
+    assert not runs

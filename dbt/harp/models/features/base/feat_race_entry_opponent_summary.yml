@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: feat_race_entry_opponent_summary
+    description: >-
+      過去走の実出走馬集合から自分を除いた相手統計。粒度はrace_id, kettonum。
+      馬成績はその開催日より前のfeat_horse_overallを使い、母集団は既存の収録正常完走。
+      騎手は履歴に保存された当時の月次lookup（当月を除く35観測月行）を使う。
+      各相手を等重みで平均し、統計欠損の相手もopp_countへ含める。
+      全履歴から再構築し、今回出走の特徴には公開しない。
+    config:
+      meta:
+        harp:
+          grain: [race_id, kettonum]
+          availability: post_race
+          role: historical_opponent_context
+    columns:
+      - name: race_id
+        data_tests: [not_null]
+      - name: kettonum
+        data_tests: [not_null]
+      - name: held_date
+        description: 相手馬の統計を参照する開催日。馬成績はこの日を含まない。
+        data_tests: [not_null]
+      - name: opp_count
+        description: 自分以外の実出走頭数。取消・除外は含めず、中止等は含む。
+        data_tests: [not_null]
+      - name: opp_horse_place_mean
+        description: past_places / past_startsの相手ごとの単純平均。母数0・lookupなしは欠損。
+      - name: opp_horse_place_top3_mean
+        description: 複勝率が高い相手3頭の平均。有効相手が3頭未満ならその頭数、0頭ならNULL。
+      - name: opp_horse_place_std
+        description: 相手複勝率の母標準偏差。有効値1件なら0、0件ならNULL。
+      - name: opp_horse_starts_mean
+        description: 複勝率が得られた相手のpast_starts平均。全実出走数・生涯出走数ではない。
+      - name: opp_horse_place_coverage
+        description: 馬複勝率が得られた相手数 / opp_count。相手0頭ならNULL。
+      - name: opp_jockey_place_mean
+        description: 正の騎乗母数を持つ相手のjockey_place_rate_3y_smooth平均。
+      - name: opp_jockey_place_top3_mean
+        description: 平滑化騎手複勝率が高い相手3頭の平均。3頭未満・欠損は馬の率と同じ規則。
+      - name: opp_jockey_starts_mean
+        description: 騎手複勝率が得られた相手のjockey_starts_3y平均。
+      - name: opp_jockey_place_coverage
+        description: 騎手複勝率が得られた相手数 / opp_count。相手0頭ならNULL。

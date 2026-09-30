@@ -1,0 +1,25 @@
+version: 2
+models:
+  - name: m_nn_run_history
+    description: >-
+      NNの公開履歴。既存int_race_entry_run_recordの全列・全行・run_noを保持し、
+      自分を除いた相手集約を左結合する。統計欠損で行を除かない。
+      当該開催日より後の予測でだけ利用する。現在の結果・相手情報を今回入力へ混ぜない。
+    config:
+      meta:
+        harp:
+          grain: [race_id, kettonum]
+          availability: post_race
+          role: nn_run_history
+          history_context_columns_macro: nn_history_context_columns
+    columns:
+      - name: race_id
+        data_tests: [not_null]
+      - name: kettonum
+        data_tests: [not_null]
+      - name: run_no
+        description: 元履歴の番号をそのまま保持する。
+        data_tests: [not_null]
+      - name: opp_count
+        description: 相手の実出走頭数。NULLは相手集計の未構築・結合不整合として拒否する。
+        data_tests: [not_null]

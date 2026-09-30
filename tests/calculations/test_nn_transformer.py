@@ -89,6 +89,39 @@ def test_training_can_learn_a_tiny_field_and_metrics_ignore_batch_padding():
     np.testing.assert_allclose(many.predictions.place_probability, one.predictions.place_probability, atol=1e-6)
 
 
+def test_calibration_uses_entrant_labels_and_is_invariant_to_batch_padding():
+    from dataclasses import replace
+    from harp.core.calibration_prediction import evaluate_calibration
+    from harp.core.nn.prediction import NnPredictor
+    prepared = small_prepared()
+    state = initialize_nn_training(NnInputSpec.from_preprocessing(prepared.preprocessing), small_recipe(), "cpu")
+    predictor = NnPredictor(state.model, prepared.preprocessing, prepared.config.history_length, "cpu")
+    one = evaluate_calibration(predictor, prepared, split="all", batch_size=1)
+    many = evaluate_calibration(predictor, prepared, split="all", batch_size=3)
+    assert many.metrics["samples"] == 4
+    assert many.metrics["observed_rate"] == .75
+    assert many.metrics["brier"] == pytest.approx(one.metrics["brier"], abs=1e-6)
+    assert many.bins["count"].sum() == 4
+    with pytest.raises(ValueError, match="contract"):
+        evaluate_calibration(replace(predictor, history_length=99), prepared)
+
+
+def test_nn_calibration_samples_preserve_unknown_labels_without_counting_padding():
+    from harp.core.calibration import calculate_calibration
+    from harp.core.nn.dataset import NnRaceDataset
+    from tests.nn_dataset_support import dataset_inputs
+    prepared = small_prepared()
+    dataset = NnRaceDataset(dataset_inputs(unknown_train_label=True, future_rate=.4), prepared.preprocessing, 3)
+    state = initialize_nn_training(NnInputSpec.from_preprocessing(prepared.preprocessing), small_recipe(), "cpu")
+    evaluation = evaluate_nn(state.model, dataset, batch_size=3, device="cpu")
+    report = calculate_calibration(evaluation.calibration_samples)
+    assert report.metrics["input_samples"] == 4
+    assert report.metrics["samples"] == 3
+    assert report.metrics["excluded_missing_labels"] == 1
+    assert report.metrics["observed_rate"] == 1
+    assert evaluation.predictions.columns.tolist() == ["race_id", "kettonum", "place_probability"]
+
+
 def test_checkpoint_resume_matches_uninterrupted_training_with_dropout():
     prepared, recipe = small_prepared(), small_recipe(**{"model.dropout": .2})
     spec = NnInputSpec.from_preprocessing(prepared.preprocessing)

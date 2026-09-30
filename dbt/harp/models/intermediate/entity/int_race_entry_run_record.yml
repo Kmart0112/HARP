@@ -43,3 +43,21 @@ models:
         description: その走の走破秒数。欠測・未完走を0で補完しない。
       - name: agari3f
         description: その走の上がり3F秒数。結果情報であり過去走としてのみ利用可能。
+      - name: ten3f
+        description: その過去レース全体の前半3F秒数。fct_race_resultの距離補正済み値を使用。今回の入力には使わず、未取得はNULL。
+      - name: ten4f
+        description: その過去レース全体の前半4F秒数。未取得はNULLのまま保持する。
+      - name: agari3f_race
+        description: その過去レース全体の後半3F秒数。馬自身のagari3fとは別の結果特徴。
+      - name: agari4f_race
+        description: その過去レース全体の後半4F秒数。レース結果がなくても履歴行を削除しない。
+      - name: time_vs_avg
+        description: >-
+          int_race_entry_metricsの走破秒数と同コース・馬場条件の基準時計の差。小さいほど速い。
+          基準はその走の前年以前の5観測年に収録された複勝圏の馬から集計。基準欠損はNULL。
+          その走の結果情報であり、対象開催日より前の過去走にだけ利用する。
+      - name: pos4_agari_synergy
+        description: >-
+          int_race_entry_metricsの同レース内で標準化した4角位置の良さ×0.6と上がりの良さの和。
+          大きいほど高評価。計測欠損や標準偏差0はNULLのまま履歴を保持する。
+          その走の結果情報であり、今回の事前特徴には使わない。

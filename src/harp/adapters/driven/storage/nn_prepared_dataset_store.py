@@ -11,6 +11,7 @@ from harp.core.nn.contracts import NnInputContractError
 from harp.core.nn.dataset import HISTORY_RELATIVE_NAMES
 from harp.core.nn.preprocessing import NnCategoryState, NnNumericState, NnPreprocessingState, NnTablePreprocessor
 from harp.core.nn.split import NnDatasetConfig, NnRacePartition
+from harp.core.nn.tasks import nn_target
 from harp.interface.ports.nn_prepared_dataset_ports import NnPreparedDatasetRecipe
 
 
@@ -37,7 +38,7 @@ class JsonNnPreparedDatasetStore:
     def save(self, recipe: NnPreparedDatasetRecipe) -> str:
         _check_identity(recipe.input_dataset_id)
         document = {
-            "version": 1, "kind": "nn_prepared_dataset", "target": "is_place",
+            "version": 2, "kind": "nn_prepared_dataset", "target": nn_target(recipe.config.task),
             "history_padding": "right", "history_order": "oldest_first",
             "history_relative_names": HISTORY_RELATIVE_NAMES,
             "recipe": asdict(recipe),
@@ -67,15 +68,19 @@ class JsonNnPreparedDatasetStore:
             if sha256(encoded).hexdigest() != identity:
                 raise NnInputContractError("NN preparation manifest integrity failure")
             document = json.loads(encoded)
-            if (document["version"] != 1 or document["kind"] != "nn_prepared_dataset"
-                    or document["target"] != "is_place" or document["history_padding"] != "right"
+            if (document["version"] not in (1, 2) or document["kind"] != "nn_prepared_dataset"
+                    or document["history_padding"] != "right"
                     or document["history_order"] != "oldest_first"
                     or tuple(document["history_relative_names"]) != HISTORY_RELATIVE_NAMES):
                 raise NnInputContractError("unsupported NN preparation version or layout")
             recipe = document["recipe"]
+            config = NnDatasetConfig(**recipe["config"])
+            if (document["target"] != nn_target(config.task)
+                    or (document["version"] == 1 and config.task != "place")):
+                raise NnInputContractError("NN preparation target differs from task")
             _check_identity(recipe["input_dataset_id"])
             return NnPreparedDatasetRecipe(
-                recipe["input_dataset_id"], NnDatasetConfig(**recipe["config"]),
+                recipe["input_dataset_id"], config,
                 decode_nn_preprocessing_state(recipe["preprocessing"]),
                 tuple(NnRacePartition(**part) for part in recipe["partitions"]),
             )

@@ -27,7 +27,7 @@ def _quote(name: str) -> str:
 @dataclass(frozen=True)
 class NnInputMapping:
     entries_table: str = "mart.m_nn_race_entry"
-    history_table: str = "intermediate.int_race_entry_run_record"
+    history_table: str = "mart.m_nn_run_history"
     targets_table: str = "intermediate.int_race_entry_outcome"
     entry_columns: dict[str, str] = field(default_factory=dict)
     history_columns: dict[str, str] = field(default_factory=dict)
@@ -59,7 +59,8 @@ class SqlNnInputRepository:
         mapping = self._mapping
         entry_columns = list(dict.fromkeys((*ENTRY_METADATA, *query.feature_names, *STATS_METADATA)))
         history_columns = list(dict.fromkeys((*HISTORY_METADATA, *query.feature_names,
-                                             *query.history_result_names, *STATS_METADATA)))
+                                             *query.history_result_names, *STATS_METADATA,
+                                             *query.history_context_names)))
 
         def col(alias, columns, name):
             physical = columns.get(name, name)

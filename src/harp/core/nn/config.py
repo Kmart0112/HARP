@@ -1,9 +1,10 @@
 """Typed training recipes. Values come from the caller, never files or settings."""
+import math
 from copy import deepcopy
 from dataclasses import dataclass
-import math
 
 from .contracts import NnInputContractError
+from .tasks import nn_target
 
 
 def _integer(name, value, minimum=1):
@@ -93,8 +94,10 @@ class NnLossConfig:
     reduction: str
 
     def __post_init__(self):
-        if self.name != "bce_with_logits" or self.reduction != "entrant_mean":
-            raise NnInputContractError("NN v1 uses BCE logits averaged over valid entrants")
+        if (self.name, self.reduction) not in {
+            ("bce_with_logits", "entrant_mean"), ("cross_entropy", "race_mean"),
+        }:
+            raise NnInputContractError("unsupported NN loss/reduction")
 
 
 @dataclass(frozen=True)
@@ -128,6 +131,31 @@ class NnRuntimeConfig:
 
 
 @dataclass(frozen=True)
+class NnAuxiliaryRankConfig:
+    name: str
+    weight: float
+    reduction: str
+    tie_policy: str
+
+    def __post_init__(self):
+        if (self.name, self.reduction, self.tie_policy) != ("pairwise_logistic", "race_mean", "ignore"):
+            raise NnInputContractError("unsupported auxiliary rank objective")
+        _number("auxiliary_rank.weight", self.weight)
+
+
+@dataclass(frozen=True)
+class NnAuxiliaryOddsConfig:
+    name: str
+    weight: float
+    reduction: str
+
+    def __post_init__(self):
+        if (self.name, self.reduction) != ("huber_log_place_midpoint", "available_entrant_mean"):
+            raise NnInputContractError("unsupported auxiliary odds objective")
+        _number("auxiliary_odds.weight", self.weight)
+
+
+@dataclass(frozen=True)
 class NnTrainRecipe:
     version: int
     model: NnModelConfig
@@ -137,10 +165,21 @@ class NnTrainRecipe:
     loss: NnLossConfig
     early_stopping: NnEarlyStoppingConfig
     runtime: NnRuntimeConfig
+    task: str = "place"
+    auxiliary_rank: NnAuxiliaryRankConfig | None = None
+    auxiliary_odds: NnAuxiliaryOddsConfig | None = None
 
     def __post_init__(self):
-        if type(self.version) is not int or self.version != 1:
+        nn_target(self.task)
+        expected_loss = "cross_entropy" if self.task == "win" else "bce_with_logits"
+        if self.loss.name != expected_loss:
+            raise NnInputContractError("NN loss differs from task")
+        if type(self.version) is not int or self.version not in (1, 2, 3):
             raise NnInputContractError("unsupported NN training recipe version")
+        if self.auxiliary_rank is not None and (self.version < 2 or self.task != "place"):
+            raise NnInputContractError("auxiliary ranking requires a version 2 or later place recipe")
+        if self.auxiliary_odds is not None and (self.version != 3 or self.task != "place"):
+            raise NnInputContractError("auxiliary odds requires a version 3 place recipe")
         if self.scheduler.min_lr > self.optimizer.lr:
             raise NnInputContractError("min_lr cannot exceed initial lr")
 
@@ -150,7 +189,13 @@ def resolve_nn_training_recipe(document: dict, overrides: dict | None = None) ->
     if not isinstance(document, dict):
         raise NnInputContractError("NN training recipe must be a mapping")
     data = deepcopy(document)
+    data.setdefault("task", "place")
+    data.setdefault("auxiliary_rank", None)
+    data.setdefault("auxiliary_odds", None)
     for key, value in (overrides or {}).items():
+        if key == "task":
+            data["task"] = value
+            continue
         parts = key.split(".")
         if len(parts) != 2 or not isinstance(data.get(parts[0]), dict) or parts[1] not in data[parts[0]]:
             raise NnInputContractError(f"unknown NN override: {key}")
@@ -159,9 +204,12 @@ def resolve_nn_training_recipe(document: dict, overrides: dict | None = None) ->
              "scheduler": NnSchedulerConfig, "training": NnTrainingConfig,
              "loss": NnLossConfig, "early_stopping": NnEarlyStoppingConfig,
              "runtime": NnRuntimeConfig}
-    if set(data) != {"version", *types}:
+    if set(data) != {"version", "task", "auxiliary_rank", "auxiliary_odds", *types}:
         raise NnInputContractError("unknown or missing NN recipe sections")
     try:
-        return NnTrainRecipe(data["version"], **{name: cls(**data[name]) for name, cls in types.items()})
+        rank = NnAuxiliaryRankConfig(**data["auxiliary_rank"]) if data["auxiliary_rank"] is not None else None
+        odds = NnAuxiliaryOddsConfig(**data["auxiliary_odds"]) if data["auxiliary_odds"] is not None else None
+        return NnTrainRecipe(data["version"], **{name: cls(**data[name]) for name, cls in types.items()},
+                            task=data["task"], auxiliary_rank=rank, auxiliary_odds=odds)
     except (TypeError, KeyError) as exc:
         raise NnInputContractError("unknown, missing or invalid NN recipe fields") from exc

@@ -29,6 +29,9 @@ HARP のモデル検証は、単にスコアが上がったかを見るだけで
 
 LightGBM の出力確率は、そのまま賭け判断に使う前に校正を確認する。既存 notebook では Platt calibration と log-odds を組み合わせた確認が使われている。
 
+保存済みLightGBM/NNモデルとDatasetからの共通出力は
+[Calibration curveの共通出力](../operations/calibration_report.md)を参照する。
+
 校正は「当たりそうな順に並べる」能力とは別物として扱う。AUC が良くても、確率が過大・過小に出ていれば EV 判断が壊れる。
 
 ## 特徴量検証

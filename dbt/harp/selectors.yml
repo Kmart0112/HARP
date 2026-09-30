@@ -12,12 +12,16 @@ selectors:
   - name: nn_training
     description: Build NN inputs and their upstream contexts/statistics; no legacy manual odds snapshots.
     definition:
-      method: fqn
-      value: m_nn_race_entry
-      parents: true
-      exclude:
+      union:
         - method: fqn
-          value: shared_pre_race_feature_parity
+          value: m_nn_race_entry
+          parents: true
+        - method: fqn
+          value: m_nn_run_history
+          parents: true
+        - exclude:
+            - method: fqn
+              value: shared_pre_race_feature_parity
 
   - name: nn_current
     description: Refresh current NN entries and shared live pre-race values, retaining an already built full run-history table. Use feature_input_mode=latest.

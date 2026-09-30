@@ -15,11 +15,47 @@ dbt入力に加え、Pythonの入力契約・Repository・入力保存は実装�
 | `feat_race_entry_pre_race` | `race_id, kettonum` | context、調教、主体・コースの事前統計を結合する共通層 |
 | `m_race_entry_feature_matrix` | `race_id, kettonum` | 共通層へ既存の過去走集計・相対特徴を追加するLightGBM出口 |
 | `int_race_entry_run_record` | `race_id, kettonum` | 当時の事前特徴とその走の結果を持つ、番号付きの馬別履歴 |
+| `feat_race_entry_opponent_summary` | `race_id, kettonum` | その走の自分以外の実出走馬の成績・騎手統計を集約 |
+| `m_nn_run_history` | `race_id, kettonum` | 番号付き履歴に相手集約を加えるNNの公開履歴出口 |
 | `m_nn_race_entry` | `race_id, kettonum` | 今回の事前特徴と履歴参照終端。教師・オッズを持たない |
 
 `m_race_inputs_v1` / `m_training_inputs_v1` と既存の教師・オッズ契約は維持する。
 共通層は既存matrixの結合・式を移したもので、統計窓、平滑化、NULL、既存matrixの列名・型・列順を変更しない。
 統計の集計元へ新しい統計付き履歴表を戻して循環を作らない。
+
+## 過去走の相手情報
+
+`int_race_entry_run_record`と`feat_horse_overall`から相手集約を作り、
+`m_nn_run_history`で元履歴に左結合する。入力取得はこのmartを使う。
+相手は同じ過去レースの自分以外の実出走馬。取消・除外は含まず、中止等は人数に残す。
+対象馬や取得日付範囲へ絞る前の全履歴で集計し、相手の履歴をDatasetに複製しない。
+
+| 入力列 | 定義 |
+|---|---|
+| `opp_count` | 自分以外の実出走頭数 |
+| `opp_horse_place_mean` / `opp_horse_place_top3_mean` | 相手馬複勝率の平均 / 高い方から3頭の平均 |
+| `opp_horse_place_std` | 相手馬複勝率の母標準偏差 |
+| `opp_horse_starts_mean` | 率が既知の相手の集計対象走数の平均 |
+| `opp_horse_place_coverage` | 馬の率が既知の相手数 / 相手数 |
+| `opp_jockey_place_mean` / `opp_jockey_place_top3_mean` | 相手騎手複勝率の平均 / 高い方から3頭の平均 |
+| `opp_jockey_starts_mean` | 率が既知の相手の騎手集計母数の平均 |
+| `opp_jockey_place_coverage` | 騎手の率が既知の相手数 / 相手数 |
+
+馬の率は当該開催日の`feat_horse_overall.past_places / past_starts`。
+開催日当日を含まない既存集計で、元データは収録された正常完走を対象とする。
+全実出走や地方・海外を含む生涯複勝率ではない。母数0、統計行なし、率未取得は欠損。
+騎手の率はその履歴の`jockey_place_rate_3y_smooth`、母数は`jockey_starts_3y`。
+正の母数を持つ率を使い、現在の統計で過去走を再評価しない。
+
+各相手を等重みで平均する。上位平均は3頭未満なら既知頭数で計算し、0頭ならNULL。
+標準偏差は既知1頭なら0、0頭ならNULL。率が全欠損でも相手がいればcoverage=0、
+相手0頭ならcoverageを含む統計はNULL。`opp_count`自体のNULLは欠損統計ではなく構築不整合。
+列順の正本は`nn_history_context_columns()`。今回入力には追加しない。
+
+相手集約は全期間table、公開履歴はview。過去データの訂正は後続の率にも波及するため、
+入力取得前に馬統計と履歴の更新を完了して相手集約・公開履歴を再構築する。
+`nn_training`は今回と履歴の両出口の上流を含む。`nn_inputs`は構築済み統計を再利用する。
+`nn_current`は当日の今回入力だけを更新するので、最新の過去走を追加する場合は先に履歴を更新する。
 
 ## 出走番号と参照終端
 
@@ -30,6 +66,20 @@ dbt入力に加え、Pythonの入力契約・Repository・入力保存は実装�
 JV-Data異常区分2101の1/2/3（取消・発走除外・競走除外）は除外し、4/5/6/7は実出走として扱う。
 結果factにない異常走の計測値は `stg_n_uma_race_all` から取得する。欠測を0で補完しない。
 [JRA-VAN JV-Data仕様書](https://jra-van.jp/dlb/sdv/sdk/JV-Data4901.pdf)
+
+過去レース全体の前半3F・4F、後半3F・4Fは `fct_race_result` を `race_id` で左結合して取得する。
+`ten3f` は既存の距離補正済み値を使い、`ten4f`, `agari3f_race`, `agari4f_race` と合わせて
+過去走専用の数値入力にする。レース結果の欠損でも履歴行を残し、今回の事前特徴には追加しない。
+
+`time_vs_avg`と`pos4_agari_synergy`も過去走専用の数値結果として扱う。
+`int_race_entry_run_record`で`int_race_entry_metrics`を`race_id, kettonum`により左結合し、
+LightGBMと同じ計算済みの値を利用する。NULLや負値をそのまま保持し、履歴行・連番を変えない。
+`time_vs_avg`は走破秒数とコース・馬場別の基準時計の差で、小さいほど速い。
+基準は当該年を除く直前5観測年の複勝圏の馬から集計した既存値であり、クラス別ではない。
+`pos4_agari_synergy`は同レース内で標準化した4角位置の良さ×0.6と上がりの良さの和で、大きいほど高評価。
+自分以外の事前成績を表す`history_context`とは分け、`history_results`に登録する。
+前処理はtrainの対象履歴だけで学習し、欠損補完と欠損フラグは既存方式を使う。
+入力列追加時は入力・前処理・モデルを新しいartifactとして保存し、以前のcheckpointへ継ぎ足さない。
 
 `history_end_no` は対象開催日より厳密に前の最後の `run_no`。履歴なしは0。
 対象レース自体、同日・未来のレースは参照しない。直近K走は次の条件で取れる。

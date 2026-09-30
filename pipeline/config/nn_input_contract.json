@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "pre_race": [
     {
       "name": "horse_number",
@@ -278,6 +278,72 @@
     {
       "name": "running_style_cd",
       "kind": "categorical"
+    },
+    {
+      "name": "ten3f",
+      "kind": "numeric"
+    },
+    {
+      "name": "ten4f",
+      "kind": "numeric"
+    },
+    {
+      "name": "agari3f_race",
+      "kind": "numeric"
+    },
+    {
+      "name": "agari4f_race",
+      "kind": "numeric"
+    },
+    {
+      "name": "time_vs_avg",
+      "kind": "numeric"
+    },
+    {
+      "name": "pos4_agari_synergy",
+      "kind": "numeric"
+    }
+  ],
+  "history_context": [
+    {
+      "name": "opp_count",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_horse_place_mean",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_horse_place_top3_mean",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_horse_place_std",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_horse_starts_mean",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_horse_place_coverage",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_jockey_place_mean",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_jockey_place_top3_mean",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_jockey_starts_mean",
+      "kind": "numeric"
+    },
+    {
+      "name": "opp_jockey_place_coverage",
+      "kind": "numeric"
     }
   ]
 }

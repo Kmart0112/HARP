@@ -40,7 +40,7 @@ class _NnInputStore:
         if training:
             frames["targets.parquet"] = inputs.targets
         manifest = {
-            "version": 1, "kind": self.kind, "availability_basis": "event_date",
+            "version": 2, "kind": self.kind, "availability_basis": "event_date",
             "query": asdict(base.query), "feature_contract": asdict(base.contract),
             "source_revision": base.source_revision, "captured_at": base.captured_at.isoformat(),
             "metadata": metadata, "files": {},
@@ -81,7 +81,7 @@ class _NnInputStore:
             if sha256(encoded).hexdigest() != identity:
                 raise NnInputContractError("NN manifest integrity failure")
             manifest = json.loads(encoded)
-            if manifest["version"] != 1 or manifest["kind"] != self.kind or manifest["availability_basis"] != "event_date":
+            if manifest["version"] not in (1, 2) or manifest["kind"] != self.kind or manifest["availability_basis"] != "event_date":
                 raise NnInputContractError("unsupported NN snapshot version or kind")
             expected_files = {"entries.parquet", "history.parquet"}
             if self.kind == "training":

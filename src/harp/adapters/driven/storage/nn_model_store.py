@@ -1,20 +1,23 @@
 """Immutable epoch snapshots plus an atomic latest pointer for each training run."""
-from dataclasses import asdict
 import errno
-from hashlib import sha256
 import json
-from pathlib import Path
 import pickle
 import re
 import tempfile
+from dataclasses import asdict
+from hashlib import sha256
+from pathlib import Path
 from uuid import uuid4
 
 import torch
 
 from harp.core.nn.config import resolve_nn_training_recipe
 from harp.core.nn.contracts import NnInputContractError
+from harp.core.nn.odds_targets import NnOddsTransform, validate_snapshot_identity
+from harp.core.nn.tasks import nn_target
 from harp.core.nn.tensor_batch import NnInputSpec
 from harp.interface.ports.nn_training_ports import StoredNnCheckpoint
+
 from .nn_prepared_dataset_store import decode_nn_preprocessing_state
 
 
@@ -112,6 +115,17 @@ class TorchNnModelStore:
                     raise NnInputContractError("NN checkpoint file integrity failure")
             metadata = json.loads((directory / "metadata.json").read_bytes())
             recipe = resolve_nn_training_recipe(metadata["recipe"])
+            odds = metadata.get("odds_target")
+            if recipe.auxiliary_odds is not None and odds is None:
+                raise NnInputContractError("saved odds head is missing its target contract")
+            if odds is not None:
+                validate_snapshot_identity(odds["snapshot_id"])
+                validate_snapshot_identity(odds["entry_keys_sha256"])
+                NnOddsTransform(**odds["transform"])
+            if (metadata.get("target", "is_place") != nn_target(recipe.task)
+                    or metadata.get("task", "place") != recipe.task
+                    or metadata.get("dataset_config", {}).get("task", "place") != recipe.task):
+                raise NnInputContractError("saved NN task differs from target or Dataset")
             preprocessing = decode_nn_preprocessing_state(metadata["preprocessing"])
             if _encoded(asdict(NnInputSpec.from_preprocessing(preprocessing))) != _encoded(metadata["input_spec"]):
                 raise NnInputContractError("saved NN input specification differs from preprocessing")

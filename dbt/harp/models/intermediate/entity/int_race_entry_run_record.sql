@@ -26,7 +26,13 @@ with runs as (
     coalesce(r.rank_2c, a.rank_2c) as rank_2c,
     coalesce(r.rank_3c, a.rank_3c) as rank_3c,
     coalesce(r.rank_4c, a.rank_4c) as rank_4c,
-    coalesce(r.running_style_cd, a.running_style_cd) as running_style_cd
+    coalesce(r.running_style_cd, a.running_style_cd) as running_style_cd,
+    rr.ten3f,
+    rr.ten4f,
+    rr.agari3f_race,
+    rr.agari4f_race,
+    m.time_vs_avg,
+    m.pos4_agari_synergy
   from {{ ref('feat_race_entry_pre_race') }} p
   left join {{ ref('fct_race_entry_result') }} r
     on p.race_id = r.race_id and p.kettonum = r.kettonum
@@ -35,6 +41,14 @@ with runs as (
   left join {{ ref('stg_n_uma_race_all') }} a
     on p.race_id = a.race_id and p.kettonum = a.kettonum
    and r.race_id is null
+  -- These are results of this historical race, never current-race features.
+  -- A missing race result must not remove an actual start from the sequence.
+  left join {{ ref('fct_race_result') }} rr
+    on p.race_id = rr.race_id
+  -- Reuse the same per-run calculations as LightGBM, including their NULLs.
+  -- Missing metrics must not remove an actual start or renumber its history.
+  left join {{ ref('int_race_entry_metrics') }} m
+    on p.race_id = m.race_id and p.kettonum = m.kettonum
   -- JV-Data 2101: 1/2/3 are nonstarters; 4/5/6/7 actually started.
   -- https://jra-van.jp/dlb/sdv/sdk/JV-Data4901.pdf
   where coalesce(p.ijyo_cd, '0') not in ('1', '2', '3')
@@ -66,5 +80,11 @@ select
   rank_2c,
   rank_3c,
   rank_4c,
-  running_style_cd
+  running_style_cd,
+  ten3f,
+  ten4f,
+  agari3f_race,
+  agari4f_race,
+  time_vs_avg,
+  pos4_agari_synergy
 from runs

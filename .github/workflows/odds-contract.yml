@@ -31,8 +31,17 @@ jobs:
       - run: >-
           uv run --no-sync pytest -q
           --ignore=tests/calculations/test_nn_transformer.py
+          --ignore=tests/calculations/test_nn_win_transformer.py
           --ignore=tests/flows/test_nn_training_flow.py
           --ignore=tests/integrations/test_nn_model_store.py
+          --ignore=tests/integrations/test_nn_win_model_store.py
+          --ignore=tests/calculations/test_nn_rank_auxiliary.py
+          --ignore=tests/flows/test_nn_rank_training_flow.py
+          --ignore=tests/integrations/test_nn_rank_model_store.py
       - run: >-
           uv run --no-sync pytest -q tests/calculations/test_nn_transformer.py
+          tests/calculations/test_nn_win_transformer.py
           tests/flows/test_nn_training_flow.py tests/integrations/test_nn_model_store.py
+          tests/integrations/test_nn_win_model_store.py
+          tests/calculations/test_nn_rank_auxiliary.py
+          tests/flows/test_nn_rank_training_flow.py tests/integrations/test_nn_rank_model_store.py

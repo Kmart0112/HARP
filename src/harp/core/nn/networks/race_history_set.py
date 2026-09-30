@@ -3,12 +3,13 @@ from torch import nn
 
 from ..config import NnModelConfig
 from ..contracts import NnInputContractError
-from ..tensor_batch import NnInputSpec, NnModelInputs
+from ..tensor_batch import NnInputSpec, NnModelInputs, NnNetworkOutput
 from .encoders import FeatureEncoder, MaskedTransformer
 
 
 class RaceHistorySetTransformer(nn.Module):
-    def __init__(self, spec: NnInputSpec, config: NnModelConfig):
+    def __init__(self, spec: NnInputSpec, config: NnModelConfig, *, rank_auxiliary: bool = False,
+                 odds_auxiliary: bool = False):
         super().__init__()
         self.current_encoder = FeatureEncoder(len(spec.current_numeric), spec.current_categories, config)
         self.history_encoder = FeatureEncoder(len(spec.history_numeric), spec.history_categories, config, relative_count=2)
@@ -18,8 +19,21 @@ class RaceHistorySetTransformer(nn.Module):
         self.fusion = nn.Sequential(nn.Linear(config.d_model * 2, config.d_model), nn.LayerNorm(config.d_model), nn.GELU())
         self.race_transformer = MaskedTransformer(config, config.race_layers)
         self.head = nn.Linear(config.d_model, 1)
+        # Keep shared initialization and the subsequent dropout RNG stream
+        # identical to a main-task-only model initialized with the same seed.
+        self.rank_head = None
+        if rank_auxiliary:
+            with torch.random.fork_rng(devices=[]):
+                self.rank_head = nn.Linear(config.d_model, 1, bias=False)
+        self.odds_head = None
+        if odds_auxiliary:
+            with torch.random.fork_rng(devices=[]):
+                self.odds_head = nn.Linear(config.d_model, 1)
 
     def forward(self, inputs: NnModelInputs) -> torch.Tensor:
+        return self.forward_outputs(inputs).logits
+
+    def forward_outputs(self, inputs: NnModelInputs) -> NnNetworkOutput:
         valid = inputs.entrant_mask
         if valid.ndim != 2 or not valid.any(dim=1).all():
             raise NnInputContractError("each NN race must contain at least one real entrant")
@@ -40,5 +54,8 @@ class RaceHistorySetTransformer(nn.Module):
         field = combined.new_zeros((*valid.shape, combined.shape[-1]))
         field[valid] = combined
         # No array-slot positional encoding: the field is permutation equivariant.
-        result = self.head(self.race_transformer(field, valid)).squeeze(-1)
-        return result.masked_fill(~valid, 0)
+        representation = self.race_transformer(field, valid)
+        logits = self.head(representation).squeeze(-1).masked_fill(~valid, 0)
+        ranks = None if self.rank_head is None else self.rank_head(representation).squeeze(-1).masked_fill(~valid, 0)
+        odds = None if self.odds_head is None else self.odds_head(representation).squeeze(-1).masked_fill(~valid, 0)
+        return NnNetworkOutput(logits, ranks, odds)

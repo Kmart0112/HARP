@@ -38,3 +38,21 @@ def replace_inputs(inputs, *, entries=None, history=None, targets=None):
         query=base.query, contract=base.contract, source_revision=base.source_revision, captured_at=base.captured_at,
     )
     return NnTrainingInputs(replacement, inputs.targets if targets is None else targets)
+
+
+def win_dataset_inputs():
+    """Two actual entrants and one known winner in each temporal split."""
+    source = dataset_inputs(future_rate=.4)
+    entries = source.inputs.entries
+    extras = []
+    for race, day, horse in (("R3", "2026-06-20", "H4"), ("R4", "2026-06-21", "H5")):
+        row = entries.loc[entries.kettonum.eq("H2")].copy()
+        row["race_id"], row["held_date"], row["kettonum"] = race, day, horse
+        extras.append(row)
+    entries = pd.concat([entries, *extras], ignore_index=True)
+    entries["active_entrant_count"] = 2
+    targets = entries[["race_id", "kettonum"]].copy()
+    targets["is_win"] = targets.kettonum.isin(["H1", "H3"])
+    targets["result_order"] = targets.is_win.map({True: 1, False: 2})
+    targets["is_place"] = True
+    return replace_inputs(source, entries=entries, targets=targets)

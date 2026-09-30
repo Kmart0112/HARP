@@ -1,6 +1,8 @@
 # NN入力Repositoryと保存の契約
 
 本書の対象は契約型、Port、DB入力Repository、特徴契約の読込、入力の保存・復元。
+確定複勝オッズを補助教師として別snapshotに保存する処理は
+[NN確定オッズ取得](../operations/nn_final_odds.md)を参照する。既存の入力・教師列契約は変更しない。
 この入力を使うDatasetの配列化、前処理、作成・復元の実行経路は
 [NN Dataset作成](nn_dataset_preparation.md)に実装済みの契約を記載する。
 後続の学習経路は [NN Transformer学習](nn_transformer_training.md) を参照する。
@@ -26,6 +28,11 @@ load_prediction_inputs(query) -> NnRaceInputs(entries, history)
 ```
 
 Queryは開催日の閉区間、事前特徴、過去走結果の選択、最大レース数を持つ。
+契約v2は過去走専用の`history_context`を持ち、Queryの`history_context_names`で選択する。
+既定の履歴参照先は`mart.m_nn_run_history`。相手集約の選択時は`opp_count`を必須とし、
+非負整数、率・coverageの範囲、coverageと欠損の整合性をCoreで検証する。
+相手列を今回の`pre_race`や`history_results`に移すことは拒否する。
+契約v1と旧Queryは相手情報なしとして読み込める。現在のモデルには新規学習が必要。
 物理テーブル名・SQL・任意の行フィルタはQueryに含めない。
 最大レース数は開催日・レースIDの昇順で適用し、レース途中で出走馬を切らない。
 
@@ -90,6 +97,8 @@ NNのdbt構築完了後に取得する運用が前提。保存後はDB更新か�
   manifest.json
 ```
 
+新規snapshotの保存形式はversion 2。version 1の保存済み入力も変更せず読み込める。
+相手特徴は`history.parquet`に保存し、旧snapshotを読んでもDBから追加取得しない。
 manifestには保存形式version、training/predictionの種別、Query、順序付き特徴契約、
 source_revision、captured_at、呼出元metadata、各ファイルのSHA-256と行数を含む。
 manifestのSHA-256をdataset_id / snapshot_idとする。
@@ -97,7 +106,7 @@ manifestのSHA-256をdataset_id / snapshot_idとする。
 一時ディレクトリへ書き、読込・契約検証を行ってからrenameで公開する。
 復元時はversion、種別、全ファイルのハッシュと行数、値と履歴参照の契約を検証する。
 学習用と推論用の保存入力は取り違えて読み込めない。復元時にDBは読まない。
-推論snapshot v1はNN入力のみで、オッズ・EV・予測結果は含まない。
+推論snapshotはNN入力のみで、オッズ・EV・予測結果は含まない。
 
 ## 利用例
 
@@ -117,6 +126,7 @@ query = NnInputQuery(
     from_date="2026-06-13", to_date="2026-06-14",
     feature_names=contract.pre_race_names,
     history_result_names=contract.history_result_names,
+    history_context_names=contract.history_context_names,
     max_races=20,
 )
 inputs = repo.load_training_inputs(query)
@@ -128,7 +138,7 @@ restored = store.load(dataset_id)
 ## 特徴契約の生成
 
 `pipeline/config/nn_input_contract.json`はdbt macroの出力を保存した生成物。
-59個の事前特徴名は`nn_pre_race_feature_columns()`を正本とし、Python側へ手で追加しない。
+事前特徴名は`nn_pre_race_feature_columns()`、相手特徴名は`nn_history_context_columns()`を正本とし、Python側へ手で追加しない。
 特徴追加時はmacroから再出力し、契約JSONも同時に更新する。
 
 ```bash
@@ -137,7 +147,7 @@ scripts/dbt run-operation export_nn_input_contract \
   --log-format json > /tmp/harp-nn-contract-export.jsonl
 ```
 
-JSONログのうち、`info.msg`が`version, pre_race, history_results`を持つJSONオブジェクトの
+JSONログのうち、`info.msg`が`version, pre_race, history_results, history_context`を持つJSONオブジェクトの
 イベントを1件取り出し、そのオブジェクトを整形して契約JSONへ保存する。
 Readerは未知version、重複列、今回特徴への結果・識別子混入を拒否する。
 

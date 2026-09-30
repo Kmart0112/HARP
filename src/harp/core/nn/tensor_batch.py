@@ -45,10 +45,25 @@ class NnTensorBatch:
     label_mask: torch.Tensor
     race_ids: tuple[str, ...]
     horse_ids: tuple[tuple[str | None, ...], ...]
+    finish_order: torch.Tensor
+    finish_order_mask: torch.Tensor
+    odds_target: torch.Tensor
+    odds_mask: torch.Tensor
 
     @classmethod
     def from_numpy(cls, batch: dict, device: str):
         return cls(NnModelInputs.from_numpy(batch, device),
                    torch.as_tensor(batch["labels"], device=device),
                    torch.as_tensor(batch["label_mask"], device=device),
-                   batch["race_ids"], batch["horse_ids"])
+                   batch["race_ids"], batch["horse_ids"],
+                   torch.as_tensor(batch["finish_order"], device=device),
+                   torch.as_tensor(batch["finish_order_mask"], device=device),
+                   torch.as_tensor(batch["odds_target"], device=device),
+                   torch.as_tensor(batch["odds_mask"], device=device))
+
+
+@dataclass(frozen=True)
+class NnNetworkOutput:
+    logits: torch.Tensor
+    rank_scores: torch.Tensor | None = None
+    odds_scores: torch.Tensor | None = None

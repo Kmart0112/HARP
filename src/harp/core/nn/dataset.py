@@ -10,11 +10,13 @@ import pandas as pd
 
 from .contracts import NnInputContractError, NnRaceInputs, NnTrainingInputs
 from .preprocessing import (
-    NnPreprocessingState, fit_table_preprocessor, nn_feature_fields,
+    NnPreprocessingState,
+    fit_table_preprocessor,
+    nn_feature_fields,
     validate_preprocessing_schema,
 )
 from .split import NnDatasetConfig, NnRacePartition, partition_nn_races
-
+from .tasks import nn_target
 
 # Deterministic relative encodings, independent of the fitted training statistics.
 HISTORY_RELATIVE_NAMES = ("log1p_days_before_target", "runs_before_target_over_k")
@@ -40,7 +42,9 @@ class NnRaceDataset:
     """
 
     def __init__(self, inputs: NnRaceInputs | NnTrainingInputs,
-                 preprocessing: NnPreprocessingState, history_length: int):
+                 preprocessing: NnPreprocessingState, history_length: int, *, task: str = "place"):
+        target = nn_target(task)
+        self._task = task
         if type(history_length) is not int or history_length < 1:
             raise NnInputContractError("history_length must be a positive integer")
         base = inputs.inputs if isinstance(inputs, NnTrainingInputs) else inputs
@@ -57,10 +61,21 @@ class NnRaceDataset:
         self._race_rows = entries.groupby("race_id", sort=False).indices
         self._race_ids = tuple(self._race_rows)
         self._history_length = history_length
-        labels = inputs.targets.is_place if isinstance(inputs, NnTrainingInputs) else pd.Series(pd.NA, index=entries.index, dtype="boolean")
+        targets = inputs.targets if isinstance(inputs, NnTrainingInputs) else None
+        labels = targets[target] if targets is not None else pd.Series(pd.NA, index=entries.index, dtype="boolean")
         self._labels = labels.fillna(False).to_numpy(dtype=np.float32)
         self._label_mask = labels.notna().to_numpy(dtype=bool)
+        orders = targets.result_order if targets is not None else pd.Series(pd.NA, index=entries.index, dtype="Int64")
+        self._finish_order = orders.fillna(0).to_numpy(dtype=np.int64)
+        self._finish_order_mask = orders.notna().to_numpy(dtype=bool)
+        self._odds_target = np.zeros(len(entries), dtype=np.float32)
+        self._odds_mask = np.zeros(len(entries), dtype=bool)
+        self.odds_scale = 1.0
         self._preprocessing = preprocessing
+
+    @property
+    def task(self) -> str:
+        return self._task
 
     @property
     def preprocessing(self) -> NnPreprocessingState:
@@ -73,6 +88,17 @@ class NnRaceDataset:
     @property
     def history_length(self) -> int:
         return self._history_length
+
+    @property
+    def entry_metadata(self) -> pd.DataFrame:
+        """Identity bridge for evaluation joins; never passed to the network."""
+        frames = []
+        for race_id in self.race_ids:
+            rows = self._race_rows[race_id]
+            frames.append(pd.DataFrame({"race_id": race_id, "kettonum": self._horse_ids[rows],
+                                       "horse_number": self._horse_numbers[rows], "held_date": self._dates[rows]}))
+        return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(
+            columns=["race_id", "kettonum", "horse_number", "held_date"])
 
     def __len__(self) -> int:
         return len(self._race_ids)
@@ -90,6 +116,10 @@ class NnRaceDataset:
             "history_relative": np.zeros((size, length, len(HISTORY_RELATIVE_NAMES)), dtype=np.float32),
             "labels": self._labels[rows].copy(),
             "label_mask": self._label_mask[rows].copy(),
+            "finish_order": self._finish_order[rows].copy(),
+            "finish_order_mask": self._finish_order_mask[rows].copy(),
+            "odds_target": self._odds_target[rows].copy(),
+            "odds_mask": self._odds_mask[rows].copy(),
         }
         for name, bank in self._current.items():
             sample[f"current_{name}"] = bank[rows].copy()
@@ -113,6 +143,31 @@ class NnRaceDataset:
         view = object.__new__(NnRaceDataset)
         view.__dict__ = self.__dict__.copy()
         view._race_ids = tuple(race_ids)
+        return view
+
+    def with_odds_targets(self, targets: pd.DataFrame, *, scale: float) -> "NnRaceDataset":
+        """Attach sidecar teachers by identity; feature banks and primary labels stay intact."""
+        keys = ["race_id", "kettonum"]
+        if (set(targets.columns) != {*keys, "odds_target", "odds_mask"}
+                or targets.duplicated(keys).any() or not np.isfinite(scale) or scale <= 0):
+            raise NnInputContractError("invalid NN odds targets")
+        rows = pd.DataFrame({"kettonum": self._horse_ids, "row": np.arange(len(self._horse_ids))})
+        races = np.empty(len(rows), dtype=object)
+        for race_id, indices in self._race_rows.items():
+            races[indices] = race_id
+        rows["race_id"] = races
+        aligned = rows.merge(targets, on=keys, how="outer", validate="one_to_one", indicator=True)
+        if aligned._merge.eq("right_only").any():
+            raise NnInputContractError("odds target contains unknown entrants")
+        if not targets.odds_mask.map(lambda x: isinstance(x, (bool, np.bool_))).all():
+            raise NnInputContractError("odds target mask must be boolean")
+        if not np.isfinite(targets.loc[targets.odds_mask, "odds_target"]).all():
+            raise NnInputContractError("non-finite available odds target")
+        aligned = aligned.sort_values("row")
+        view = self.select_races(self.race_ids)
+        view._odds_mask = aligned.odds_mask.eq(True).to_numpy(dtype=bool)
+        view._odds_target = aligned.odds_target.where(view._odds_mask, 0).to_numpy(dtype=np.float32)
+        view.odds_scale = float(scale)
         return view
 
 
@@ -184,7 +239,7 @@ def prepare_nn_dataset(inputs: NnTrainingInputs, config: NnDatasetConfig) -> Pre
         # Each reachable historical run contributes once, regardless of reuse.
         fit_table_preprocessor(history.loc[eligible], history_fields),
     )
-    return PreparedNnDataset(NnRaceDataset(inputs, preprocessing, config.history_length), config, partitions)
+    return PreparedNnDataset(NnRaceDataset(inputs, preprocessing, config.history_length, task=config.task), config, partitions)
 
 
 def restore_nn_dataset(inputs: NnTrainingInputs, config: NnDatasetConfig,
@@ -195,4 +250,4 @@ def restore_nn_dataset(inputs: NnTrainingInputs, config: NnDatasetConfig,
         raise NnInputContractError("saved splits differ from source inputs")
     if not any(part.split == "train" and part.exclusion_reason is None for part in partitions):
         raise NnInputContractError("saved Dataset has no training races")
-    return PreparedNnDataset(NnRaceDataset(inputs, preprocessing, config.history_length), config, partitions)
+    return PreparedNnDataset(NnRaceDataset(inputs, preprocessing, config.history_length, task=config.task), config, partitions)

@@ -9,6 +9,14 @@ from harp.core.nn.contracts import NnFeatureField, NnInputContractError, NnRaceI
 from tests.nn_input_support import feature_contract, input_query, input_tables
 
 
+@pytest.mark.parametrize("name", ["ten3f", "ten4f", "agari3f_race", "agari4f_race",
+                                  "time_vs_avg", "pos4_agari_synergy"])
+def test_race_results_cannot_be_declared_as_current_features(name):
+    contract = feature_contract()
+    with pytest.raises(NnInputContractError, match="post-race"):
+        replace(contract, pre_race=(*contract.pre_race, NnFeatureField(name, "numeric")))
+
+
 @pytest.mark.parametrize("fault,message", [
     ("infinite_feature", "numeric"), ("floating_id", "IDs"),
     ("invalid_history_value", "numeric"), ("future_stats", "cutoff"),

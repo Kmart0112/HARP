@@ -9,18 +9,21 @@ from harp.core.nn.split import NnDatasetConfig
 from harp.usecase.nn_dataset.dto import NnDatasetDeps, PrepareNnDatasetRequest
 from harp.usecase.nn_dataset.prepare import load_prepared_nn_dataset, run_prepare_nn_dataset_usecase
 from tests.nn_dataset_support import dataset_inputs
+from tests.nn_opponent_support import opponent_inputs
+from tests.nn_performance_support import performance_inputs
 
 
-def stored_dataset(root):
+def stored_dataset(root, inputs=None):
     deps = NnDatasetDeps(ParquetNnDatasetStore(root / "inputs"), JsonNnPreparedDatasetStore(root / "prepared"))
-    input_id = deps.input_store.save(dataset_inputs(), {"source": "integration"})
+    input_id = deps.input_store.save(inputs or dataset_inputs(), {"source": "integration"})
     req = PrepareNnDatasetRequest(NnDatasetConfig("2026-06-13", "2026-06-20", 3), input_dataset_id=input_id)
     result = run_prepare_nn_dataset_usecase(req, deps)
     return deps, req, result
 
 
-def test_dataset_roundtrip_preserves_batches_splits_and_feature_dictionaries_without_db(tmp_path):
-    deps, req, result = stored_dataset(tmp_path)
+@pytest.mark.parametrize("input_factory", [dataset_inputs, opponent_inputs, performance_inputs])
+def test_dataset_roundtrip_preserves_batches_splits_and_feature_dictionaries_without_db(tmp_path, input_factory):
+    deps, req, result = stored_dataset(tmp_path, input_factory())
     recipe = deps.prepared_store.load(result.prepared_dataset_id)
     assert recipe.input_dataset_id == result.input_dataset_id
     assert len(recipe.partitions) == 3

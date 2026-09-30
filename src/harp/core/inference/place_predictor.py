@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from numbers import Number
 
 import numpy as np
 import pandas as pd
@@ -60,15 +61,31 @@ def predict_proba_from_payload(
         )
 
     features = df_in.loc[:, feature_names]
-    if isinstance(features, pd.DataFrame):
+    categorical = [name for name in feature_names if name in model_payload.get("cat_features", [])]
+    saved_categories = getattr(getattr(model, "booster_", None), "pandas_categorical", None)
+    if categorical and saved_categories:
+        if len(categorical) != len(saved_categories):
+            raise ValueError("saved model categorical vocabulary does not match feature contract")
+        model_input = _normalize_feature_dtypes(features, [name for name in feature_names if name not in categorical])
+        for name, vocabulary in zip(categorical, saved_categories, strict=True):
+            values = features[name]
+            if all(isinstance(value, Number) for value in vocabulary):
+                values = pd.to_numeric(values, errors="coerce")
+            else:
+                values = values.astype("string").fillna("__NA__")
+            model_input[name] = pd.Categorical(values, categories=vocabulary)
+    elif isinstance(features, pd.DataFrame):
         normalized = _normalize_feature_dtypes(features, feature_names=feature_names)
         model_input = normalized.replace({pd.NA: np.nan}).to_numpy(dtype=np.float64)
     else:
         model_input = features
 
     proba = np.asarray(model.predict_proba(model_input))
-    if proba.ndim == 2 and proba.shape[1] >= 2:
-        return proba[:, 1].astype(float)
+    if proba.ndim == 2 and proba.shape[1] == 2:
+        classes = np.asarray(getattr(model, "classes_", [0, 1]))
+        if classes.shape != (2,) or set(classes.tolist()) != {0, 1}:
+            raise ValueError("binary prediction requires model classes 0 and 1")
+        return proba[:, int(np.flatnonzero(classes == 1)[0])].astype(float)
     if proba.ndim == 1:
         return proba.astype(float)
     raise ValueError(f"Unexpected predict_proba output shape: {proba.shape}")

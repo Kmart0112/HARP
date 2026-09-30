@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 
-NN_INPUT_VERSION = 1
+NN_INPUT_VERSION = 2
 ENTRY_KEY = ("race_id", "kettonum")
 ENTRY_METADATA = (*ENTRY_KEY, "held_date", "horse_number", "history_end_no",
                   "last_history_race_id", "last_history_held_date",
@@ -31,7 +31,9 @@ _STATS_CUTOFF_GROUPS = {
 TARGET_COLUMNS = ("result_order", "is_win", "is_place")
 _RESULT_FIELDS = frozenset((*TARGET_COLUMNS, "time_sec", "time_diff", "agari3f",
                             "rank_1c", "rank_2c", "rank_3c", "rank_4c",
-                            "running_style_cd", "result_status_code"))
+                            "running_style_cd", "result_status_code",
+                            "ten3f", "ten4f", "agari3f_race", "agari4f_race",
+                            "time_vs_avg", "pos4_agari_synergy"))
 _IDENTITIES = frozenset(("jockey_cd", "trainer_cd", "breeder_cd", "sire_id", "dam_id",
                          "damsire_id", "horse_name", "jockey_name", "trainer_name"))
 
@@ -55,13 +57,17 @@ class NnFeatureContract:
     pre_race: tuple[NnFeatureField, ...]
     history_results: tuple[NnFeatureField, ...]
     version: int = NN_INPUT_VERSION
+    history_context: tuple[NnFeatureField, ...] = ()
 
     def __post_init__(self):
         object.__setattr__(self, "pre_race", tuple(self.pre_race))
         object.__setattr__(self, "history_results", tuple(self.history_results))
-        if type(self.version) is not int or self.version != NN_INPUT_VERSION:
+        object.__setattr__(self, "history_context", tuple(self.history_context))
+        if type(self.version) is not int or self.version not in (1, NN_INPUT_VERSION):
             raise NnInputContractError("unsupported NN input contract version")
-        names = [field.name for field in (*self.pre_race, *self.history_results)]
+        if self.version == 1 and self.history_context:
+            raise NnInputContractError("version 1 cannot contain history context")
+        names = [field.name for field in (*self.pre_race, *self.history_results, *self.history_context)]
         if not self.pre_race or len(set(names)) != len(names):
             raise NnInputContractError("empty or duplicate feature contract")
         reserved = set(ENTRY_METADATA + HISTORY_METADATA + STATS_METADATA) - {"horse_number"}
@@ -71,8 +77,15 @@ class NnFeatureContract:
             raise NnInputContractError("odds or lifecycle field cannot be an NN feature")
         if set(self.pre_race_names) & _RESULT_FIELDS:
             raise NnInputContractError("post-race fields cannot be current features")
+        if any(name.startswith("opp_") for name in self.pre_race_names):
+            raise NnInputContractError("opponent context cannot be current features")
         if not set(self.history_result_names) <= _RESULT_FIELDS:
             raise NnInputContractError("unsupported historical result field")
+        for field in self.history_context:
+            if field.kind != "numeric" or not re.fullmatch(
+                r"opp_(count|(horse|jockey)_(place_(mean|top3_mean|std|coverage)|starts_mean))", field.name
+            ):
+                raise NnInputContractError("unsupported historical context field")
 
     @property
     def pre_race_names(self) -> tuple[str, ...]:
@@ -82,6 +95,10 @@ class NnFeatureContract:
     def history_result_names(self) -> tuple[str, ...]:
         return tuple(field.name for field in self.history_results)
 
+    @property
+    def history_context_names(self) -> tuple[str, ...]:
+        return tuple(field.name for field in self.history_context)
+
 
 @dataclass(frozen=True)
 class NnInputQuery:
@@ -90,6 +107,7 @@ class NnInputQuery:
     feature_names: tuple[str, ...]
     history_result_names: tuple[str, ...] = ()
     max_races: int | None = None
+    history_context_names: tuple[str, ...] = ()
 
     def __post_init__(self):
         try:
@@ -97,11 +115,13 @@ class NnInputQuery:
                 raise ValueError
         except (ValueError, TypeError) as exc:
             raise NnInputContractError("invalid NN input date range") from exc
-        for attr in ("feature_names", "history_result_names"):
+        for attr in ("feature_names", "history_result_names", "history_context_names"):
             names = tuple(getattr(self, attr))
             if any(not isinstance(name, str) for name in names) or len(set(names)) != len(names):
                 raise NnInputContractError("invalid or duplicate requested feature names")
             object.__setattr__(self, attr, names)
+        if self.history_context_names and "opp_count" not in self.history_context_names:
+            raise NnInputContractError("history context requires the opponent count")
         if self.max_races is not None and (isinstance(self.max_races, bool)
                 or not isinstance(self.max_races, Integral) or self.max_races < 1):
             raise NnInputContractError("max_races must be a positive integer")
@@ -113,6 +133,8 @@ class NnInputQuery:
             raise NnInputContractError("requested current feature is not allowed by the input contract")
         if not set(self.history_result_names) <= set(contract.history_result_names):
             raise NnInputContractError("requested history result is not allowed by the input contract")
+        if not set(self.history_context_names) <= set(contract.history_context_names):
+            raise NnInputContractError("requested history context is not allowed by the input contract")
 
 
 def _identifier(value):
@@ -214,6 +236,37 @@ def _normalize(frame, columns, fields):
     return out
 
 
+def _validate_history_context(past: pd.DataFrame, names: tuple[str, ...]) -> None:
+    if not names:
+        return
+    counts = _numbers(past.opp_count, integer=True, nullable=False)
+    if counts.lt(0).any():
+        raise NnInputContractError("negative opponent count")
+    for name in names:
+        if name == "opp_count":
+            continue
+        values = past[name]
+        maximum = .5 if name.endswith("_std") else 1.0
+        if values.lt(-1e-10).any() or ("_place_" in name and values.gt(maximum + 1e-10).any()):
+            raise NnInputContractError("opponent statistics outside their valid range")
+        if values.loc[counts.eq(0)].notna().any():
+            raise NnInputContractError("empty opponent field must have missing statistics")
+    for entity in ("horse", "jockey"):
+        coverage_name = f"opp_{entity}_place_coverage"
+        if coverage_name not in names:
+            continue
+        coverage = past[coverage_name]
+        known = coverage * counts
+        if coverage.loc[counts.gt(0)].isna().any() or (
+            (known - known.round()).abs().gt(1e-8).any()
+        ):
+            raise NnInputContractError("opponent coverage differs from a count of available opponents")
+        for name in names:
+            if name.startswith(f"opp_{entity}_") and name != coverage_name:
+                if not past[name].notna().eq(coverage.gt(0).fillna(False)).all():
+                    raise NnInputContractError("opponent statistics disagree with coverage")
+
+
 class NnRaceInputs:
     """Validated current entries and reusable horse histories with defensive copies.
 
@@ -229,8 +282,9 @@ class NnRaceInputs:
             raise NnInputContractError("source revision and timezone-aware capture time are required")
         current = _normalize(entries, (*ENTRY_METADATA, *query.feature_names, *STATS_METADATA), contract.pre_race)
         past = _normalize(history, (*HISTORY_METADATA, *query.feature_names,
-                                  *query.history_result_names, *STATS_METADATA),
-                          (*contract.pre_race, *contract.history_results))
+                                  *query.history_result_names, *STATS_METADATA, *query.history_context_names),
+                          (*contract.pre_race, *contract.history_results, *contract.history_context))
+        _validate_history_context(past, query.history_context_names)
         for name in ("horse_number", "history_end_no", "active_entrant_count"):
             current[name] = _numbers(current[name], integer=True, nullable=False)
         if current.horse_number.le(0).any() or current.history_end_no.lt(0).any():

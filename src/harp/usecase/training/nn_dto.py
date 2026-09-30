@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
 from harp.core.nn.config import NnTrainRecipe
-from harp.interface.ports.nn_storage_ports import NnDatasetStorePort
+from harp.interface.ports.nn_odds_ports import NnOddsSnapshotStorePort
 from harp.interface.ports.nn_prepared_dataset_ports import NnPreparedDatasetStorePort
+from harp.interface.ports.nn_storage_ports import NnDatasetStorePort
 from harp.interface.ports.nn_training_ports import NnModelStorePort
 from harp.interface.ports.tracking_ports import TrackingPort
 
@@ -15,6 +16,7 @@ class NnTrainRequest:
     provenance: dict
     resume_run_id: str | None = None
     tracking_experiment: str | None = None
+    odds_snapshot_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -23,6 +25,7 @@ class NnTrainDeps:
     prepared_store: NnPreparedDatasetStorePort
     model_store: NnModelStorePort
     tracking: TrackingPort | None = None
+    odds_store: NnOddsSnapshotStorePort | None = None
 
 
 @dataclass(frozen=True)
@@ -36,6 +39,7 @@ class NnTrainResult:
     stopped_early: bool
     split_summary: dict
     tracking_run_id: str | None
+    task: str = "place"
 
 
 @dataclass(frozen=True)
@@ -55,3 +59,4 @@ class NnEvaluateResult:
     split: str
     best_epoch: int
     metrics: dict
+    task: str = "place"

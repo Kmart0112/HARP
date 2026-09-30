@@ -18,6 +18,7 @@ class PrepareNnDatasetCommand:
     to_date: str | None = None
     max_races: int | None = None
     contract_path: str = "pipeline/config/nn_input_contract.json"
+    task: str = "place"
 
 
 class NnDatasetController:
@@ -25,7 +26,7 @@ class NnDatasetController:
         self.input_root, self.prepared_root, self.db_url = input_root, prepared_root, db_url
 
     def run(self, cmd: PrepareNnDatasetCommand):
-        config = NnDatasetConfig(cmd.train_end_date, cmd.validation_end_date, cmd.history_length)
+        config = NnDatasetConfig(cmd.train_end_date, cmd.validation_end_date, cmd.history_length, cmd.task)
         contract, query = None, None
         if cmd.input_dataset_id is not None:
             if cmd.from_date is not None or cmd.to_date is not None or cmd.max_races is not None:
@@ -34,7 +35,11 @@ class NnDatasetController:
             if self.db_url is None:
                 raise NnInputContractError("DB input preparation requires database settings")
             contract = load_nn_feature_contract(cmd.contract_path)
-            query = NnInputQuery(cmd.from_date, cmd.to_date, contract.pre_race_names, contract.history_result_names, cmd.max_races)
+            query = NnInputQuery(
+                from_date=cmd.from_date, to_date=cmd.to_date,
+                feature_names=contract.pre_race_names, history_result_names=contract.history_result_names,
+                max_races=cmd.max_races, history_context_names=contract.history_context_names,
+            )
         req = PrepareNnDatasetRequest(config, cmd.input_dataset_id, query)
         with build_nn_dataset_deps(self.input_root, self.prepared_root,
                                    db_url=self.db_url if query is not None else None, contract=contract) as deps:

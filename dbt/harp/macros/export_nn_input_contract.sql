@@ -11,8 +11,14 @@
   {% endfor %}
   {% set results = [] %}
   {% for name in ['result_status_code', 'result_order', 'time_sec', 'time_diff', 'agari3f',
-                 'rank_1c', 'rank_2c', 'rank_3c', 'rank_4c', 'running_style_cd'] %}
+                 'rank_1c', 'rank_2c', 'rank_3c', 'rank_4c', 'running_style_cd',
+                 'ten3f', 'ten4f', 'agari3f_race', 'agari4f_race',
+                 'time_vs_avg', 'pos4_agari_synergy'] %}
     {% do results.append({'name': name, 'kind': 'categorical' if name in ['result_status_code', 'running_style_cd'] else 'numeric'}) %}
   {% endfor %}
-  {{ log(tojson({'version': 1, 'pre_race': fields, 'history_results': results}), info=True) }}
+  {% set context = [] %}
+  {% for name in nn_history_context_columns() %}
+    {% do context.append({'name': name, 'kind': 'numeric'}) %}
+  {% endfor %}
+  {{ log(tojson({'version': 2, 'pre_race': fields, 'history_results': results, 'history_context': context}), info=True) }}
 {% endmacro %}

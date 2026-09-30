@@ -16,6 +16,7 @@ def main() -> None:
     parser.add_argument("--train-end-date", required=True, help="Inclusive train end date")
     parser.add_argument("--validation-end-date", required=True, help="Inclusive validation end; later targets become test")
     parser.add_argument("--history-length", type=int, default=10)
+    parser.add_argument("--task", choices=("place", "win"), default="place")
     parser.add_argument("--max-races", type=int, help="Take earliest complete races in DB mode; primarily for smoke checks")
     parser.add_argument("--input-root", default="pipeline/artifacts/nn_inputs")
     parser.add_argument("--prepared-root", default="pipeline/artifacts/nn_datasets")
@@ -35,7 +36,7 @@ def main() -> None:
                 train_end_date=args.train_end_date, validation_end_date=args.validation_end_date,
                 history_length=args.history_length, input_dataset_id=args.input_dataset_id,
                 from_date=args.from_date, to_date=args.to_date, max_races=args.max_races,
-                contract_path=args.contract_path,
+                contract_path=args.contract_path, task=args.task,
             )
         )
     except (ValueError, FileNotFoundError) as exc:

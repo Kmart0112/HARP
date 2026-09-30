@@ -26,6 +26,17 @@
   ]) }}
 {% endmacro %}
 
+{% macro nn_history_context_columns() %}
+  {# Historical opponents only. Never append these to current-entry features. #}
+  {{ return([
+    'opp_count',
+    'opp_horse_place_mean', 'opp_horse_place_top3_mean', 'opp_horse_place_std',
+    'opp_horse_starts_mean', 'opp_horse_place_coverage',
+    'opp_jockey_place_mean', 'opp_jockey_place_top3_mean',
+    'opp_jockey_starts_mean', 'opp_jockey_place_coverage'
+  ]) }}
+{% endmacro %}
+
 {% macro nn_select_pre_race_features(alias) %}
   {% for column in nn_pre_race_feature_columns() %}
     {{ alias }}.{{ column }}{% if not loop.last %},{% endif %}

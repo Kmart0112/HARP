@@ -1,7 +1,8 @@
 # NN Transformer学習
 
 実装は`history_set_transformer_v1`。馬ごとの過去走をTransformerで集約し、
-今回特徴と結合した後、出走馬全体を別のTransformerへ渡して各馬の複勝logitを出す。
+今回特徴と結合した後、出走馬全体を別のTransformerへ渡して各馬のlogitを出す。
+`task=place/win`で複勝・勝率を切り替え、Datasetのtaskと学習recipeのtaskが違う場合は学習を拒否する。
 [作成済みDataset](nn_dataset_preparation.md)を復元して学習し、DB問合せや前処理の再fitはしない。
 
 ## 配置と責務
@@ -48,12 +49,61 @@ PyTorchは`nn` extra。既存LightGBMやDataset作成の入口からはNNネッ�
 - Transformerの各層は個別に生成・初期化する。全馬・全レースでEncoderの重みを共有する。
 - `NnModelInputs`に教師・馬ID・レースIDは含めない。ネットワークへ渡す特徴と位置合わせ情報を分離する。
 
-`forward()`は`[B,N]`のlogitを返す。確率出力時だけsigmoidを適用する。
-複勝は複数頭が正例になるので出走馬全体へのsoftmaxは使わない。
+`forward()`は`[B,N]`のlogitを返す。複勝は各馬にsigmoid、勝率は実出走馬のレース内softmaxを適用する。
+勝率ではPADのlogitを負の無限大へ置換し、PADへ確率を割り当てない。学習・評価は単独勝者のレースだけを使う。
+
+## 複勝への着順補助タスク
+
+`pipeline/config/nn_training/place_history_set_rank.yml`は`version: 2, task: place`のrecipe。
+主損失は既存の頭数平均BCE、補助損失はレース平均のpairwise logisticとする。
+出走馬Transformerの表現を共有し、既存の複勝headとは別に線形の順位headを置く。
+順位スコアが大きい馬ほど先着しやすい。`forward()`の戻り値と公開予測の`place_probability`は維持する。
+学習と順位診断は`forward_outputs()`で両headを一度のTransformer計算から得る。
+
+- 教師は保存済み`targets.result_order`。Datasetが`finish_order/finish_order_mask`として渡す。
+  今回の着順は`NnModelInputs`に含めない。既存snapshot・prepared ID・前処理を再利用できる。
+- 同じレースの既知着順`r_i < r_j`ごとに`softplus(-(s_i - s_j))`を計算し、各ペアを一度だけ数える。
+  ペアをレース内で平均し、比較ペアなしのレースを0として全レースで平均する。
+- 同着馬同士、未知着順、PADのペアは除外する。1着同着を含めて複勝Datasetの既存採用条件を維持する。
+  結果0を最下位へ置換しない。Repositoryで主教師もNULLとなるレースは従来どおり全体を除外する。
+- `L = entrant_mean_BCE + auxiliary_rank.weight * race_mean_rank_loss`。
+  補助あり/なしで主タスクの集約単位を変えない。初版の順位補助は複勝のみで利用可能。
+- `auxiliary_rank`には`name: pairwise_logistic`、非負の`weight`、`reduction: race_mean`、
+  `tie_policy: ignore`を指定する。旧version 1 recipeは補助なしとして復元する。
+- `weight: 0`は同じ構成の比較対照。順位headの初期化で共有部・dropoutの乱数列を進めず、
+  重み0では順位勾配を逆伝播しない。主タスクだけの既存学習と予測が一致することを検証する。
+- best選択・early stopping・schedulerは複勝の`validation.logloss`だけを使う。
+  `rank_loss`、`rank_pair_accuracy`、`rank_pairs`、`rank_races`を別途記録する。
+  先着正解率は比較可能レースの平均で予測同値を0.5点とする。有効ペア0のとき順位指標は未定義。
+  trainの`total_loss`はepochの各損失をそれぞれの母数で集約してから再結合する。
+- recipeと両headをcheckpointへ保存し、推論・明示評価・校正レポートで同じ構成を復元する。
+  補助重みを変更したrunの途中再開は拒否する。
+
+同じprepared Datasetに対して、上記recipeと`--set auxiliary_rank.weight=0`を比較する。
+特徴・対象レース・seed・学習予算を揃え、validationで判断してから固定した設定をtestへ適用する。
+順位損失の改善だけでは複勝予測の改善と判断しない。
 
 ## 設定
 
-正本は`pipeline/config/nn_training/place_history_set_v1.yml`。
+複勝のデフォルトは`pipeline/config/nn_training/place_history_set_no_aux.yml`。
+直近の比較実験と同じD=32、履歴1層、全頭2層、最大30epochの構成で、
+`auxiliary_rank: null`と`auxiliary_odds: null`により両補助headを生成しない。
+`--recipe`を省略するとこの設定を使う。
+勝率の正本は`pipeline/config/nn_training/win_history_set_v1.yml`（D=32、履歴1層、全頭2層、最大30epoch）。
+taskが省略された既存recipe・モデルは複勝として読み込む。勝率recipeは`task: win`、
+`loss.name: cross_entropy`、`loss.reduction: race_mean`を指定する。
+
+勝率用のDataset作成・学習例（入力snapshotと年境界を明示する）:
+
+```bash
+uv run --no-sync python -m pipeline.jobs.prepare_nn_dataset \
+  --input-dataset-id <input_dataset_id> --task win --history-length 10 \
+  --train-end-date 2023-12-31 --validation-end-date 2024-12-31
+
+uv run --no-sync python -m pipeline.jobs.run_nn_train \
+  --dataset-id <win_prepared_dataset_id> \
+  --recipe pipeline/config/nn_training/win_history_set_v1.yml
+```
 同じチューニング値をPythonのデフォルトにも重複させない。
 
 | セクション | 値 |
@@ -62,16 +112,26 @@ PyTorchは`nn` extra。既存LightGBMやDataset作成の入口からはNNネッ�
 | optimizer | AdamWのlr、weight_decay |
 | scheduler | validation loglossによるReduceLROnPlateauのfactor/patience/min_lr |
 | training | レース単位batch size、max_epochs、seed、gradient clipping |
-| loss | BCE with logits / entrant_mean |
+| loss | 複勝: BCE with logits / entrant_mean、勝率: cross_entropy / race_mean |
 | early_stopping | validation.logloss、min、patience、min_delta |
 | runtime | auto/cpu/mps/cuda、float32、num_workers、num_threads |
 
 CLIで`--set section.field=value`を指定した値だけYAMLへ上書きする。
 数値・bool等はJSONリテラルとして解析し、`runtime.device=cpu`のような名前は文字列になる。
 未知キー、重複YAMLキー、重複override、必須値の欠落、無効な範囲、D/head数の不整合は拒否する。
-初版のarchitecture・optimizer・loss・選択指標・精度は上記のみをサポートする。
+architecture・optimizer・loss・選択指標・精度は上記のみをサポートする。
+
+勝率では`logloss`は勝ち馬に対する負の対数確率のレース平均で、モデル選択・schedulerにも使う。
+`top1_accuracy`は予測最大の馬が勝ったレースの割合、`race_brier`はレース内二乗誤差の合計のレース平均。
+`auc`、`brier`、`binary_logloss`は全評価馬をまとめた二値指標で、レース単位Log lossとは別。
+確率が同値のときのtop1はDatasetの馬順で先の馬を選ぶ。
+複勝と勝率のLog lossは教師・集約単位が異なるため、値を直接比較しない。
 
 特徴数、カテゴリ数はDatasetから自動決定し、YAMLには書かない。
+過去走の相手集約も`history_numeric`へ入る。`history_set_transformer_v1`のEncoderが
+前処理から増加した入力次元を決めるため、新しいネットワーク名・相手用の配列軸は設けない。
+相手情報ありのDatasetは別IDとして新規学習し、旧重みへ列を継ぎ足して再開しない。
+旧Dataset・旧モデルは元の特徴次元で復元でき、特徴順が違う入力での予測は拒否する。
 K・期間分割・特徴契約・前処理はprepared Dataset側で固定する。変更時はDatasetを再作成して別IDを渡す。
 device=autoはCUDA→MPS→CPUの順に利用可能なものを選び、解決後のdeviceも保存する。
 
@@ -84,9 +144,10 @@ device=autoはCUDA→MPS→CPUの順に利用可能なものを選び、解決�
 5. `eval()`・`inference_mode()`でvalidationを評価する。
 6. best判定、early stopping、scheduler更新、checkpoint保存、任意のtrackingを行う。
 
-損失は`entrant_mask & label_mask`の位置だけで平均する。PADや未知教師を負例にしない。
+複勝損失は`entrant_mask & label_mask`の位置だけで平均する。勝率損失は実出走馬内の勝ち馬の交差エントロピーをレース平均する。
+PADや未知教師を負例にしない。
 学習入力はレースの全教師が揃っていることを再確認する。
-epochのloglossは損失総和/有効頭数で集計する。Brier/AUCも記録し、単一クラスのAUCは未定義扱い。
+epochのloglossは複勝では有効頭数、勝率では有効レース数で重み付けする。Brier/AUCも記録し、単一クラスのAUCは未定義扱い。
 非有限logit・勾配・validation loglossは失敗とする。
 
 bestモデルは最小validation loglossで更新する。停止のpatienceは`min_delta`以上の改善がないepochを数える。
@@ -128,7 +189,8 @@ shuffle順はseed+epochから決まり、dropout用の乱数状態とoptimizer�
 異なるハードウェア間のbit単位一致は保証しない。CPUの同一環境では中断なし学習との一致をテストする。
 
 予測は`load_nn_predictor`でモデルと前処理を復元し、`NnPredictor.predict(NnRaceInputs)`を使う。
-予測に学習入力全体は不要。出力は`race_id, kettonum, place_probability`。
+予測に学習入力全体は不要。出力は`race_id, kettonum, place_probability`または`win_probability`。
+taskはモデルmetadata・recipeとDatasetへ保存し、復元・推論・校正レポートでも照合する。
 オッズ・校正・EV・購入判断はこの経路に含まない。
 
 ## 実行
@@ -138,7 +200,7 @@ uv sync --locked --extra nn
 
 uv run --no-sync python -m pipeline.jobs.run_nn_train \
   --dataset-id "<prepared_dataset_id>" \
-  --recipe pipeline/config/nn_training/place_history_set_v1.yml
+  --recipe pipeline/config/nn_training/place_history_set_no_aux.yml
 ```
 
 短い動作確認は、同じ入口へ明示overrideを渡す。
@@ -171,8 +233,13 @@ MLflowにはepoch指標、実効設定、checkpoint参照、終了時のモデ�
 
 ```bash
 uv run --no-sync pytest -q tests/calculations/test_nn_transformer.py \
-  tests/flows/test_nn_training_flow.py tests/integrations/test_nn_model_store.py
+  tests/calculations/test_nn_win_transformer.py tests/flows/test_nn_training_flow.py \
+  tests/integrations/test_nn_model_store.py tests/integrations/test_nn_win_model_store.py
 ```
+
+順位補助の検証は`tests/calculations/test_nn_rank_auxiliary.py`、
+`tests/flows/test_nn_rank_training_flow.py`、`tests/integrations/test_nn_rank_model_store.py`を
+同じNN専用プロセスへ加える。
 
 馬の並べ替え、padding増加と無効値の不変性、新馬の有限値・勾配、微小Datasetの学習、
 batchサイズが異なる評価の整合、dropoutありの再開、test教師の非干渉、early stopping、
@@ -188,6 +255,11 @@ CIも既存テストと上記NN学習テストを別プロセスへ分ける。�
 ```bash
 uv run --no-sync pytest -q \
   --ignore=tests/calculations/test_nn_transformer.py \
+  --ignore=tests/calculations/test_nn_win_transformer.py \
   --ignore=tests/flows/test_nn_training_flow.py \
-  --ignore=tests/integrations/test_nn_model_store.py
+  --ignore=tests/integrations/test_nn_model_store.py \
+  --ignore=tests/integrations/test_nn_win_model_store.py \
+  --ignore=tests/calculations/test_nn_rank_auxiliary.py \
+  --ignore=tests/flows/test_nn_rank_training_flow.py \
+  --ignore=tests/integrations/test_nn_rank_model_store.py
 ```

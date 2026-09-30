@@ -1,5 +1,6 @@
 """The NN input Port across SQL schemas, retaining full fields and past-run identities."""
 import os
+from dataclasses import replace
 from uuid import uuid4
 
 import pandas as pd
@@ -7,9 +8,10 @@ import pytest
 from sqlalchemy import create_engine, text
 
 from harp.adapters.driven.db.nn_input_repository import NnInputMapping, SqlNnInputRepository
-from harp.core.nn.contracts import NnInputContractError
+from harp.core.nn.contracts import NnFeatureField, NnInputContractError
 from harp.interface.ports.nn_input_ports import NnInputRepositoryPort
 from tests.nn_input_support import feature_contract, input_query, input_tables
+from tests.nn_opponent_support import opponent_inputs
 
 
 @pytest.fixture(params=["sqlite"] + (["postgres"] if os.environ.get("HARP_CONTRACT_TEST_DB_URL") else []))
@@ -39,6 +41,10 @@ def nn_engine(request):
 @pytest.fixture(params=["original", "renamed", "extra_columns", "typed"])
 def nn_provider(request, nn_engine):
     tables = input_tables()
+    context = opponent_inputs().inputs
+    tables = (tables[0], tables[1].merge(
+        context.history[["race_id", "kettonum", *context.query.history_context_names]],
+        on=["race_id", "kettonum"], how="left", validate="one_to_one"), tables[2])
     mappings = []
     with nn_engine.begin() as conn:
         for table, frame in zip(("entrants", "past_runs", "outcomes"), tables):
@@ -57,6 +63,29 @@ def nn_provider(request, nn_engine):
     mapping = NnInputMapping("entrants", "past_runs", "outcomes", *mappings)
     port: NnInputRepositoryPort = SqlNnInputRepository(engine=nn_engine, mapping=mapping, contract=feature_contract())
     return port, nn_engine, mapping
+
+
+def test_opponent_context_port_survives_schema_changes_and_keeps_full_history(nn_provider, tmp_path):
+    from harp.adapters.driven.storage.nn_dataset_store import ParquetNnPredictionSnapshotStore
+
+    _, engine, mapping = nn_provider
+    contract = opponent_inputs().inputs.contract
+    query = replace(input_query(), history_context_names=contract.history_context_names)
+    port: NnInputRepositoryPort = SqlNnInputRepository(engine=engine, mapping=mapping, contract=contract)
+    result = port.load_prediction_inputs(query)
+    assert result.history.race_id.tolist() == ["R0", "R1", "R2"]
+    assert result.history.opp_count.tolist() == [2, 2, 2]
+    assert result.history.opp_horse_place_mean.iloc[0] == .5
+    assert pd.isna(result.history.opp_horse_place_mean.iloc[1])
+    assert result.history.opp_horse_place_coverage.iloc[1] == 0
+    assert not set(query.history_context_names) & set(result.entries.columns)
+    store = ParquetNnPredictionSnapshotStore(tmp_path)
+    restored = store.load(store.save(result, {})).inputs
+    pd.testing.assert_frame_equal(restored.history, result.history)
+    with engine.begin() as conn:
+        conn.execute(text(f'UPDATE "{mapping.history_table}" SET "{mapping.history_columns["opp_count"]}" = NULL'))
+    with pytest.raises(NnInputContractError, match="numeric"):
+        port.load_prediction_inputs(query)
 
 
 def test_longitudinal_port_preserves_fields_and_deduplicates_shared_history(nn_provider):
@@ -187,3 +216,30 @@ def test_large_integer_ids_and_missing_endpoints_keep_their_exact_identity(nn_en
     assert result.inputs.entries.race_id.tolist() == ["20260613010101011", "20260613010101011", "20260620010101011"]
     assert result.inputs.entries.iloc[0].last_history_race_id == "20260601010101011"
     assert pd.isna(result.inputs.entries.iloc[1].last_history_race_id)
+
+
+def test_race_lap_results_round_trip_as_nullable_past_only_values(nn_engine, tmp_path):
+    from harp.adapters.driven.storage.nn_dataset_store import ParquetNnDatasetStore
+
+    names = ("ten3f", "ten4f", "agari3f_race", "agari4f_race")
+    entries, history, targets = input_tables()
+    for offset, name in enumerate(names):
+        history[name] = [34.5 + offset, None, 99.0, 100.0, 10.0]
+    with nn_engine.begin() as conn:
+        for table, frame in zip(("entrants", "past_runs", "outcomes"), (entries, history, targets)):
+            frame.to_sql(table, conn, index=False)
+    contract = feature_contract()
+    contract = replace(contract, history_results=(*contract.history_results,
+                       *(NnFeatureField(name, "numeric") for name in names)))
+    query = input_query(max_races=1, history_result_names=contract.history_result_names)
+    port: NnInputRepositoryPort = SqlNnInputRepository(
+        engine=nn_engine, mapping=NnInputMapping("entrants", "past_runs", "outcomes"), contract=contract)
+    source = port.load_training_inputs(query)
+    store = ParquetNnDatasetStore(tmp_path)
+    restored = store.load(store.save(source, {})).inputs.inputs
+    assert restored.history.race_id.tolist() == ["R0", "R1"]
+    assert len(restored.entries) == 2
+    for offset, name in enumerate(names):
+        assert name not in restored.entries
+        assert restored.history.iloc[0][name] == pytest.approx(34.5 + offset)
+        assert pd.isna(restored.history.iloc[1][name])

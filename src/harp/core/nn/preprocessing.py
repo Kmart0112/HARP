@@ -83,11 +83,13 @@ class NnPreprocessingState:
 
 
 def nn_feature_fields(inputs: NnRaceInputs) -> tuple[tuple[NnFeatureField, ...], tuple[NnFeatureField, ...]]:
-    lookup = {field.name: field for field in (*inputs.contract.pre_race, *inputs.contract.history_results)}
+    lookup = {field.name: field for field in (
+        *inputs.contract.pre_race, *inputs.contract.history_results, *inputs.contract.history_context)}
     shared = tuple(lookup[name] for name in inputs.query.feature_names)
     flags = tuple(NnFeatureField(name, "numeric") for name in STATS_FLAGS)
     current = (*shared, *flags, NnFeatureField("days_since_last_run", "numeric"))
-    history = (*shared, *(lookup[name] for name in inputs.query.history_result_names), *flags)
+    history = (*shared, *(lookup[name] for name in inputs.query.history_result_names), *flags,
+               *(lookup[name] for name in inputs.query.history_context_names))
     return current, history
 
 

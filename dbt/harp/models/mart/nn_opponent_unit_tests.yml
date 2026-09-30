@@ -1,0 +1,71 @@
+version: 2
+unit_tests:
+  - name: nn_opponents_keep_missing_and_abnormal_runs
+    model: feat_race_entry_opponent_summary
+    given:
+      - input: ref('int_race_entry_run_record')
+        rows:
+          - {race_id: 10, kettonum: 1, held_date: '2026-06-01', jockey_starts_3y: 8, jockey_place_rate_3y_smooth: 0.125}
+          - {race_id: 10, kettonum: 2, held_date: '2026-06-01', jockey_starts_3y: 16, jockey_place_rate_3y_smooth: 0.375}
+          - {race_id: 10, kettonum: 3, held_date: '2026-06-01', result_status_code: '4'}
+          - {race_id: 20, kettonum: 4, held_date: '2026-06-01'}
+          - {race_id: 20, kettonum: 5, held_date: '2026-06-01', jockey_starts_3y: 0, jockey_place_rate_3y_smooth: 0.25}
+          - {race_id: 30, kettonum: 6, held_date: '2026-06-01', jockey_starts_3y: 8, jockey_place_rate_3y_smooth: 0.5}
+      - input: ref('feat_horse_overall')
+        rows:
+          - {kettonum: 1, held_date: '2026-06-01', past_starts: 4, past_places: 1}
+          - {kettonum: 2, held_date: '2026-06-01', past_starts: 8, past_places: 6}
+          - {kettonum: 3, held_date: '2026-06-02', past_starts: 10, past_places: 10}
+          - {kettonum: 5, held_date: '2026-06-01', past_starts: 0, past_places: 0}
+          - {kettonum: 6, held_date: '2026-06-01', past_starts: 2, past_places: 1}
+    expect:
+      rows:
+        - {race_id: 10, kettonum: 1, opp_count: 2, opp_horse_place_mean: 0.75, opp_horse_place_top3_mean: 0.75, opp_horse_place_std: 0, opp_horse_starts_mean: 8, opp_horse_place_coverage: 0.5, opp_jockey_place_mean: 0.375, opp_jockey_place_top3_mean: 0.375, opp_jockey_starts_mean: 16, opp_jockey_place_coverage: 0.5}
+        - {race_id: 10, kettonum: 2, opp_count: 2, opp_horse_place_mean: 0.25, opp_horse_place_top3_mean: 0.25, opp_horse_place_std: 0, opp_horse_starts_mean: 4, opp_horse_place_coverage: 0.5, opp_jockey_place_mean: 0.125, opp_jockey_place_top3_mean: 0.125, opp_jockey_starts_mean: 8, opp_jockey_place_coverage: 0.5}
+        - {race_id: 10, kettonum: 3, opp_count: 2, opp_horse_place_mean: 0.5, opp_horse_place_top3_mean: 0.5, opp_horse_place_std: 0.25, opp_horse_starts_mean: 6, opp_horse_place_coverage: 1, opp_jockey_place_mean: 0.25, opp_jockey_place_top3_mean: 0.25, opp_jockey_starts_mean: 12, opp_jockey_place_coverage: 1}
+        - {race_id: 20, kettonum: 4, opp_count: 1, opp_horse_place_mean: null, opp_horse_place_top3_mean: null, opp_horse_place_std: null, opp_horse_starts_mean: null, opp_horse_place_coverage: 0, opp_jockey_place_mean: null, opp_jockey_place_top3_mean: null, opp_jockey_starts_mean: null, opp_jockey_place_coverage: 0}
+        - {race_id: 20, kettonum: 5, opp_count: 1, opp_horse_place_mean: null, opp_horse_place_top3_mean: null, opp_horse_place_std: null, opp_horse_starts_mean: null, opp_horse_place_coverage: 0, opp_jockey_place_mean: null, opp_jockey_place_top3_mean: null, opp_jockey_starts_mean: null, opp_jockey_place_coverage: 0}
+        - {race_id: 30, kettonum: 6, opp_count: 0, opp_horse_place_mean: null, opp_horse_place_top3_mean: null, opp_horse_place_std: null, opp_horse_starts_mean: null, opp_horse_place_coverage: null, opp_jockey_place_mean: null, opp_jockey_place_top3_mean: null, opp_jockey_starts_mean: null, opp_jockey_place_coverage: null}
+
+  - name: nn_opponents_top_three_remove_self_even_from_the_top_four
+    model: feat_race_entry_opponent_summary
+    given:
+      - input: ref('int_race_entry_run_record')
+        rows:
+          - {race_id: 10, kettonum: 1, held_date: '2026-06-01', jockey_starts_3y: 4, jockey_place_rate_3y_smooth: 1}
+          - {race_id: 10, kettonum: 2, held_date: '2026-06-01', jockey_starts_3y: 4, jockey_place_rate_3y_smooth: 0.75}
+          - {race_id: 10, kettonum: 3, held_date: '2026-06-01', jockey_starts_3y: 4, jockey_place_rate_3y_smooth: 0.5}
+          - {race_id: 10, kettonum: 4, held_date: '2026-06-01', jockey_starts_3y: 4, jockey_place_rate_3y_smooth: 0.25}
+          - {race_id: 10, kettonum: 5, held_date: '2026-06-01', jockey_starts_3y: 4, jockey_place_rate_3y_smooth: 0}
+      - input: ref('feat_horse_overall')
+        rows:
+          - {kettonum: 1, held_date: '2026-06-01', past_starts: 4, past_places: 4}
+          - {kettonum: 2, held_date: '2026-06-01', past_starts: 4, past_places: 3}
+          - {kettonum: 3, held_date: '2026-06-01', past_starts: 4, past_places: 2}
+          - {kettonum: 4, held_date: '2026-06-01', past_starts: 4, past_places: 1}
+          - {kettonum: 5, held_date: '2026-06-01', past_starts: 4, past_places: 0}
+    expect:
+      rows:
+        - {race_id: 10, kettonum: 1, opp_count: 4, opp_horse_place_top3_mean: 0.5, opp_jockey_place_top3_mean: 0.5}
+        - {race_id: 10, kettonum: 2, opp_count: 4, opp_horse_place_top3_mean: 0.5833333333333334, opp_jockey_place_top3_mean: 0.5833333333333334}
+        - {race_id: 10, kettonum: 3, opp_count: 4, opp_horse_place_top3_mean: 0.6666666666666666, opp_jockey_place_top3_mean: 0.6666666666666666}
+        - {race_id: 10, kettonum: 4, opp_count: 4, opp_horse_place_top3_mean: 0.75, opp_jockey_place_top3_mean: 0.75}
+        - {race_id: 10, kettonum: 5, opp_count: 4, opp_horse_place_top3_mean: 0.75, opp_jockey_place_top3_mean: 0.75}
+
+  - name: nn_opponent_horse_source_excludes_the_whole_current_day
+    model: feat_horse_overall
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: ref('int_race_entry_enriched')
+        rows:
+          - {race_id: 1, kettonum: 1, held_date: '2026-06-01', is_place: 1}
+          - {race_id: 2, kettonum: 1, held_date: '2026-06-01', is_place: 0}
+          - {race_id: 3, kettonum: 1, held_date: '2026-06-02', is_place: 1}
+          - {race_id: 4, kettonum: 1, held_date: '2026-06-03', is_place: 0}
+    expect:
+      rows:
+        - {kettonum: 1, held_date: '2026-06-01', past_starts: 0, past_places: 0}
+        - {kettonum: 1, held_date: '2026-06-02', past_starts: 2, past_places: 1}
+        - {kettonum: 1, held_date: '2026-06-03', past_starts: 3, past_places: 2}

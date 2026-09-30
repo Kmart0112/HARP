@@ -13,11 +13,13 @@ from harp.core.nn.tensor_batch import NnInputSpec
 from harp.core.nn.training import capture_nn_checkpoint, evaluate_nn, initialize_nn_training, train_one_nn_epoch, update_nn_selection
 from harp.usecase.prediction.nn import load_nn_predictor
 from tests.nn_dataset_support import dataset_inputs
+from tests.nn_opponent_support import opponent_inputs
+from tests.nn_performance_support import performance_inputs
 from tests.nn_training_support import small_prepared, small_recipe, torch_cpu_runtime
 
 
-def trained_checkpoint():
-    prepared, recipe = small_prepared(), small_recipe()
+def trained_checkpoint(inputs=None):
+    prepared, recipe = small_prepared(inputs), small_recipe()
     spec = NnInputSpec.from_preprocessing(prepared.preprocessing)
     state = initialize_nn_training(spec, recipe, "cpu")
     train_one_nn_epoch(state, prepared.split("train"), recipe, "cpu")
@@ -30,8 +32,10 @@ def trained_checkpoint():
     return metadata, capture_nn_checkpoint(state, "cpu"), prepared
 
 
-def test_model_bundle_restores_predictions_without_the_training_inputs(tmp_path):
-    metadata, checkpoint, prepared = trained_checkpoint()
+@pytest.mark.parametrize("input_factory", [dataset_inputs, opponent_inputs, performance_inputs])
+def test_model_bundle_restores_predictions_without_the_training_inputs(tmp_path, input_factory):
+    inputs = input_factory()
+    metadata, checkpoint, prepared = trained_checkpoint(inputs)
     store = TorchNnModelStore(tmp_path)
     run_id = store.create_run(metadata)
     identity = store.save_checkpoint(run_id, checkpoint)
@@ -43,9 +47,38 @@ def test_model_bundle_restores_predictions_without_the_training_inputs(tmp_path)
     model.load_state_dict(checkpoint["best_weights"])
     expected = evaluate_nn(model, prepared.dataset, batch_size=2, device="cpu").predictions
     predictor = load_nn_predictor(run_id, store)
-    actual = predictor.predict(dataset_inputs(future_rate=.4).inputs, batch_size=2)
+    actual = predictor.predict(inputs.inputs, batch_size=2)
     assert actual[["race_id", "kettonum"]].equals(expected[["race_id", "kettonum"]])
     np.testing.assert_array_equal(actual.place_probability, expected.place_probability)
+    if input_factory is not dataset_inputs:
+        with pytest.raises(NnInputContractError, match="feature order"):
+            predictor.predict(dataset_inputs(future_rate=.4).inputs, batch_size=2)
+
+
+def test_nn_calibration_loads_explicit_dataset_and_publishes_checkpoint_identity(tmp_path):
+    import json
+    from harp.adapters.driven.storage.nn_dataset_store import ParquetNnDatasetStore
+    from harp.adapters.driven.storage.nn_prepared_dataset_store import JsonNnPreparedDatasetStore
+    from harp.controllers.calibration import export_calibration_report
+    from harp.interface.ports.nn_prepared_dataset_ports import NnPreparedDatasetRecipe
+    metadata, checkpoint, prepared = trained_checkpoint()
+    input_id = ParquetNnDatasetStore(tmp_path / "inputs").save(dataset_inputs(future_rate=.4), {})
+    dataset_id = JsonNnPreparedDatasetStore(tmp_path / "datasets").save(NnPreparedDatasetRecipe(
+        input_id, prepared.config, prepared.preprocessing, prepared.partitions))
+    # The evaluation dataset identity may differ; its fitted contract must match.
+    store = TorchNnModelStore(tmp_path / "models")
+    run_id = store.create_run(metadata)
+    checkpoint_id = store.save_checkpoint(run_id, checkpoint)
+    result = export_calibration_report(model=run_id, dataset=dataset_id, backend="nn",
+        output_dir=tmp_path / "report", input_root=tmp_path / "inputs",
+        prepared_root=tmp_path / "datasets", model_root=tmp_path / "models")
+    document = json.loads((tmp_path / "report/metrics.json").read_text())
+    assert document["metadata"]["checkpoint_id"] == checkpoint_id
+    assert document["metadata"]["prepared_dataset_id"] == dataset_id
+    assert result.report.metrics["samples"] == 1
+    assert result.report.metrics["observed_rate"] == 1
+    assert result.report.predictions[["race_id", "kettonum", "horse_number"]].to_dict("records") == [
+        {"race_id": "R4", "kettonum": "H3", "horse_number": 1}]
 
 
 @pytest.mark.parametrize("file", ["best_weights.pt", "last_checkpoint.pt", "metadata.json", "manifest.json"])

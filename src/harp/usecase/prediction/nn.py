@@ -6,4 +6,5 @@ def load_nn_predictor(run_id: str, model_store: NnModelStorePort, *, device: str
                       checkpoint_id: str | None = None) -> NnPredictor:
     saved = model_store.load_checkpoint(run_id, checkpoint_id)
     return NnPredictor.from_weights(saved.preprocessing, saved.recipe.model, saved.checkpoint["best_weights"],
-                                     saved.metadata["history_length"], device)
+                                     saved.metadata["history_length"], device, task=saved.recipe.task,
+                                     auxiliary_rank=saved.recipe.auxiliary_rank, auxiliary_odds=saved.recipe.auxiliary_odds)

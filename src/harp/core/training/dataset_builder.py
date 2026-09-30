@@ -22,6 +22,12 @@ class BinaryDataset:
     split_info: dict[str, Any]
 
 
+def year_holdout_masks(held_year: pd.Series, *, train_year_start: int,
+                       train_year_end: int, test_year: int) -> dict[str, pd.Series]:
+    return {"train": (held_year >= train_year_start) & (held_year < train_year_end),
+            "validation": held_year == train_year_end, "test": held_year == test_year}
+
+
 def build_binary_dataset(
     df: pd.DataFrame,
     feature_names: list[str],
@@ -63,9 +69,9 @@ def build_binary_dataset(
         raise ValueError(f"年分割不能: held_year has invalid rows={invalid_rows}")
     held_year = held_year.astype(int)
 
-    train_mask = (held_year >= int(train_year_start)) & (held_year < int(train_year_end))
-    val_mask = held_year == int(train_year_end)
-    test_mask = held_year == int(test_year)
+    masks = year_holdout_masks(held_year, train_year_start=int(train_year_start),
+                               train_year_end=int(train_year_end), test_year=int(test_year))
+    train_mask, val_mask, test_mask = masks["train"], masks["validation"], masks["test"]
     if not train_mask.any() or not val_mask.any() or not test_mask.any():
         raise ValueError(
             "年分割不能: "

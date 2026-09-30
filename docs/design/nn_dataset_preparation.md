@@ -30,9 +30,11 @@ LightGBMのDataset、前処理、学習経路は変更しない。
 - test: `validation_end_date < held_date`
 
 境界日は必須で、trainの終端はvalidationの終端より前にする。
-1レースを複数splitへ分けない。初版の教師は`is_place`。
+1レースを複数splitへ分けない。`task=place`は`is_place`、`task=win`は`is_win`を教師にする。
+省略時は既存互換の`place`。勝率は全頭の教師が既知で、着順と勝敗が一致し、勝ち馬が1頭のレースだけを採用する。
+1着同着は`dead_heat`、勝ち馬なしは`no_winner`、着順との不整合は`inconsistent_win_result`として除外する。
 1頭でも教師がNULLのレースは、全頭をそのsplitの学習・評価用Datasetから除外し、
-recipeに`missing_place_label`とレースID・開催日・頭数を残す。
+recipeに`missing_place_label`または`missing_win_label`とレースID・開催日・頭数を残す。
 元の入力と`prepared.dataset`は全頭を保持する。学習・評価には必ず`prepared.split(name)`を使う。
 新馬や特徴量欠損だけでは除外しない。教師が揃ったtrainレースが0件なら作成を失敗させる。
 validation/testが0件の小規模検証は許容し、件数を結果に表示する。
@@ -41,7 +43,9 @@ validation/testが0件の小規模検証は許容し、件数を結果に表示�
 
 当該Queryで選択されたdbt共通事前特徴を、今回と過去走で使う。
 両方に6種類の`*_stats_missing`を加え、今回側に`days_since_last_run`を加える。
-過去側だけに当該Queryで選択された過去走結果列を加える。
+過去側だけに当該Queryで選択された過去走結果列と`history_context_names`の相手集約列を加える。
+相手列は従来の履歴特徴の後へ追加し、同じ数値前処理・欠損配列で扱う。
+今回の特徴数、履歴のK軸、履歴なしの扱いは変えない。相手全員の率が欠損でも実在過去走を保持する。
 entity ID、今回結果、絶対run_no、開催日はモデル特徴に含めない。
 ID・馬番は配列と予測結果の位置合わせ用metadataとして返す。
 許可された事前特徴`horse_number`は特徴としても利用できる。
@@ -81,7 +85,8 @@ categoricalはtrainで観測した文字列を辞書化する。`0=PAD, 1=UNK, 2
 | `history_relative` | `[B,N,K,2]` | float32、後述の相対時間と位置 |
 | `entrant_mask` | `[B,N]` | bool、実在出走馬ならTrue |
 | `history_mask` | `[B,N,K]` | bool、実在過去走ならTrue |
-| `labels` / `label_mask` | `[B,N]` | float32複勝教師 / bool教師既知 |
+| `labels` / `label_mask` | `[B,N]` | float32選択taskの教師 / bool教師既知 |
+| `finish_order` / `finish_order_mask` | `[B,N]` | int64着順 / bool着順既知。教師専用でモデル入力に含めない |
 
 `history_relative`の列順は`HISTORY_RELATIVE_NAMES`で固定。
 `log1p(対象開催日 - 過去開催日の日数)`と`(終端run_no - 過去run_no) / K`。
@@ -105,6 +110,9 @@ pipeline/artifacts/nn_datasets/<prepared_dataset_id>/
 
 prepared manifestにはversion、教師名、配列配置、相対特徴順、入力ID、K、期間境界、
 全レースの分割・除外理由、前処理状態を保持する。manifestのSHA-256がprepared_dataset_id。
+新規保存はversion 2でconfigにtaskを持つ。従来のversion 1も複勝Datasetとして復元できる。
+相手特徴の有無は参照する入力Query・契約と前処理の特徴順に保存される。
+preparedの配列配置は同じなので保存形式はversion 2を維持する。
 一時ディレクトリ内で保存・読込検証してからrenameで公開する。
 入力保存後にrecipe公開が失敗した場合、完成済み入力は残り再利用できる。
 
@@ -129,6 +137,7 @@ uv run --no-sync python -m pipeline.jobs.prepare_nn_dataset \
 stdoutには入力ID、prepared ID、split別の採用・除外レース数と頭数をJSONで返す。
 
 既存入力からKや分割を変えて作る。DB設定・特徴契約JSONの再読込は不要。
+勝率用は`--task win`を指定する。同じ入力snapshotを使っても、taskごとの採用レースで前処理をfitし、別のprepared IDを発行する。
 
 ```bash
 uv run --no-sync python -m pipeline.jobs.prepare_nn_dataset \

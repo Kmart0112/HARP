@@ -19,12 +19,22 @@ unit_tests:
         rows:
           - {race_id: 20, kettonum: 1, ijyo_cd: '4'}
           - {race_id: 20, kettonum: 2, ijyo_cd: '5'}
+      - input: ref('fct_race_result')
+        rows:
+          - {race_id: 10, ten3f: 34.5, ten4f: 46.0, agari3f_race: 36.2, agari4f_race: 48.1}
+          - {race_id: 20, ten3f: 35.1, ten4f: 47.2, agari3f_race: 35.8, agari4f_race: 48.0}
+      - input: ref('int_race_entry_metrics')
+        rows:
+          - {race_id: 10, kettonum: 1, time_vs_avg: -1.25, pos4_agari_synergy: 0.75}
+          - {race_id: 30, kettonum: 1, time_vs_avg: null, pos4_agari_synergy: -0.5}
+          # Another horse's metrics must not attach to this horse's missing run.
+          - {race_id: 20, kettonum: 3, time_vs_avg: 2.0, pos4_agari_synergy: 1.0}
     expect:
       rows:
-        - {race_id: 10, kettonum: 1, run_no: 1, result_order: 3, time_diff: 0.5, jockey_place_rate_3y_smooth: 0.10, monthly_stats_cutoff: '2026-05-01'}
-        - {race_id: 20, kettonum: 1, run_no: 2, result_order: null, time_diff: null, jockey_place_rate_3y_smooth: 0.20, monthly_stats_cutoff: '2026-06-01'}
-        - {race_id: 30, kettonum: 1, run_no: 3, result_order: 1, time_diff: 0.0, jockey_place_rate_3y_smooth: 0.30, monthly_stats_cutoff: '2026-07-01'}
-        - {race_id: 20, kettonum: 2, run_no: 1, result_order: null, time_diff: null, jockey_place_rate_3y_smooth: null, monthly_stats_cutoff: '2026-06-01'}
+        - {race_id: 10, kettonum: 1, run_no: 1, result_order: 3, time_diff: 0.5, jockey_place_rate_3y_smooth: 0.10, monthly_stats_cutoff: '2026-05-01', ten3f: 34.5, ten4f: 46.0, agari3f_race: 36.2, agari4f_race: 48.1, time_vs_avg: -1.25, pos4_agari_synergy: 0.75}
+        - {race_id: 20, kettonum: 1, run_no: 2, result_order: null, time_diff: null, jockey_place_rate_3y_smooth: 0.20, monthly_stats_cutoff: '2026-06-01', ten3f: 35.1, ten4f: 47.2, agari3f_race: 35.8, agari4f_race: 48.0, time_vs_avg: null, pos4_agari_synergy: null}
+        - {race_id: 30, kettonum: 1, run_no: 3, result_order: 1, time_diff: 0.0, jockey_place_rate_3y_smooth: 0.30, monthly_stats_cutoff: '2026-07-01', ten3f: null, ten4f: null, agari3f_race: null, agari4f_race: null, time_vs_avg: null, pos4_agari_synergy: -0.5}
+        - {race_id: 20, kettonum: 2, run_no: 1, result_order: null, time_diff: null, jockey_place_rate_3y_smooth: null, monthly_stats_cutoff: '2026-06-01', ten3f: 35.1, ten4f: 47.2, agari3f_race: 35.8, agari4f_race: 48.0, time_vs_avg: null, pos4_agari_synergy: null}
 
   - name: nn_current_new_horses_and_history_cutoff
     model: m_nn_race_entry

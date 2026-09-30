@@ -42,6 +42,13 @@ def small_prepared(inputs=None):
     return prepare_nn_dataset(inputs or dataset_inputs(future_rate=.4), NnDatasetConfig("2026-06-13", "2026-06-20", 3))
 
 
+def rank_recipe(weight=.1, **overrides):
+    document = asdict(small_recipe(**overrides))
+    document.update(version=2, auxiliary_rank=dict(
+        name="pairwise_logistic", weight=weight, reduction="race_mean", tie_policy="ignore"))
+    return resolve_nn_training_recipe(document)
+
+
 def training_deps(inputs=None, config=None):
     inputs = inputs or dataset_inputs(future_rate=.4)
     prepared = prepare_nn_dataset(inputs, config or NnDatasetConfig("2026-06-13", "2026-06-20", 3))
