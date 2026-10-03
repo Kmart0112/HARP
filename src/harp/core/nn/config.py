@@ -31,7 +31,7 @@ class NnModelConfig:
     dropout: float
 
     def __post_init__(self):
-        if self.name != "history_set_transformer_v1":
+        if self.name not in ("history_set_transformer_v1", "history_conditioned_set_transformer_v1"):
             raise NnInputContractError("unsupported NN architecture")
         for name in ("d_model", "categorical_embedding_dim", "history_layers", "race_layers", "attention_heads", "feedforward_dim"):
             _integer(name, getattr(self, name))

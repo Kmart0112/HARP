@@ -1,6 +1,6 @@
 # NN Transformer学習
 
-実装は`history_set_transformer_v1`。馬ごとの過去走をTransformerで集約し、
+実装は`history_set_transformer_v1`と`history_conditioned_set_transformer_v1`。馬ごとの過去走をTransformerで集約し、
 今回特徴と結合した後、出走馬全体を別のTransformerへ渡して各馬のlogitを出す。
 `task=place/win`で複勝・勝率を切り替え、Datasetのtaskと学習recipeのtaskが違う場合は学習を拒否する。
 [作成済みDataset](nn_dataset_preparation.md)を復元して学習し、DB問合せや前処理の再fitはしない。
@@ -52,6 +52,32 @@ PyTorchは`nn` extra。既存LightGBMやDataset作成の入口からはNNネッ�
 `forward()`は`[B,N]`のlogitを返す。複勝は各馬にsigmoid、勝率は実出走馬のレース内softmaxを適用する。
 勝率ではPADのlogitを負の無限大へ置換し、PADへ確率を割り当てない。学習・評価は単独勝者のレースだけを使う。
 
+### 今回特徴で条件付けた履歴集約
+
+`history_conditioned_set_transformer_v1`は、Current Encoderの出力`c`を
+既存の学習可能な集約トークン`t`へ加算してから履歴Transformerへ渡す。
+
+```text
+c = CurrentEncoder(今回の数値・欠損flag・カテゴリ)
+h = HistoryEncoder(各過去走の特徴・欠損flag・相対日数/走順)
+tokens = concat([(t + c)], h)             # 馬ごとに [K+1, D]
+summary = HistoryTransformer(tokens)[:, 0]
+horse = Fusion(concat(c, summary))       # [2D] → [D]
+logit = Head(RaceTransformer(horse))
+```
+
+- 今回の距離・芝ダート・馬場等に加え、現在の馬・騎手に関する既存の事前特徴全体を使う。
+  `time_vs_avg`・`pos4_agari_synergy`・相手集約は引き続き各過去走の入力であり、今回の結果は使わない。
+- `[t+c, h_1, ..., h_K]`のSelf-Attentionで、先頭トークンのQueryが今回特徴に依存する。
+  Key/Valueには先頭トークン自身も含まれる。同条件の過去走へ高い重みを付ける規則は固定しない。
+- 集約トークンは常に有効。履歴0走でも今回特徴を含むトークンで計算し、全maskのAttentionを作らない。
+  履歴PAD・出走馬PADの無効化、出走馬の並べ替えに対する性質は共通実装を使う。
+- 追加の学習パラメータや乱数消費はない。同じ入力次元・recipeのseedで初期重みが一致する。
+  Current Encoderへは履歴集約と最終結合の両経路から勾配が流れる。
+- モデル名は保存recipeから学習・推論ともに復元する。既存名は`t`だけを使う従来計算を維持する。
+  重みの形が同じでもモデル名は意味が異なり、モデル名を変更した途中再開は拒否する。
+  保存済みprepared Datasetを再利用でき、dbt・特徴契約・前処理の変更は不要。
+
 ## 複勝への着順補助タスク
 
 `pipeline/config/nn_training/place_history_set_rank.yml`は`version: 2, task: place`のrecipe。
@@ -89,6 +115,16 @@ PyTorchは`nn` extra。既存LightGBMやDataset作成の入口からはNNネッ�
 直近の比較実験と同じD=32、履歴1層、全頭2層、最大30epochの構成で、
 `auxiliary_rank: null`と`auxiliary_odds: null`により両補助headを生成しない。
 `--recipe`を省略するとこの設定を使う。
+条件付き履歴集約は`pipeline/config/nn_training/place_history_conditioned_no_aux.yml`を明示して使う。
+モデル名以外は通常の補助なしrecipeと同じD=32、4heads（各8次元）、履歴1層、全頭2層、
+FFN=64、dropout=0.1とし、同じprepared Dataset・seed・学習予算で比較する。
+
+```bash
+uv run --no-sync python -m pipeline.jobs.run_nn_train \
+  --dataset-id <place_prepared_dataset_id> \
+  --recipe pipeline/config/nn_training/place_history_conditioned_no_aux.yml
+```
+
 勝率の正本は`pipeline/config/nn_training/win_history_set_v1.yml`（D=32、履歴1層、全頭2層、最大30epoch）。
 taskが省略された既存recipe・モデルは複勝として読み込む。勝率recipeは`task: win`、
 `loss.name: cross_entropy`、`loss.reduction: race_mean`を指定する。

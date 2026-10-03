@@ -24,6 +24,11 @@ def torch_cpu_runtime():
     torch.set_num_threads(original)
 
 
+@pytest.fixture(params=("history_set_transformer_v1", "history_conditioned_set_transformer_v1"))
+def nn_architecture(request):
+    return request.param
+
+
 def small_recipe(**overrides):
     return resolve_nn_training_recipe({
         "version": 1,

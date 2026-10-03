@@ -1,4 +1,4 @@
-from dataclasses import fields
+from dataclasses import fields, replace
 
 import numpy as np
 import pytest
@@ -12,19 +12,20 @@ from harp.core.nn.training import (
     capture_nn_checkpoint, evaluate_nn, initialize_nn_training, restore_nn_checkpoint,
     train_one_nn_epoch, update_nn_selection,
 )
-from tests.nn_training_support import small_prepared, small_recipe, torch_cpu_runtime
+from tests.nn_training_support import nn_architecture, small_prepared, small_recipe, torch_cpu_runtime
 
 
-def network_and_batch():
+def network_and_batch(architecture="history_set_transformer_v1"):
     prepared = small_prepared()
-    state = initialize_nn_training(NnInputSpec.from_preprocessing(prepared.preprocessing), small_recipe(), "cpu")
+    recipe = small_recipe(**{"model.name": architecture})
+    state = initialize_nn_training(NnInputSpec.from_preprocessing(prepared.preprocessing), recipe, "cpu")
     state.model.eval()
     batch = collate_nn_races([prepared.dataset[0], prepared.dataset[1]])
     return state.model, batch
 
 
-def test_transformer_predictions_follow_horses_when_the_field_is_permuted():
-    model, batch = network_and_batch()
+def test_transformer_predictions_follow_horses_when_the_field_is_permuted(nn_architecture):
+    model, batch = network_and_batch(nn_architecture)
     features = NnModelInputs.from_numpy(batch, "cpu")
     permuted = NnModelInputs(**{field.name: getattr(features, field.name)[:, [1, 0]] for field in fields(features)})
     with torch.inference_mode():
@@ -33,8 +34,8 @@ def test_transformer_predictions_follow_horses_when_the_field_is_permuted():
     torch.testing.assert_close(actual, expected, atol=1e-6, rtol=1e-6)
 
 
-def test_extra_padding_and_arbitrary_padded_values_cannot_change_real_horse_predictions():
-    model, batch = network_and_batch()
+def test_extra_padding_and_arbitrary_padded_values_cannot_change_real_horse_predictions(nn_architecture):
+    model, batch = network_and_batch(nn_architecture)
     with torch.inference_mode():
         expected = model(NnModelInputs.from_numpy(batch, "cpu"))
     padded = {}
@@ -56,8 +57,11 @@ def test_extra_padding_and_arbitrary_padded_values_cannot_change_real_horse_pred
     assert not actual[:, 2:].any()
 
 
-def test_new_horses_have_finite_predictions_and_gradients_and_unknown_labels_are_ignored():
-    model, batch = network_and_batch()
+@pytest.mark.parametrize("all_histories_missing", [False, True])
+def test_new_horses_have_finite_predictions_and_gradients_and_unknown_labels_are_ignored(nn_architecture, all_histories_missing):
+    model, batch = network_and_batch(nn_architecture)
+    if all_histories_missing:
+        batch["history_mask"][:] = False
     model.train()
     features = NnModelInputs.from_numpy(batch, "cpu")
     logits = model(features)
@@ -73,8 +77,8 @@ def test_new_horses_have_finite_predictions_and_gradients_and_unknown_labels_are
     assert all(torch.isfinite(parameter.grad).all() for parameter in model.parameters() if parameter.grad is not None)
 
 
-def test_training_can_learn_a_tiny_field_and_metrics_ignore_batch_padding():
-    prepared, recipe = small_prepared(), small_recipe()
+def test_training_can_learn_a_tiny_field_and_metrics_ignore_batch_padding(nn_architecture):
+    prepared, recipe = small_prepared(), small_recipe(**{"model.name": nn_architecture})
     state = initialize_nn_training(NnInputSpec.from_preprocessing(prepared.preprocessing), recipe, "cpu")
     train = prepared.split("train")
     before = evaluate_nn(state.model, train, batch_size=1, device="cpu")
@@ -122,8 +126,8 @@ def test_nn_calibration_samples_preserve_unknown_labels_without_counting_padding
     assert evaluation.predictions.columns.tolist() == ["race_id", "kettonum", "place_probability"]
 
 
-def test_checkpoint_resume_matches_uninterrupted_training_with_dropout():
-    prepared, recipe = small_prepared(), small_recipe(**{"model.dropout": .2})
+def test_checkpoint_resume_matches_uninterrupted_training_with_dropout(nn_architecture):
+    prepared, recipe = small_prepared(), small_recipe(**{"model.name": nn_architecture, "model.dropout": .2})
     spec = NnInputSpec.from_preprocessing(prepared.preprocessing)
     state = initialize_nn_training(spec, recipe, "cpu")
     train_one_nn_epoch(state, prepared.split("train"), recipe, "cpu")
@@ -138,3 +142,31 @@ def test_checkpoint_resume_matches_uninterrupted_training_with_dropout():
     actual = evaluate_nn(resumed.model, prepared.dataset, batch_size=2, device="cpu")
     np.testing.assert_array_equal(actual.predictions.place_probability, uninterrupted.predictions.place_probability)
     assert resumed.global_step == state.global_step == 2
+
+
+def test_current_features_reach_predictions_through_history_without_extra_parameters():
+    baseline, batch = network_and_batch()
+    conditioned, _ = network_and_batch("history_conditioned_set_transformer_v1")
+    baseline_weights = baseline.state_dict()
+    conditioned_weights = conditioned.state_dict()
+    assert baseline_weights.keys() == conditioned_weights.keys()
+    assert sum(p.numel() for p in baseline.parameters()) == sum(p.numel() for p in conditioned.parameters())
+    for name in baseline_weights:
+        torch.testing.assert_close(baseline_weights[name], conditioned_weights[name], atol=0, rtol=0)
+
+    # Isolate the history path in a controlled checkpoint: the direct current
+    # half of fusion cannot contribute to predictions in either architecture.
+    width = small_recipe().model.d_model
+    for model in (baseline, conditioned):
+        weights = model.state_dict()
+        weights["fusion.0.weight"][:, :width] = 0
+        model.load_state_dict(weights)
+
+    features = NnModelInputs.from_numpy(batch, "cpu")
+    current = features.current_numeric.clone()
+    current[0, 0, 0] += 2
+    changed = replace(features, current_numeric=current)
+    assert features.history_mask[0, 0].any()
+    with torch.inference_mode():
+        torch.testing.assert_close(baseline(features), baseline(changed), atol=0, rtol=0)
+        assert not torch.isclose(conditioned(features)[0, 0], conditioned(changed)[0, 0])

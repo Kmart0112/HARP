@@ -11,6 +11,7 @@ class RaceHistorySetTransformer(nn.Module):
     def __init__(self, spec: NnInputSpec, config: NnModelConfig, *, rank_auxiliary: bool = False,
                  odds_auxiliary: bool = False):
         super().__init__()
+        self.condition_history_on_current = config.name == "history_conditioned_set_transformer_v1"
         self.current_encoder = FeatureEncoder(len(spec.current_numeric), spec.current_categories, config)
         self.history_encoder = FeatureEncoder(len(spec.history_numeric), spec.history_categories, config, relative_count=2)
         self.history_token = nn.Parameter(torch.empty(1, 1, config.d_model))
@@ -47,6 +48,9 @@ class RaceHistorySetTransformer(nn.Module):
         relative = inputs.history_relative[valid].masked_fill(~history_valid.unsqueeze(-1), 0)
         history = self.history_encoder(numeric, missing, categorical, relative)
         token = self.history_token.expand(len(current), -1, -1)
+        if self.condition_history_on_current:
+            # Condition the history query without new weights or extra RNG draws.
+            token = token + current.unsqueeze(1)
         history = torch.cat((token, history), dim=1)
         token_valid = torch.ones((len(current), 1), dtype=torch.bool, device=valid.device)
         history = self.history_transformer(history, torch.cat((token_valid, history_valid), dim=1))[:, 0]

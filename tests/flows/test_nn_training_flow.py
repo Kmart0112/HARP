@@ -8,17 +8,18 @@ from harp.core.nn.split import NnDatasetConfig
 from harp.usecase.training.nn import run_nn_evaluate_usecase, run_nn_train_usecase
 from harp.usecase.training.nn_dto import NnEvaluateRequest, NnTrainRequest
 from tests.nn_dataset_support import dataset_inputs, replace_inputs, win_dataset_inputs
-from tests.nn_training_support import small_recipe, training_deps, torch_cpu_runtime
+from tests.nn_training_support import nn_architecture, small_recipe, training_deps, torch_cpu_runtime
 
 
 def request(recipe=None, **kwargs):
     return NnTrainRequest("b" * 64, recipe or small_recipe(), "cpu", {"source": "test"}, tracking_experiment="fixture", **kwargs)
 
 
-def test_training_publishes_best_and_last_state_and_tracks_validation_without_testing_holdout():
+def test_training_publishes_best_and_last_state_and_tracks_validation_without_testing_holdout(nn_architecture):
     deps, runs, tracking = training_deps()
-    result = run_nn_train_usecase(request(), deps)
+    result = run_nn_train_usecase(request(small_recipe(**{"model.name": nn_architecture})), deps)
     snapshot = runs[result.run_id]["checkpoints"][result.checkpoint_id]
+    assert runs[result.run_id]["metadata"]["recipe"]["model"]["name"] == nn_architecture
     assert result.completed_epochs == 3
     assert 1 <= result.best_epoch <= result.completed_epochs
     assert snapshot["best_epoch"] == result.best_epoch
@@ -53,22 +54,23 @@ def test_explicit_test_evaluation_uses_saved_best_model_without_another_training
     assert len(runs) == 1
 
 
-def test_early_stopping_and_resume_keep_the_epoch_boundary_contract():
+def test_early_stopping_and_resume_keep_the_epoch_boundary_contract(nn_architecture):
     deps, runs, _ = training_deps()
-    recipe = small_recipe(**{"training.max_epochs": 1, "model.dropout": .2})
+    recipe = small_recipe(**{"model.name": nn_architecture, "training.max_epochs": 1, "model.dropout": .2})
     first = run_nn_train_usecase(request(recipe), deps)
     extended = replace(recipe, training=replace(recipe.training, max_epochs=3))
     result = run_nn_train_usecase(request(extended, resume_run_id=first.run_id), deps)
     assert result.completed_epochs == 3
     assert runs[result.run_id]["metadata"]["parent_run_id"] == first.run_id
     assert len(runs[result.run_id]["checkpoints"]) == 2
-    stop_recipe = small_recipe(**{"training.max_epochs": 10, "early_stopping.min_delta": 100, "early_stopping.patience": 2})
+    stop_recipe = small_recipe(**{"model.name": nn_architecture, "training.max_epochs": 10,
+                                 "early_stopping.min_delta": 100, "early_stopping.patience": 2})
     stopped = run_nn_train_usecase(request(stop_recipe), deps)
     assert stopped.stopped_early
     assert stopped.completed_epochs == 3
 
 
-@pytest.mark.parametrize("mismatch", ["dataset", "recipe", "provenance"])
+@pytest.mark.parametrize("mismatch", ["dataset", "recipe", "architecture", "provenance"])
 def test_resume_rejects_mismatched_experiment_before_creating_another_run(mismatch):
     deps, runs, _ = training_deps()
     initial_recipe = small_recipe(**{"training.max_epochs": 1})
@@ -78,6 +80,8 @@ def test_resume_rejects_mismatched_experiment_before_creating_another_run(mismat
         req = replace(req, prepared_dataset_id="c" * 64)
     elif mismatch == "recipe":
         req = replace(req, recipe=small_recipe(**{"optimizer.lr": .01}))
+    elif mismatch == "architecture":
+        req = replace(req, recipe=small_recipe(**{"model.name": "history_conditioned_set_transformer_v1"}))
     else:
         req = replace(req, provenance={"source": "changed"})
     with pytest.raises(NnInputContractError, match="resume"):

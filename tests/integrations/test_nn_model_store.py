@@ -15,11 +15,11 @@ from harp.usecase.prediction.nn import load_nn_predictor
 from tests.nn_dataset_support import dataset_inputs
 from tests.nn_opponent_support import opponent_inputs
 from tests.nn_performance_support import performance_inputs
-from tests.nn_training_support import small_prepared, small_recipe, torch_cpu_runtime
+from tests.nn_training_support import nn_architecture, small_prepared, small_recipe, torch_cpu_runtime
 
 
-def trained_checkpoint(inputs=None):
-    prepared, recipe = small_prepared(inputs), small_recipe()
+def trained_checkpoint(inputs=None, architecture="history_set_transformer_v1"):
+    prepared, recipe = small_prepared(inputs), small_recipe(**{"model.name": architecture})
     spec = NnInputSpec.from_preprocessing(prepared.preprocessing)
     state = initialize_nn_training(spec, recipe, "cpu")
     train_one_nn_epoch(state, prepared.split("train"), recipe, "cpu")
@@ -33,9 +33,9 @@ def trained_checkpoint(inputs=None):
 
 
 @pytest.mark.parametrize("input_factory", [dataset_inputs, opponent_inputs, performance_inputs])
-def test_model_bundle_restores_predictions_without_the_training_inputs(tmp_path, input_factory):
+def test_model_bundle_restores_predictions_without_the_training_inputs(tmp_path, input_factory, nn_architecture):
     inputs = input_factory()
-    metadata, checkpoint, prepared = trained_checkpoint(inputs)
+    metadata, checkpoint, prepared = trained_checkpoint(inputs, nn_architecture)
     store = TorchNnModelStore(tmp_path)
     run_id = store.create_run(metadata)
     identity = store.save_checkpoint(run_id, checkpoint)
@@ -43,7 +43,9 @@ def test_model_bundle_restores_predictions_without_the_training_inputs(tmp_path,
     assert restored.checkpoint_id == identity
     assert restored.checkpoint["epoch"] == 1
     assert restored.preprocessing == prepared.preprocessing
-    model = build_nn_network(NnInputSpec.from_preprocessing(prepared.preprocessing), small_recipe().model)
+    assert restored.recipe.model.name == nn_architecture
+    model = build_nn_network(NnInputSpec.from_preprocessing(prepared.preprocessing),
+                             small_recipe(**{"model.name": nn_architecture}).model)
     model.load_state_dict(checkpoint["best_weights"])
     expected = evaluate_nn(model, prepared.dataset, batch_size=2, device="cpu").predictions
     predictor = load_nn_predictor(run_id, store)
